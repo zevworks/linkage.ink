@@ -12,7 +12,7 @@ export class Anchor {
   draw(p, cameraZoom) {
     p.stroke(0);
     p.strokeWeight(2);
-    p.fill(100, 100, 250);
+    p.fill(0);
     p.ellipse(this.pos.x, this.pos.y, this.radius * 2, this.radius * 2);
   }
 

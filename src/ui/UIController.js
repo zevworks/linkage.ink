@@ -16,6 +16,31 @@ export class UIController {
 
   handleColorChange(color) {
     this.traceSystem.setTraceColor(color);
+    this.updateButtonColors(color);
+  }
+
+  updateButtonColors(color) {
+    const buttons = document.querySelectorAll('#controls button');
+    const rgbColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
+    const hoverColor = `rgb(${Math.max(0, color.r - 28)}, ${Math.max(0, color.g - 28)}, ${Math.max(0, color.b - 28)})`;
+
+    buttons.forEach(button => {
+      button.style.backgroundColor = rgbColor;
+    });
+
+    // Update hover style
+    const styleId = 'button-hover-style';
+    let style = document.getElementById(styleId);
+    if (!style) {
+      style = document.createElement('style');
+      style.id = styleId;
+      document.head.appendChild(style);
+    }
+    style.textContent = `
+      #controls button:hover {
+        background-color: ${hoverColor} !important;
+      }
+    `;
   }
 
   setP5Instance(p5Instance, mechanism) {
