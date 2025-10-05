@@ -1,0 +1,126 @@
+import { ColorPicker } from './ColorPicker.js';
+
+/**
+ * Manages UI button interactions and state updates
+ */
+export class UIController {
+  constructor(mechanism, traceSystem, gifExporter, videoExporter) {
+    this.mechanism = mechanism;
+    this.traceSystem = traceSystem;
+    this.gifExporter = gifExporter;
+    this.videoExporter = videoExporter;
+    this.p5Instance = null;
+    this.colorPicker = new ColorPicker((color) => this.handleColorChange(color));
+    this.setupEventListeners();
+  }
+
+  handleColorChange(color) {
+    this.traceSystem.setTraceColor(color);
+  }
+
+  setP5Instance(p5Instance, mechanism) {
+    this.p5Instance = p5Instance;
+    this.mechanism = mechanism;
+  }
+
+  setupEventListeners() {
+    // Play/Pause button
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    if (playPauseBtn) {
+      playPauseBtn.onclick = () => {
+        const isPlaying = this.mechanism.togglePlayPause();
+        playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+      };
+    }
+
+    // Add Rod button
+    const addRodBtn = document.getElementById('addRodBtn');
+    if (addRodBtn) {
+      addRodBtn.onclick = () => {
+        this.mechanism.addRod();
+        this.traceSystem.updateFadeLifespan(this.mechanism.FRAMES_PER_ROUND);
+      };
+    }
+
+    // Remove Rod button
+    const removeRodBtn = document.getElementById('removeRodBtn');
+    if (removeRodBtn) {
+      removeRodBtn.onclick = () => {
+        // Clear trace for the rod being removed
+        const lastRodId = this.mechanism.rods.length - 1;
+        this.traceSystem.clearTrace(lastRodId);
+        
+        this.mechanism.removeRod();
+        this.traceSystem.updateFadeLifespan(this.mechanism.FRAMES_PER_ROUND);
+      };
+    }
+
+    // Clear Trace button
+    const clearTraceBtn = document.getElementById('clearTraceBtn');
+    if (clearTraceBtn) {
+      clearTraceBtn.onclick = () => {
+        this.traceSystem.clearAllTraces();
+      };
+    }
+
+    // Save GIF button
+    const saveGifBtn = document.getElementById('saveGifBtn');
+    if (saveGifBtn) {
+      saveGifBtn.onclick = () => {
+        if (this.gifExporter.isCurrentlyRecording()) {
+          return; // Already recording
+        }
+
+        // Update button text
+        saveGifBtn.textContent = 'Recording...';
+        saveGifBtn.disabled = true;
+
+        // Start recording with current crank angle
+        this.gifExporter.startRecording(
+          this.mechanism.FRAMES_PER_ROUND,
+          this.mechanism.crankAngle,
+          () => {
+            // Reset button when complete
+            saveGifBtn.textContent = 'Save GIF';
+            saveGifBtn.disabled = false;
+          }
+        );
+      };
+    }
+
+    // Save Video button
+    const saveVideoBtn = document.getElementById('saveVideoBtn');
+    if (saveVideoBtn) {
+      saveVideoBtn.onclick = () => {
+        if (this.videoExporter.isCurrentlyRecording()) {
+          return; // Already recording
+        }
+
+        // Update button text
+        saveVideoBtn.textContent = 'Recording...';
+        saveVideoBtn.disabled = true;
+
+        // Start recording
+        this.videoExporter.startRecording(
+          this.p5Instance.canvas,
+          this.mechanism.FRAMES_PER_ROUND,
+          () => {
+            // Reset button when complete
+            saveVideoBtn.textContent = 'Save Video';
+            saveVideoBtn.disabled = false;
+          }
+        );
+      };
+    }
+
+    // Color Picker button
+    const colorPickerBtn = document.getElementById('colorPickerBtn');
+    if (colorPickerBtn) {
+      colorPickerBtn.onclick = () => {
+        // Set current color before opening
+        this.colorPicker.setColor(this.traceSystem.getTraceColor());
+        this.colorPicker.open();
+      };
+    }
+  }
+}

@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 2D Linkage Simulator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.js"></script>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+            min-height: 100vh;
+        }
+        main {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        #controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 18px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #007aff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+
+    <div id="controls">
+        <button id="playPauseBtn">Pause</button>
+        <button id="addRodBtn">Add Rod</button>
+        <button id="removeRodBtn">Remove Rod</button>
+        <button id="clearTraceBtn">Clear Trace</button>
+    </div>
+
+    <main id="canvas-container"></main>
+
+    <script>
+        // --- GLOBAL STATE & CONFIGURATION ---
+        let isPlaying = true;
+        let crankAngle = 0;
+        
+        const FRAMES_PER_ROUND = 360;
+        const crankSpeed = Math.PI * 2 / FRAMES_PER_ROUND;
+
+        let anchor;
+        let rods = [];
+        let guidePoints = [];
+        let joints = [];
+        
+        let tracePaths = {}; // Object to hold multiple trace paths
+        let fadeLifespan;
+
+        let selectedObject = null;
+        let dragOffset = null;
+        let isPanning = false;
+        let pressPos = null; // To distinguish clicks/taps from drags
+        let prevPinchDist = 0; // For touch zoom
+        
+        const traceColor = [0, 150, 255];
+
+        // --- Camera State ---
+        let cameraOffset;
+        let cameraZoom = 1.0;
+        const maxZoom = 5.0;
+        const minZoom = 0.2;
+
+
+        // --- OBJECT CLASSES ---
+        class Anchor {
+            constructor(x, y) {
+                this.pos = createVector(x, y);
+                this.radius = 10;
+            }
+
+            draw() {
+                stroke(0);
+                strokeWeight(2 / cameraZoom);
+                fill(100, 100, 250);
+                ellipse(this.pos.x, this.pos.y, this.radius * 2);
+            }
+
+            isMouseOver(worldMouse) {
+                return dist(worldMouse.x, worldMouse.y, this.pos.x, this.pos.y) < this.radius;
+            }
+        }
+
+        class Rod {
+            constructor(id, length) {
+                this.id = id;
+                this.length = length;
+                this.angle = 0;
+                this.isTracing = false; // Property to toggle tracing
+            }
+            
+            isMouseOver(jointPos, worldMouse) {
+                 return dist(worldMouse.x, worldMouse.y, jointPos.x, jointPos.y) < 10;
+            }
+        }
+
+        class GuidePoint {
+            constructor(id, x, y) {
+                this.id = id;
+                this.pos = createVector(x, y);
+                this.radius = 10;
+            }
+
+            draw(rodAngle) {
+                push();
+                translate(this.pos.x, this.pos.y);
+                
+                if (rodAngle !== undefined) {
+                    rotate(rodAngle);
+                }
+
+                stroke(0);
+                strokeWeight(8 / cameraZoom);
+                strokeCap(SQUARE);
+                line(-this.radius * 2, 0, this.radius * 2, 0);
+
+                stroke(0);
+                strokeWeight(2 / cameraZoom);
+                fill(255);
+                ellipse(0, 0, this.radius * 2);
+                
+                strokeCap(ROUND);
+                pop();
+            }
+            
+            isMouseOver(worldMouse) {
+                return dist(worldMouse.x, worldMouse.y, this.pos.x, this.pos.y) < this.radius;
+            }
+        }
+
+        // --- P5.JS SETUP FUNCTION ---
+        function setup() {
+            const canvasContainer = document.getElementById('canvas-container');
+            const canvas = createCanvas(600, 600);
+            canvas.parent(canvasContainer);
+            
+            cameraOffset = createVector(0, 0);
+
+            // Heart Shape Configuration
+            anchor = new Anchor(width / 2, height / 2 + 50);
+            
+            rods.push(new Rod(0, 80));  // Crank
+            rods.push(new Rod(1, 120)); // First Follower (stretchy)
+            rods.push(new Rod(2, 60));  // Second Follower (fixed length for pinch)
+            
+            guidePoints.push(new GuidePoint(1, width / 2, height / 2 + 80)); // GP for Rod 1
+            guidePoints.push(new GuidePoint(2, width / 2, height / 2 - 100)); // GP for Rod 2 (creates the pinch)
+            
+            rods[rods.length - 1].isTracing = true; // Default trace for last rod
+            
+            updateFadeLifespan();
+
+            document.getElementById('playPauseBtn').onclick = togglePlayPause;
+            document.getElementById('addRodBtn').onclick = addRod;
+            document.getElementById('removeRodBtn').onclick = removeRod;
+            document.getElementById('clearTraceBtn').onclick = () => { tracePaths = {}; };
+        }
+
+        // --- P5.JS DRAW LOOP ---
+        function draw() {
+            background(245);
+            
+            translate(cameraOffset.x, cameraOffset.y);
+            scale(cameraZoom);
+
+            updateMechanism();
+            drawMechanism(); // Draw mechanism before trace so trace is on top
+            drawTrace();
+            handleSelectionHighlight();
+        }
+        
+        // --- CORE LOGIC FUNCTIONS ---
+        function updateMechanism() {
+            if (isPlaying) {
+                crankAngle += crankSpeed;
+            }
+
+            joints = [];
+            
+            let currentPos = anchor.pos.copy();
+            rods[0].angle = crankAngle;
+            let crankEndpoint = createVector(
+                currentPos.x + rods[0].length * cos(rods[0].angle),
+                currentPos.y + rods[0].length * sin(rods[0].angle)
+            );
+            joints.push(crankEndpoint);
+            
+            for (let i = 1; i < rods.length; i++) {
+                let parentJointPos = joints[i - 1];
+                let guide = guidePoints[i-1];
+                
+                let angle = atan2(guide.pos.y - parentJointPos.y, guide.pos.x - parentJointPos.x);
+                rods[i].angle = angle;
+                
+                let effectiveLength;
+                // FIX: Apply stretching logic only to the first follower (rod index 1)
+                if (i === 1) {
+                    let distanceToGP = dist(parentJointPos.x, parentJointPos.y, guide.pos.x, guide.pos.y);
+                    const buffer = (guide.radius * 2) + 10;
+                    const requiredLength = distanceToGP + buffer;
+                    rods[i].length = max(rods[i].length, requiredLength);
+                    effectiveLength = rods[i].length;
+                } else {
+                    // All other rods have a fixed length
+                    effectiveLength = rods[i].length;
+                }
+
+                let nextJointPos = createVector(
+                    parentJointPos.x + effectiveLength * cos(angle),
+                    parentJointPos.y + effectiveLength * sin(angle)
+                );
+                joints.push(nextJointPos);
+            }
+            
+            // Update all active trace paths
+            for (let i = 0; i < rods.length; i++) {
+                if (rods[i].isTracing) {
+                    if (!tracePaths[i]) {
+                        tracePaths[i] = []; // Initialize if it doesn't exist
+                    }
+                    tracePaths[i].push({ pos: joints[i].copy(), age: 0 });
+                }
+            }
+        }
+
+        function drawMechanism() {
+            // Draw joints first, so rods are on top
+            for (let i = 0; i < joints.length; i++) {
+                const endPos = joints[i];
+                if (rods[i].isTracing) {
+                    fill(traceColor[0], traceColor[1], traceColor[2]);
+                } else {
+                    fill(255);
+                }
+                stroke(0);
+                strokeWeight(2 / cameraZoom);
+                ellipse(endPos.x, endPos.y, 20, 20);
+            }
+
+            // Draw rods
+            let startPos = anchor.pos;
+            for (let i = 0; i < rods.length; i++) {
+                let endPos = joints[i];
+                stroke(50);
+                strokeWeight(4 / cameraZoom);
+                line(startPos.x, startPos.y, endPos.x, endPos.y);
+                startPos = endPos;
+            }
+            
+            // Draw guide lines
+            for (let i = 0; i < guidePoints.length; i++) {
+                let gp = guidePoints[i];
+                let guidedJoint = joints[i];
+                if (guidedJoint) {
+                    drawingContext.setLineDash([5 / cameraZoom, 5 / cameraZoom]);
+                    stroke(150, 150, 150, 150);
+                    strokeWeight(1 / cameraZoom);
+                    line(gp.pos.x, gp.pos.y, guidedJoint.x, guidedJoint.y);
+                    drawingContext.setLineDash([]);
+                }
+            }
+            
+            // Draw anchor and guide points on top
+            anchor.draw();
+            for (let i = 0; i < guidePoints.length; i++) {
+                let correspondingRod = rods[i + 1];
+                if (correspondingRod) {
+                    guidePoints[i].draw(correspondingRod.angle);
+                } else {
+                    guidePoints[i].draw();
+                }
+            }
+        }
+
+        function drawTrace() {
+            for (const rodId in tracePaths) {
+                let path = tracePaths[rodId];
+                
+                for (let i = path.length - 1; i >= 0; i--) {
+                    path[i].age++;
+                    if (path[i].age > fadeLifespan) {
+                        path.splice(0, i + 1);
+                        break;
+                    }
+                }
+
+                if (path.length < 2) continue;
+
+                noFill();
+                
+                for (let i = 0; i < path.length - 1; i++) {
+                    let p0 = (i > 0) ? path[i - 1] : path[i];
+                    let p1 = path[i];
+                    let p2 = path[i + 1];
+                    let p3 = (i < path.length - 2) ? path[i + 2] : path[i + 1];
+
+                    let avgAge = (p1.age + p2.age) / 2;
+                    let alpha = map(avgAge, 0, fadeLifespan, 255, 0);
+
+                    stroke(traceColor[0], traceColor[1], traceColor[2], alpha);
+                    strokeWeight(4 / cameraZoom);
+
+                    beginShape();
+                    curveVertex(p0.pos.x, p0.pos.y);
+                    curveVertex(p1.pos.x, p1.pos.y);
+                    curveVertex(p2.pos.x, p2.pos.y);
+                    curveVertex(p3.pos.x, p3.pos.y);
+                    endShape();
+                }
+            }
+        }
+        
+        function handleSelectionHighlight() {
+            if (!selectedObject) return;
+            
+            let pos;
+            let radius = 20;
+            
+            if (selectedObject.type === 'anchor') {
+                pos = selectedObject.obj.pos;
+                radius = selectedObject.obj.radius + 5;
+            } else if (selectedObject.type === 'guidePoint') {
+                pos = selectedObject.obj.pos;
+                radius = selectedObject.obj.radius + 5;
+            } else if (selectedObject.type === 'rod') {
+                pos = joints[selectedObject.obj.id];
+                radius = 15;
+            }
+            
+            if (pos) {
+                noFill();
+                stroke(255, 204, 0);
+                strokeWeight(3 / cameraZoom);
+                ellipse(pos.x, pos.y, radius * 2);
+            }
+        }
+
+        // --- USER INTERACTION ---
+        function handlePress(x, y) {
+            pressPos = createVector(x, y);
+            let worldMouse = screenToWorld(x, y);
+            selectedObject = null;
+
+            if (anchor.isMouseOver(worldMouse)) {
+                selectedObject = { type: 'anchor', obj: anchor };
+                dragOffset = p5.Vector.sub(anchor.pos, worldMouse);
+                return;
+            }
+
+            for (let gp of guidePoints) {
+                if (gp.isMouseOver(worldMouse)) {
+                    selectedObject = { type: 'guidePoint', obj: gp };
+                    dragOffset = p5.Vector.sub(gp.pos, worldMouse);
+                    return;
+                }
+            }
+
+            for (let i = rods.length - 1; i >= 0; i--) {
+                if (joints[i] && rods[i].isMouseOver(joints[i], worldMouse)) {
+                    selectedObject = { type: 'rod', obj: rods[i] };
+                    return;
+                }
+            }
+            
+            if (!selectedObject) {
+                isPanning = true;
+            }
+        }
+
+        function handleDrag(x, y, px, py) {
+            let worldMouse = screenToWorld(x, y);
+            
+            if (isPanning) {
+                cameraOffset.add(createVector(x - px, y - py));
+            } else if (selectedObject) {
+                if (selectedObject.type === 'anchor' && dragOffset) {
+                    selectedObject.obj.pos.set(worldMouse.x + dragOffset.x, worldMouse.y + dragOffset.y);
+                } else if (selectedObject.type === 'guidePoint' && dragOffset) {
+                    selectedObject.obj.pos.set(worldMouse.x + dragOffset.x, worldMouse.y + dragOffset.y);
+                } else if (selectedObject.type === 'rod') {
+                    let startPos = (selectedObject.obj.id === 0) ? anchor.pos : joints[selectedObject.obj.id - 1];
+                    let newLength = dist(startPos.x, startPos.y, worldMouse.x, worldMouse.y);
+                    selectedObject.obj.length = newLength;
+                }
+            }
+        }
+        
+        function handleRelease(x, y) {
+            if (selectedObject && selectedObject.type === 'rod') {
+                const dragDist = dist(x, y, pressPos.x, pressPos.y);
+                if (dragDist < 5 * (window.devicePixelRatio || 1)) { // Click/Tap threshold
+                    const rod = selectedObject.obj;
+                    rod.isTracing = !rod.isTracing;
+                    if (!rod.isTracing) {
+                        delete tracePaths[rod.id];
+                    }
+                }
+            }
+            
+            selectedObject = null;
+            dragOffset = null;
+            isPanning = false;
+        }
+
+        // --- MOUSE & TOUCH EVENT HANDLERS ---
+        function mousePressed() {
+            if (mouseX < 0 || mouseX > width || mouseY < 0 || mouseY > height) return;
+            handlePress(mouseX, mouseY);
+        }
+
+        function mouseDragged() {
+            handleDrag(mouseX, mouseY, pmouseX, pmouseY);
+        }
+        
+        function mouseReleased() {
+            handleRelease(mouseX, mouseY);
+        }
+
+        function touchStarted() {
+            if (touches.length === 1) {
+                handlePress(touches[0].x, touches[0].y);
+            } else if (touches.length === 2) {
+                prevPinchDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+            }
+            return false;
+        }
+
+        function touchMoved() {
+            if (touches.length === 1 && !isPanning) {
+                handleDrag(touches[0].x, touches[0].y, pwinMouseX, pwinMouseY);
+            } else if (touches.length === 1 && isPanning) {
+                handleDrag(touches[0].x, touches[0].y, pmouseX, pmouseY);
+            } else if (touches.length === 2) {
+                // Handle pinch zoom
+                const currentPinchDist = dist(touches[0].x, touches[0].y, touches[1].x, touches[1].y);
+                const zoomFactor = currentPinchDist / prevPinchDist;
+                
+                let midPointScreen = createVector((touches[0].x + touches[1].x) / 2, (touches[0].y + touches[1].y) / 2);
+                let worldMouse = screenToWorld(midPointScreen.x, midPointScreen.y);
+                
+                let newZoom = cameraZoom * zoomFactor;
+                newZoom = constrain(newZoom, minZoom, maxZoom);
+
+                cameraOffset.sub(worldMouse).mult(newZoom / cameraZoom).add(worldMouse);
+                cameraZoom = newZoom;
+                
+                prevPinchDist = currentPinchDist;
+            }
+            return false;
+        }
+
+        function touchEnded() {
+            if (touches.length === 0) {
+                handleRelease(mouseX, mouseY);
+            }
+        }
+        
+        function mouseWheel(event) {
+            let worldMouse = screenToWorld(mouseX, mouseY);
+            let zoomFactor = 1 - event.delta * 0.001;
+            let newZoom = cameraZoom * zoomFactor;
+            newZoom = constrain(newZoom, minZoom, maxZoom);
+
+            cameraOffset.sub(worldMouse).mult(newZoom / cameraZoom).add(worldMouse);
+            cameraZoom = newZoom;
+            return false;
+        }
+
+        function screenToWorld(mx, my) {
+            return createVector(
+                (mx - cameraOffset.x) / cameraZoom,
+                (my - cameraOffset.y) / cameraZoom
+            );
+        }
+
+        // --- UI BUTTON FUNCTIONS ---
+        function togglePlayPause() {
+            isPlaying = !isPlaying;
+            document.getElementById('playPauseBtn').textContent = isPlaying ? 'Pause' : 'Play';
+        }
+
+        function addRod() {
+            const newId = rods.length;
+            if (joints.length === 0) return;
+            const lastJointPos = joints[joints.length - 1];
+            
+            if (rods.length > 0) {
+                rods[rods.length - 1].isTracing = false;
+            }
+
+            let newRod = new Rod(newId, 100);
+            newRod.isTracing = true;
+            rods.push(newRod);
+            
+            guidePoints.push(new GuidePoint(newId, lastJointPos.x + 50, lastJointPos.y - 50));
+            updateFadeLifespan();
+        }
+
+        function removeRod() {
+            if (rods.length > 1) {
+                delete tracePaths[rods.length - 1];
+                
+                rods.pop();
+                guidePoints.pop();
+                
+                if (rods.length > 0) {
+                    rods[rods.length - 1].isTracing = true;
+                }
+                
+                updateFadeLifespan();
+            }
+        }
+        
+        function updateFadeLifespan() {
+            fadeLifespan = FRAMES_PER_ROUND * 2;
+        }
+    </script>
+</body>
+</html>
