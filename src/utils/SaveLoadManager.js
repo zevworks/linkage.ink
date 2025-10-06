@@ -119,21 +119,12 @@ export class SaveLoadManager {
       rod.isFullRodTracing = rodData.isFullRodTracing;
       this.mechanism.rods.push(rod);
 
-      // Restore guide point if rod has one (nested in rod)
+      // Restore guide point if rod has one (rod 0 doesn't have one)
       if (rodData.guidePoint) {
         const gp = new GuidePoint(rodData.id, rodData.guidePoint.x, rodData.guidePoint.y);
         this.mechanism.guidePoints.push(gp);
       }
     });
-
-    // Backward compatibility: restore guide points from old format (separate array)
-    if (state.guidePoints && state.guidePoints.length > 0) {
-      this.mechanism.guidePoints = [];
-      state.guidePoints.forEach(gpData => {
-        const gp = new GuidePoint(gpData.id, gpData.x, gpData.y);
-        this.mechanism.guidePoints.push(gp);
-      });
-    }
 
     // Restore camera
     this.camera.offset.set(state.camera.offsetX, state.camera.offsetY);
