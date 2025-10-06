@@ -12,9 +12,9 @@ export class SaveLoadManager {
   }
 
   /**
-   * Export current state to a .lnk file
+   * Export current state to a .json file
    */
-  saveToFile(filename = 'linkage.lnk') {
+  saveToFile(filename = 'linkage.json') {
     const state = this.exportState();
     const json = JSON.stringify(state, null, 2);
 
@@ -62,7 +62,7 @@ export class SaveLoadManager {
   }
 
   /**
-   * Load state from a .lnk file
+   * Load state from a .json file
    */
   loadFromFile(file, onComplete) {
     const reader = new FileReader();
@@ -135,7 +135,7 @@ export class SaveLoadManager {
   openFilePicker(onComplete) {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = '.lnk';
+    input.accept = '.json';
 
     input.onchange = (e) => {
       const file = e.target.files[0];

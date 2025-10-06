@@ -156,7 +156,7 @@ export class UIController {
     if (saveBtn) {
       saveBtn.onclick = () => {
         const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-        const filename = `linkage-${timestamp}.lnk`;
+        const filename = `linkage-${timestamp}.json`;
         this.saveLoadManager.saveToFile(filename);
       };
     }
