@@ -31,7 +31,7 @@ class LinkageApp {
     // Initialize rendering and interaction
     this.renderer = new Renderer(this.mechanism, this.camera, this.traceSystem);
     this.inputHandler = new InputHandler(this.mechanism, this.camera, this.renderer);
-    this.uiController = new UIController(this.mechanism, this.traceSystem, this.gifExporter, this.videoExporter);
+    this.uiController = new UIController(this.mechanism, this.traceSystem, this.gifExporter, this.videoExporter, this.camera);
 
     // Store p5 instance for GIF export
     this.p5Instance = null;
