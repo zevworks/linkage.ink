@@ -43,9 +43,17 @@ export class TraceSystem {
     if (!this.tracePaths[rodId]) {
       this.tracePaths[rodId] = [];
     }
-    
+
     const path = this.tracePaths[rodId];
     path.push({ pos: position.copy(), age: 0 });
+  }
+
+  getLastPoint(rodId) {
+    const path = this.tracePaths[rodId];
+    if (!path || path.length === 0) {
+      return null;
+    }
+    return path[path.length - 1];
   }
 
   addFullRodTrace(rodId, startPos, endPos) {
@@ -124,31 +132,38 @@ export class TraceSystem {
       }
     }
 
-    // Draw joint point traces on top
+    // Draw joint point traces on top with smooth curves
     p.strokeWeight(8);
     for (const rodId in this.tracePaths) {
       let path = this.tracePaths[rodId];
 
       if (path.length < 2) continue;
 
-      // Use beginShape for better performance
-      p.beginShape();
-      let prevAlpha = -1;
-      for (let i = 0; i < path.length; i++) {
-        let point = path[i];
-        let alpha = MathUtils.map(point.age, 0, this.fadeLifespan, 255, 0);
+      // Draw smooth curves using curveVertex
+      for (let i = 0; i < path.length - 1; i++) {
+        // Get 4 points for Catmull-Rom spline: p0, p1, p2, p3
+        // The curve is drawn between p1 and p2
+        let p0 = (i > 0) ? path[i - 1] : path[i];
+        let p1 = path[i];
+        let p2 = path[i + 1];
+        let p3 = (i < path.length - 2) ? path[i + 2] : path[i + 1];
+
+        // Calculate average age for this segment
+        let avgAge = (p1.age + p2.age) / 2;
+        let alpha = MathUtils.map(avgAge, 0, this.fadeLifespan, 255, 0);
+
         if (alpha <= 0) continue;
 
-        // Only change stroke when alpha changes significantly
-        if (Math.abs(alpha - prevAlpha) > 5) {
-          if (i > 0) p.endShape();
-          p.stroke(this.traceColor[0], this.traceColor[1], this.traceColor[2], alpha);
-          if (i > 0) p.beginShape();
-          prevAlpha = alpha;
-        }
-        p.vertex(point.pos.x, point.pos.y);
+        p.stroke(this.traceColor[0], this.traceColor[1], this.traceColor[2], alpha);
+
+        // Draw curve segment
+        p.beginShape();
+        p.curveVertex(p0.pos.x, p0.pos.y);
+        p.curveVertex(p1.pos.x, p1.pos.y);
+        p.curveVertex(p2.pos.x, p2.pos.y);
+        p.curveVertex(p3.pos.x, p3.pos.y);
+        p.endShape();
       }
-      p.endShape();
     }
   }
 

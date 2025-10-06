@@ -16,7 +16,7 @@ export class UIController {
 
   handleColorChange(color) {
     this.traceSystem.setTraceColor(color);
-    this.updateButtonColors(color);
+     this.updateButtonColors(color);
   }
 
   updateButtonColors(color) {

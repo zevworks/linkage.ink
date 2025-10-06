@@ -7,6 +7,7 @@ import { InputHandler } from '../ui/InputHandler.js';
 import { UIController } from '../ui/UIController.js';
 import { GifExporter } from '../utils/GifExporter.js';
 import { VideoExporter } from '../utils/VideoExporter.js';
+import { Vector } from '../utils/Vector.js';
 
 /**
  * Main application class that orchestrates all components
@@ -16,13 +17,16 @@ class LinkageApp {
     // Make canvas responsive to screen size
     this.width = Math.min(600, window.innerWidth - 40);
     this.height = Math.min(600, window.innerHeight - 120);
-    
+
     // Initialize core systems
     this.mechanism = new LinkageMechanism(this.width, this.height);
     this.camera = new Camera();
     this.traceSystem = new TraceSystem();
     this.gifExporter = new GifExporter();
     this.videoExporter = new VideoExporter();
+
+    // Adaptive sampling threshold (in pixels)
+    this.minTraceDistance = 2;
 
     // Initialize rendering and interaction
     this.renderer = new Renderer(this.mechanism, this.camera, this.traceSystem);
@@ -59,17 +63,23 @@ class LinkageApp {
       p.draw = () => {
         // Update mechanism
         this.mechanism.update();
-        
+
         // Only add trace points when mechanism is playing
         if (this.mechanism.isPlaying) {
           for (let i = 0; i < this.mechanism.rods.length; i++) {
             const rod = this.mechanism.rods[i];
-            
-            // Regular point tracing
+
+            // Regular point tracing with adaptive sampling
             if (rod.isTracing && this.mechanism.joints[i]) {
-              this.traceSystem.addTracePoint(i, this.mechanism.joints[i]);
+              const currentPos = this.mechanism.joints[i];
+              const lastPoint = this.traceSystem.getLastPoint(i);
+
+              // Add point if no previous point exists OR if distance exceeds threshold
+              if (!lastPoint || Vector.dist(lastPoint.pos, currentPos) >= this.minTraceDistance) {
+                this.traceSystem.addTracePoint(i, currentPos);
+              }
             }
-            
+
             // Full-rod tracing
             if (rod.isFullRodTracing) {
               const startPos = (i === 0) ? this.mechanism.anchor.pos : this.mechanism.joints[i - 1];
