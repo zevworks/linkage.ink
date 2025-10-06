@@ -10,10 +10,16 @@ export class Anchor {
   }
 
   draw(p, cameraZoom) {
+    // Draw outer black circle
     p.stroke(0);
     p.strokeWeight(2);
     p.fill(0);
     p.ellipse(this.pos.x, this.pos.y, this.radius * 2, this.radius * 2);
+
+    // Draw inner white circle (hole)
+    p.fill(255);
+    p.noStroke();
+    p.ellipse(this.pos.x, this.pos.y, this.radius, this.radius);
   }
 
   isMouseOver(worldMouse) {

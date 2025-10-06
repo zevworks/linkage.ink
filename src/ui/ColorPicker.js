@@ -257,10 +257,37 @@ export class ColorPicker {
   setupEventListeners() {
     // Slider input events
     Object.entries(this.sliders).forEach(([name, { slider, valueText }]) => {
-      slider.oninput = () => {
+      slider.oninput = (e) => {
+        e.stopPropagation();
         this.currentColor[name] = parseInt(slider.value);
         valueText.textContent = slider.value;
         this.updatePreview();
+      };
+
+      // Prevent mouse events from propagating to canvas
+      slider.onmousedown = (e) => {
+        e.stopPropagation();
+      };
+
+      slider.onmousemove = (e) => {
+        e.stopPropagation();
+      };
+
+      slider.onmouseup = (e) => {
+        e.stopPropagation();
+      };
+
+      // Prevent touch events from propagating to canvas
+      slider.ontouchstart = (e) => {
+        e.stopPropagation();
+      };
+
+      slider.ontouchmove = (e) => {
+        e.stopPropagation();
+      };
+
+      slider.ontouchend = (e) => {
+        e.stopPropagation();
       };
     });
 
@@ -269,6 +296,31 @@ export class ColorPicker {
       if (e.target === this.overlay) {
         this.close();
       }
+    };
+
+    // Prevent all mouse/touch events on the picker from reaching the canvas
+    this.picker.onmousedown = (e) => {
+      e.stopPropagation();
+    };
+
+    this.picker.onmousemove = (e) => {
+      e.stopPropagation();
+    };
+
+    this.picker.onmouseup = (e) => {
+      e.stopPropagation();
+    };
+
+    this.picker.ontouchstart = (e) => {
+      e.stopPropagation();
+    };
+
+    this.picker.ontouchmove = (e) => {
+      e.stopPropagation();
+    };
+
+    this.picker.ontouchend = (e) => {
+      e.stopPropagation();
     };
   }
 
