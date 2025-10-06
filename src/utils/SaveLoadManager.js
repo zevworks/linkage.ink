@@ -41,17 +41,27 @@ export class SaveLoadManager {
         x: this.mechanism.anchor.pos.x,
         y: this.mechanism.anchor.pos.y
       },
-      rods: this.mechanism.rods.map(rod => ({
-        id: rod.id,
-        length: rod.length,
-        isTracing: rod.isTracing,
-        isFullRodTracing: rod.isFullRodTracing
-      })),
-      guidePoints: this.mechanism.guidePoints.map(gp => ({
-        id: gp.id,
-        x: gp.pos.x,
-        y: gp.pos.y
-      })),
+      rods: this.mechanism.rods.map(rod => {
+        const rodData = {
+          id: rod.id,
+          length: rod.length,
+          isTracing: rod.isTracing,
+          isFullRodTracing: rod.isFullRodTracing
+        };
+
+        // Find corresponding guide point (rod 0 doesn't have one)
+        if (rod.id > 0) {
+          const gp = this.mechanism.guidePoints.find(gp => gp.id === rod.id);
+          if (gp) {
+            rodData.guidePoint = {
+              x: gp.pos.x,
+              y: gp.pos.y
+            };
+          }
+        }
+
+        return rodData;
+      }),
       camera: {
         offsetX: this.camera.offset.x,
         offsetY: this.camera.offset.y,
@@ -102,19 +112,28 @@ export class SaveLoadManager {
     // Restore anchor
     this.mechanism.anchor.pos.set(state.anchor.x, state.anchor.y);
 
-    // Restore rods
+    // Restore rods and their guide points
     state.rods.forEach(rodData => {
       const rod = new Rod(rodData.id, rodData.length);
       rod.isTracing = rodData.isTracing;
       rod.isFullRodTracing = rodData.isFullRodTracing;
       this.mechanism.rods.push(rod);
+
+      // Restore guide point if rod has one (nested in rod)
+      if (rodData.guidePoint) {
+        const gp = new GuidePoint(rodData.id, rodData.guidePoint.x, rodData.guidePoint.y);
+        this.mechanism.guidePoints.push(gp);
+      }
     });
 
-    // Restore guide points
-    state.guidePoints.forEach(gpData => {
-      const gp = new GuidePoint(gpData.id, gpData.x, gpData.y);
-      this.mechanism.guidePoints.push(gp);
-    });
+    // Backward compatibility: restore guide points from old format (separate array)
+    if (state.guidePoints && state.guidePoints.length > 0) {
+      this.mechanism.guidePoints = [];
+      state.guidePoints.forEach(gpData => {
+        const gp = new GuidePoint(gpData.id, gpData.x, gpData.y);
+        this.mechanism.guidePoints.push(gp);
+      });
+    }
 
     // Restore camera
     this.camera.offset.set(state.camera.offsetX, state.camera.offsetY);
