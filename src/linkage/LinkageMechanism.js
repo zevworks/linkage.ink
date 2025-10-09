@@ -13,6 +13,7 @@ export class LinkageMechanism {
     this.crankSpeed = Math.PI * 2 / this.FRAMES_PER_ROUND;
     this.crankAngularVelocity = (Math.PI * 2) / (this.FRAMES_PER_ROUND / 60); // radians per second at 60fps
     this.crankAngle = 0;
+    this.prevCrankAngle = 0;
     this.isPlaying = true;
 
     // Initialize mechanism components

@@ -77,28 +77,52 @@ class LinkageApp {
         const dt = p.deltaTime / 1000; // deltaTime is in ms, convert to seconds
         this.camera.update(dt);
 
+        // Calculate angular movement and number of trace points to add
+        const prevAngle = this.mechanism.crankAngle;
+
         // Update mechanism (time-based for consistent speed)
         this.mechanism.update(dt);
 
+        // Calculate how much the crank moved this frame
+        const angleChange = Math.abs(this.mechanism.crankAngle - prevAngle);
+        const numTracePoints = Math.max(1, Math.ceil(angleChange / this.mechanism.crankSpeed));
+
         // Only add trace points when mechanism is playing
         if (this.mechanism.isPlaying) {
-          for (let i = 0; i < this.mechanism.rods.length; i++) {
-            const rod = this.mechanism.rods[i];
+          // Add multiple trace points if frame rate dropped
+          for (let t = 0; t < numTracePoints; t++) {
+            const interpAngle = prevAngle + (angleChange / numTracePoints) * (t + 1);
 
-            // Regular point tracing - add every frame for flow effect
-            if (rod.isTracing && this.mechanism.joints[i]) {
-              this.traceSystem.addTracePoint(i, this.mechanism.joints[i]);
-            }
+            // Temporarily set angle to interpolated value
+            const savedAngle = this.mechanism.crankAngle;
+            this.mechanism.crankAngle = interpAngle;
+            this.mechanism.updateJoints();
 
-            // Full-rod tracing
-            if (rod.isFullRodTracing) {
-              const startPos = (i === 0) ? this.mechanism.anchor.pos : this.mechanism.joints[i - 1];
-              const endPos = this.mechanism.joints[i];
-              if (startPos && endPos) {
-                this.traceSystem.addFullRodTrace(`fullrod_${i}`, startPos, endPos);
+            // Add trace points at this interpolated position
+            for (let i = 0; i < this.mechanism.rods.length; i++) {
+              const rod = this.mechanism.rods[i];
+
+              // Regular point tracing
+              if (rod.isTracing && this.mechanism.joints[i]) {
+                this.traceSystem.addTracePoint(i, this.mechanism.joints[i]);
+              }
+
+              // Full-rod tracing
+              if (rod.isFullRodTracing) {
+                const startPos = (i === 0) ? this.mechanism.anchor.pos : this.mechanism.joints[i - 1];
+                const endPos = this.mechanism.joints[i];
+                if (startPos && endPos) {
+                  this.traceSystem.addFullRodTrace(`fullrod_${i}`, startPos, endPos);
+                }
               }
             }
+
+            // Restore the final angle
+            this.mechanism.crankAngle = savedAngle;
           }
+
+          // Make sure joints are at the correct final position
+          this.mechanism.updateJoints();
         }
         
         // Update trace aging
