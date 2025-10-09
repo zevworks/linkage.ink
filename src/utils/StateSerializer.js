@@ -2,32 +2,13 @@ import { Rod } from '../linkage/Rod.js';
 import { GuidePoint } from '../linkage/GuidePoint.js';
 
 /**
- * Handles saving and loading linkage configurations to/from .lnk files
+ * Serializes and deserializes linkage state for URL encoding
  */
-export class SaveLoadManager {
+export class StateSerializer {
   constructor(mechanism, camera, traceSystem) {
     this.mechanism = mechanism;
     this.camera = camera;
     this.traceSystem = traceSystem;
-  }
-
-  /**
-   * Export current state to a .json file
-   */
-  saveToFile(filename = 'linkage.json') {
-    const state = this.exportState();
-    const json = JSON.stringify(state, null, 2);
-
-    // Use a data URL instead of blob URL to avoid .download suffix
-    const dataStr = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
-
-    const link = document.createElement('a');
-    link.setAttribute('href', dataStr);
-    link.setAttribute('download', filename);
-    link.style.display = 'none';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   }
 
   /**
@@ -78,31 +59,6 @@ export class SaveLoadManager {
   }
 
   /**
-   * Load state from a .json file
-   */
-  loadFromFile(file, onComplete) {
-    const reader = new FileReader();
-
-    reader.onload = (e) => {
-      try {
-        const json = e.target.result;
-        const state = JSON.parse(json);
-        this.importState(state);
-        if (onComplete) onComplete(true, 'File loaded successfully');
-      } catch (error) {
-        console.error('Error loading file:', error);
-        if (onComplete) onComplete(false, `Error: ${error.message}`);
-      }
-    };
-
-    reader.onerror = () => {
-      if (onComplete) onComplete(false, 'Error reading file');
-    };
-
-    reader.readAsText(file);
-  }
-
-  /**
    * Import state from JSON object
    */
   importState(state) {
@@ -149,23 +105,5 @@ export class SaveLoadManager {
 
     // Update joints
     this.mechanism.updateJoints();
-  }
-
-  /**
-   * Open file picker dialog
-   */
-  openFilePicker(onComplete) {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.json';
-
-    input.onchange = (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        this.loadFromFile(file, onComplete);
-      }
-    };
-
-    input.click();
   }
 }

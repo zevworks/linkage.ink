@@ -4,16 +4,18 @@ import { ColorPicker } from './ColorPicker.js';
  * Manages UI button interactions and state updates
  */
 export class UIController {
-  constructor(mechanism, traceSystem, videoExporter, camera, saveLoadManager, urlStateManager) {
+  constructor(mechanism, traceSystem, videoExporter, camera, urlStateManager) {
     this.mechanism = mechanism;
     this.traceSystem = traceSystem;
     this.videoExporter = videoExporter;
     this.camera = camera;
-    this.saveLoadManager = saveLoadManager;
     this.urlStateManager = urlStateManager;
     this.p5Instance = null;
     this.colorPicker = new ColorPicker((color) => this.handleColorChange(color));
     this.setupEventListeners();
+
+    // Set initial button colors based on current trace color
+    this.updateButtonColors(this.traceSystem.getTraceColor());
   }
 
   handleColorChange(color) {
@@ -82,14 +84,6 @@ export class UIController {
         this.mechanism.removeRod();
         this.traceSystem.updateFadeLifespan(this.mechanism.FRAMES_PER_ROUND);
         this.urlStateManager.updateURLNow();
-      };
-    }
-
-    // Clear Trace button
-    const clearTraceBtn = document.getElementById('clearTraceBtn');
-    if (clearTraceBtn) {
-      clearTraceBtn.onclick = () => {
-        this.traceSystem.clearAllTraces();
       };
     }
 

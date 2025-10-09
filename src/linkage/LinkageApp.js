@@ -6,7 +6,7 @@ import { Renderer } from './Renderer.js';
 import { InputHandler } from '../ui/InputHandler.js';
 import { UIController } from '../ui/UIController.js';
 import { VideoExporter } from '../utils/VideoExporter.js';
-import { SaveLoadManager } from '../utils/SaveLoadManager.js';
+import { StateSerializer } from '../utils/StateSerializer.js';
 import { URLStateManager } from '../utils/URLStateManager.js';
 
 /**
@@ -24,9 +24,9 @@ class LinkageApp {
     this.traceSystem = new TraceSystem();
     this.videoExporter = new VideoExporter();
 
-    // Initialize save/load and URL state management
-    this.saveLoadManager = new SaveLoadManager(this.mechanism, this.camera, this.traceSystem);
-    this.urlStateManager = new URLStateManager(this.saveLoadManager);
+    // Initialize state serialization and URL state management
+    this.stateSerializer = new StateSerializer(this.mechanism, this.camera, this.traceSystem);
+    this.urlStateManager = new URLStateManager(this.stateSerializer);
 
     // Try to load state from URL, if not present, use default configuration
     const loadedFromURL = this.urlStateManager.decodeStateFromURL();
@@ -42,7 +42,6 @@ class LinkageApp {
       this.traceSystem,
       this.videoExporter,
       this.camera,
-      this.saveLoadManager,
       this.urlStateManager
     );
 

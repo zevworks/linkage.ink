@@ -3,8 +3,8 @@
  * Format: #anchor=x,y&crank=len,trace,fulltrace&rod1=len,gpx,gpy,trace,fulltrace&camera=ox,oy,zoom&color=r,g,b
  */
 export class URLStateManager {
-  constructor(saveLoadManager) {
-    this.saveLoadManager = saveLoadManager;
+  constructor(stateSerializer) {
+    this.stateSerializer = stateSerializer;
     this.updateTimeout = null;
   }
 
@@ -12,7 +12,7 @@ export class URLStateManager {
    * Encode current state to URL hash with readable parameters
    */
   encodeStateToURL() {
-    const state = this.saveLoadManager.exportState();
+    const state = this.stateSerializer.exportState();
     const params = new URLSearchParams();
 
     // Encode anchor: anchor=x,y
@@ -118,7 +118,7 @@ export class URLStateManager {
       }
 
       // Import the state
-      this.saveLoadManager.importState(state);
+      this.stateSerializer.importState(state);
       return true;
     } catch (error) {
       console.error('Error decoding state from URL:', error);
