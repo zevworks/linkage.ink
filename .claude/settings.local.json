@@ -24,8 +24,7 @@
       "Bash(gh workflow:*)",
       "Bash(gh run list:*)",
       "Bash(gh api:*)",
-      "Bash(gh run cancel:*)",
-      "Bash(git revert:*)"
+      "Bash(gh run cancel:*)"
     ],
     "deny": [],
     "ask": []

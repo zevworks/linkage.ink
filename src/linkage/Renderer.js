@@ -21,7 +21,6 @@ export class Renderer {
     // Draw components in proper order: traces first, then mechanism on top
     this.traceSystem.draw(p, this.camera.zoom);
     this.drawMechanism(p);
-    this.drawSelectionHighlight(p);
 
     p.pop();
   }
@@ -74,32 +73,6 @@ export class Renderer {
       } else {
         this.mechanism.guidePoints[i].draw(p, this.camera.zoom);
       }
-    }
-  }
-
-  drawSelectionHighlight(p) {
-    if (!this.selectedObject) return;
-
-    let pos;
-    // Much larger radius for better visibility, especially on touch devices
-    // Divide by zoom to keep constant screen size regardless of zoom level
-    let radius = 100 / this.camera.zoom;
-
-    if (this.selectedObject.type === 'anchor') {
-      pos = this.selectedObject.obj.pos;
-    } else if (this.selectedObject.type === 'guidePoint') {
-      pos = this.selectedObject.obj.pos;
-    } else if (this.selectedObject.type === 'rod') {
-      pos = this.mechanism.joints[this.selectedObject.obj.id];
-    } else if (this.selectedObject.type === 'joint') {
-      pos = this.selectedObject.obj;
-    }
-
-    if (pos) {
-      p.noFill();
-      p.stroke(0);
-      p.strokeWeight(4 / this.camera.zoom);
-      p.ellipse(pos.x, pos.y, radius * 2, radius * 2);
     }
   }
 
