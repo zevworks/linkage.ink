@@ -5,11 +5,9 @@ import { TraceSystem } from './TraceSystem.js';
 import { Renderer } from './Renderer.js';
 import { InputHandler } from '../ui/InputHandler.js';
 import { UIController } from '../ui/UIController.js';
-import { GifExporter } from '../utils/GifExporter.js';
 import { VideoExporter } from '../utils/VideoExporter.js';
 import { SaveLoadManager } from '../utils/SaveLoadManager.js';
 import { URLStateManager } from '../utils/URLStateManager.js';
-import { Vector } from '../utils/Vector.js';
 
 /**
  * Main application class that orchestrates all components
@@ -24,11 +22,7 @@ class LinkageApp {
     this.mechanism = new LinkageMechanism(this.width, this.height);
     this.camera = new Camera();
     this.traceSystem = new TraceSystem();
-    this.gifExporter = new GifExporter();
     this.videoExporter = new VideoExporter();
-
-    // Adaptive sampling threshold (in pixels)
-    this.minTraceDistance = 2;
 
     // Initialize save/load and URL state management
     this.saveLoadManager = new SaveLoadManager(this.mechanism, this.camera, this.traceSystem);
@@ -46,7 +40,6 @@ class LinkageApp {
     this.uiController = new UIController(
       this.mechanism,
       this.traceSystem,
-      this.gifExporter,
       this.videoExporter,
       this.camera,
       this.saveLoadManager,
@@ -110,11 +103,6 @@ class LinkageApp {
 
         // Render everything
         this.renderer.draw(p);
-
-        // Capture frame for GIF if recording
-        if (this.gifExporter.isCurrentlyRecording()) {
-          this.gifExporter.captureFrame(p.canvas, this.mechanism.crankAngle);
-        }
 
         // Update frame count for video recording
         if (this.videoExporter.isCurrentlyRecording()) {
