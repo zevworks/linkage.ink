@@ -7,6 +7,8 @@ import { InputHandler } from '../ui/InputHandler.js';
 import { UIController } from '../ui/UIController.js';
 import { GifExporter } from '../utils/GifExporter.js';
 import { VideoExporter } from '../utils/VideoExporter.js';
+import { SaveLoadManager } from '../utils/SaveLoadManager.js';
+import { URLStateManager } from '../utils/URLStateManager.js';
 import { Vector } from '../utils/Vector.js';
 
 /**
@@ -28,10 +30,28 @@ class LinkageApp {
     // Adaptive sampling threshold (in pixels)
     this.minTraceDistance = 2;
 
+    // Initialize save/load and URL state management
+    this.saveLoadManager = new SaveLoadManager(this.mechanism, this.camera, this.traceSystem);
+    this.urlStateManager = new URLStateManager(this.saveLoadManager);
+
+    // Try to load state from URL, if not present, use default configuration
+    const loadedFromURL = this.urlStateManager.decodeStateFromURL();
+    if (loadedFromURL) {
+      console.log('Loaded configuration from URL');
+    }
+
     // Initialize rendering and interaction
     this.renderer = new Renderer(this.mechanism, this.camera, this.traceSystem);
-    this.inputHandler = new InputHandler(this.mechanism, this.camera, this.renderer);
-    this.uiController = new UIController(this.mechanism, this.traceSystem, this.gifExporter, this.videoExporter, this.camera);
+    this.inputHandler = new InputHandler(this.mechanism, this.camera, this.renderer, this.urlStateManager);
+    this.uiController = new UIController(
+      this.mechanism,
+      this.traceSystem,
+      this.gifExporter,
+      this.videoExporter,
+      this.camera,
+      this.saveLoadManager,
+      this.urlStateManager
+    );
 
     // Store p5 instance for GIF export
     this.p5Instance = null;

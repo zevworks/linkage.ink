@@ -4,11 +4,12 @@ import { Vector } from '../utils/Vector.js';
  * Handles mouse and touch input events
  */
 export class InputHandler {
-  constructor(mechanism, camera, renderer) {
+  constructor(mechanism, camera, renderer, urlStateManager) {
     this.mechanism = mechanism;
     this.camera = camera;
     this.renderer = renderer;
-    
+    this.urlStateManager = urlStateManager;
+
     this.selectedObject = null;
     this.dragOffset = null;
     this.isPanning = false;
@@ -141,12 +142,22 @@ export class InputHandler {
     this.dragOffset = null;
     this.isPanning = false;
     this.renderer.setSelectedObject(null);
+
+    // Update URL after any interaction completes
+    if (this.urlStateManager) {
+      this.urlStateManager.scheduleURLUpdate();
+    }
   }
 
   handleZoom(x, y, delta) {
     let worldMouse = this.camera.screenToWorld(x, y);
     let zoomFactor = 1 - delta * 0.001;
     this.camera.zoomAt(worldMouse, zoomFactor);
+
+    // Update URL after zoom
+    if (this.urlStateManager) {
+      this.urlStateManager.scheduleURLUpdate();
+    }
   }
 
   handlePinchZoom(touch1, touch2, prevDist) {

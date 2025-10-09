@@ -1,25 +1,26 @@
 import { ColorPicker } from './ColorPicker.js';
-import { SaveLoadManager } from '../utils/SaveLoadManager.js';
 
 /**
  * Manages UI button interactions and state updates
  */
 export class UIController {
-  constructor(mechanism, traceSystem, gifExporter, videoExporter, camera) {
+  constructor(mechanism, traceSystem, gifExporter, videoExporter, camera, saveLoadManager, urlStateManager) {
     this.mechanism = mechanism;
     this.traceSystem = traceSystem;
     this.gifExporter = gifExporter;
     this.videoExporter = videoExporter;
     this.camera = camera;
+    this.saveLoadManager = saveLoadManager;
+    this.urlStateManager = urlStateManager;
     this.p5Instance = null;
     this.colorPicker = new ColorPicker((color) => this.handleColorChange(color));
-    this.saveLoadManager = new SaveLoadManager(mechanism, camera, traceSystem);
     this.setupEventListeners();
   }
 
   handleColorChange(color) {
     this.traceSystem.setTraceColor(color);
-     this.updateButtonColors(color);
+    this.updateButtonColors(color);
+    this.urlStateManager.updateURLNow();
   }
 
   updateButtonColors(color) {
@@ -67,6 +68,7 @@ export class UIController {
       addRodBtn.onclick = () => {
         this.mechanism.addRod();
         this.traceSystem.updateFadeLifespan(this.mechanism.FRAMES_PER_ROUND);
+        this.urlStateManager.updateURLNow();
       };
     }
 
@@ -77,9 +79,10 @@ export class UIController {
         // Clear trace for the rod being removed
         const lastRodId = this.mechanism.rods.length - 1;
         this.traceSystem.clearTrace(lastRodId);
-        
+
         this.mechanism.removeRod();
         this.traceSystem.updateFadeLifespan(this.mechanism.FRAMES_PER_ROUND);
+        this.urlStateManager.updateURLNow();
       };
     }
 
@@ -171,10 +174,33 @@ export class UIController {
             this.traceSystem.clearAllTraces();
             // Update button colors to match loaded trace color
             this.updateButtonColors(this.traceSystem.getTraceColor());
+            // Update URL to reflect loaded state
+            this.urlStateManager.updateURLNow();
           } else {
             alert(message);
           }
         });
+      };
+    }
+
+    // Copy Link button
+    const copyLinkBtn = document.getElementById('copyLinkBtn');
+    if (copyLinkBtn) {
+      copyLinkBtn.onclick = async () => {
+        // First update URL to ensure it's current
+        this.urlStateManager.updateURLNow();
+
+        const success = await this.urlStateManager.copyURLToClipboard();
+        if (success) {
+          // Visual feedback
+          const originalText = copyLinkBtn.textContent;
+          copyLinkBtn.textContent = 'Copied!';
+          setTimeout(() => {
+            copyLinkBtn.textContent = originalText;
+          }, 2000);
+        } else {
+          alert('Failed to copy link to clipboard');
+        }
       };
     }
   }

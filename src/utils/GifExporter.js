@@ -27,7 +27,7 @@ export class GifExporter {
     // Initialize gif.js with worker script
     this.gif = new GIF({
       workers: 2,
-      quality: 10,
+      quality: 20,
       workerScript: workerUrl,
       repeat: 0 // Loop forever
     });
