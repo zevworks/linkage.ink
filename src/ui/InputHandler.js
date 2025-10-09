@@ -22,9 +22,13 @@ export class InputHandler {
     let worldMouse = this.camera.screenToWorld(x, y);
     this.selectedObject = null;
 
-    // Increase hit radius for touch devices
-    const jointRadius = isTouchDevice ? 25 : 15;
-    const objectRadius = isTouchDevice ? 20 : null; // null uses default radius
+    // Hit radius in screen pixels (constant regardless of zoom)
+    const screenJointRadius = isTouchDevice ? 40 : 20;
+    const screenObjectRadius = isTouchDevice ? 35 : 15;
+
+    // Convert to world space (divide by zoom so it stays constant in screen space)
+    const jointRadius = screenJointRadius / this.camera.zoom;
+    const objectRadius = screenObjectRadius / this.camera.zoom;
 
     // Check for anchor selection
     if (this.mechanism.anchor.isMouseOver(worldMouse, objectRadius)) {
@@ -58,7 +62,7 @@ export class InputHandler {
 
     // Check for rod selection (in reverse order for proper layering)
     for (let i = this.mechanism.rods.length - 1; i >= 0; i--) {
-      if (this.mechanism.joints[i] && this.mechanism.rods[i].isMouseOver(this.mechanism.joints[i], worldMouse)) {
+      if (this.mechanism.joints[i] && this.mechanism.rods[i].isMouseOver(this.mechanism.joints[i], worldMouse, jointRadius)) {
         this.selectedObject = { type: 'rod', obj: this.mechanism.rods[i] };
         this.renderer.setSelectedObject(this.selectedObject);
         return;

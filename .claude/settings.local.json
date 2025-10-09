@@ -23,7 +23,8 @@
       "Bash(git ls-tree:*)",
       "Bash(gh workflow:*)",
       "Bash(gh run list:*)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(gh run cancel:*)"
     ],
     "deny": [],
     "ask": []

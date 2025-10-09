@@ -12,7 +12,7 @@ export class Rod {
     this.isFullRodTracing = false;
   }
 
-  isMouseOver(jointPos, worldMouse) {
-    return Vector.dist(worldMouse, jointPos) < 10;
+  isMouseOver(jointPos, worldMouse, hitRadius = 10) {
+    return Vector.dist(worldMouse, jointPos) < hitRadius;
   }
 }
