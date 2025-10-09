@@ -17,8 +17,8 @@ import { Vector } from '../utils/Vector.js';
 class LinkageApp {
   constructor() {
     // Make canvas responsive to screen size
-    this.width = Math.min(600, window.innerWidth - 40);
-    this.height = Math.min(600, window.innerHeight - 120);
+    this.width = Math.min(1000, window.innerWidth - 40);
+    this.height = Math.min(800, window.innerHeight - 120);
 
     // Initialize core systems
     this.mechanism = new LinkageMechanism(this.width, this.height);
