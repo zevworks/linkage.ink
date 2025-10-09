@@ -128,14 +128,11 @@ class LinkageApp {
         return false;
       };
 
-      // Touch events
-      p.touchStarted = () => {
-        // Only handle touches on canvas, allow buttons to work
-        if (p.touches.length > 0) {
-          const touch = p.touches[0];
-          if (touch.x < 0 || touch.x > this.width || touch.y < 0 || touch.y > this.height) {
-            return true; // Let buttons handle the touch
-          }
+      // Touch events - only prevent default when touching canvas
+      p.touchStarted = (event) => {
+        // Check if touch is on canvas element
+        if (event && event.target && event.target.tagName === 'BUTTON') {
+          return true; // Allow button clicks
         }
 
         if (p.touches.length === 1) {
@@ -149,13 +146,10 @@ class LinkageApp {
         return false;
       };
 
-      p.touchMoved = () => {
-        // Check if touch is on canvas
-        if (p.touches.length > 0) {
-          const touch = p.touches[0];
-          if (touch.x < 0 || touch.x > this.width || touch.y < 0 || touch.y > this.height) {
-            return true;
-          }
+      p.touchMoved = (event) => {
+        // Check if touch is on canvas element
+        if (event && event.target && event.target.tagName === 'BUTTON') {
+          return true;
         }
 
         if (p.touches.length === 1 && !this.inputHandler.isPanning) {
@@ -172,7 +166,12 @@ class LinkageApp {
         return false;
       };
 
-      p.touchEnded = () => {
+      p.touchEnded = (event) => {
+        // Check if touch is on canvas element
+        if (event && event.target && event.target.tagName === 'BUTTON') {
+          return true;
+        }
+
         if (p.touches.length === 0) {
           this.inputHandler.handleRelease(p.mouseX, p.mouseY);
         }

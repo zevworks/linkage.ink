@@ -8,8 +8,8 @@ export class TraceSystem {
   constructor() {
     this.tracePaths = {}; // Object to hold multiple trace paths
     this.fullRodTracePaths = {}; // Object to hold full rod traces
-    this.traceColor = [128, 0, 128];
-    this.fullRodTraceColor = [255, 0, 255]; // Magenta for full rod traces
+    this.traceColor = [0, 100, 0]; // Dark green
+    this.fullRodTraceColor = [0, 150, 0]; // Lighter green for full rod traces
     this.fadeLifespan = 360; // 1 full rotation (360 frames)
     this.fullRodTraceSegments = 8; // Number of points to trace along rod length
   }
