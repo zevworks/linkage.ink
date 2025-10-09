@@ -11,7 +11,6 @@
     "lint": "eslint src --ext .js,.ts"
   },
   "dependencies": {
-    "gif.js": "^0.2.0",
     "p5": "^1.9.0"
   },
   "devDependencies": {
