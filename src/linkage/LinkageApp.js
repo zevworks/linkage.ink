@@ -130,6 +130,8 @@ class LinkageApp {
 
       // Touch events - single touch for objects, two-finger for pan/zoom
       let prevTouchMidpoint = null;
+      let lastTapTime = 0;
+      let lastTapPos = null;
 
       p.touchStarted = (event) => {
         // Check if touch is on canvas element
@@ -138,8 +140,26 @@ class LinkageApp {
         }
 
         if (p.touches.length === 1) {
-          // Single touch - try to select object (with touch device flag)
-          this.inputHandler.handlePress(p.touches[0].x, p.touches[0].y, true);
+          // Check for double tap
+          const now = Date.now();
+          const tapPos = { x: p.touches[0].x, y: p.touches[0].y };
+
+          if (lastTapPos &&
+              now - lastTapTime < 300 &&
+              Math.abs(tapPos.x - lastTapPos.x) < 20 &&
+              Math.abs(tapPos.y - lastTapPos.y) < 20) {
+            // Double tap detected - zoom in
+            const worldPos = this.camera.screenToWorld(tapPos.x, tapPos.y);
+            this.camera.zoomAt(worldPos, 1.3);
+            this.urlStateManager.scheduleURLUpdate();
+            lastTapTime = 0; // Reset to prevent triple tap
+            lastTapPos = null;
+          } else {
+            // Single touch - try to select object (with touch device flag)
+            this.inputHandler.handlePress(tapPos.x, tapPos.y, true);
+            lastTapTime = now;
+            lastTapPos = tapPos;
+          }
         } else if (p.touches.length === 2) {
           // Two fingers - prepare for pan/zoom
           this.inputHandler.prevPinchDist = p.dist(
