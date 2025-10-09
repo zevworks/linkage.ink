@@ -17,13 +17,17 @@ export class InputHandler {
     this.prevPinchDist = 0;
   }
 
-  handlePress(x, y) {
+  handlePress(x, y, isTouchDevice = false) {
     this.pressPos = new Vector(x, y);
     let worldMouse = this.camera.screenToWorld(x, y);
     this.selectedObject = null;
 
+    // Increase hit radius for touch devices
+    const jointRadius = isTouchDevice ? 25 : 15;
+    const objectRadius = isTouchDevice ? 20 : null; // null uses default radius
+
     // Check for anchor selection
-    if (this.mechanism.anchor.isMouseOver(worldMouse)) {
+    if (this.mechanism.anchor.isMouseOver(worldMouse, objectRadius)) {
       this.selectedObject = { type: 'anchor', obj: this.mechanism.anchor };
       this.dragOffset = Vector.sub(this.mechanism.anchor.pos, worldMouse);
       this.renderer.setSelectedObject(this.selectedObject);
@@ -33,7 +37,7 @@ export class InputHandler {
     // Check for guide point selection
     for (let i = 0; i < this.mechanism.guidePoints.length; i++) {
       let gp = this.mechanism.guidePoints[i];
-      if (gp.isMouseOver(worldMouse)) {
+      if (gp.isMouseOver(worldMouse, objectRadius)) {
         this.selectedObject = { type: 'guidePoint', obj: gp, rodIndex: i + 1 };
         this.dragOffset = Vector.sub(gp.pos, worldMouse);
         this.renderer.setSelectedObject(this.selectedObject);
@@ -45,7 +49,7 @@ export class InputHandler {
     for (let i = this.mechanism.joints.length - 1; i >= 0; i--) {
       let joint = this.mechanism.joints[i];
       let dist = Vector.dist(joint, worldMouse);
-      if (dist < 15) { // Joint click radius
+      if (dist < jointRadius) { // Joint click radius (larger for touch)
         this.selectedObject = { type: 'joint', obj: joint, rodIndex: i };
         this.renderer.setSelectedObject(this.selectedObject);
         return;
@@ -61,8 +65,8 @@ export class InputHandler {
       }
     }
 
-    // If nothing is selected, enable panning
-    if (!this.selectedObject) {
+    // If nothing is selected, enable panning (only for mouse, not touch)
+    if (!this.selectedObject && !isTouchDevice) {
       this.isPanning = true;
     }
 

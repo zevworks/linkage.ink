@@ -36,7 +36,8 @@ export class GuidePoint {
     p.pop();
   }
 
-  isMouseOver(worldMouse) {
-    return Vector.dist(worldMouse, this.pos) < this.radius;
+  isMouseOver(worldMouse, hitRadius = null) {
+    const checkRadius = hitRadius !== null ? hitRadius : this.radius;
+    return Vector.dist(worldMouse, this.pos) < checkRadius;
   }
 }

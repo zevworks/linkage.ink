@@ -128,7 +128,9 @@ class LinkageApp {
         return false;
       };
 
-      // Touch events - only prevent default when touching canvas
+      // Touch events - single touch for objects, two-finger for pan/zoom
+      let prevTouchMidpoint = null;
+
       p.touchStarted = (event) => {
         // Check if touch is on canvas element
         if (event && event.target && event.target.tagName === 'BUTTON') {
@@ -136,12 +138,18 @@ class LinkageApp {
         }
 
         if (p.touches.length === 1) {
-          this.inputHandler.handlePress(p.touches[0].x, p.touches[0].y);
+          // Single touch - try to select object (with touch device flag)
+          this.inputHandler.handlePress(p.touches[0].x, p.touches[0].y, true);
         } else if (p.touches.length === 2) {
+          // Two fingers - prepare for pan/zoom
           this.inputHandler.prevPinchDist = p.dist(
             p.touches[0].x, p.touches[0].y,
             p.touches[1].x, p.touches[1].y
           );
+          prevTouchMidpoint = {
+            x: (p.touches[0].x + p.touches[1].x) / 2,
+            y: (p.touches[0].y + p.touches[1].y) / 2
+          };
         }
         return false;
       };
@@ -152,16 +160,38 @@ class LinkageApp {
           return true;
         }
 
-        if (p.touches.length === 1 && !this.inputHandler.isPanning) {
-          this.inputHandler.handleDrag(p.touches[0].x, p.touches[0].y, p.pwinMouseX, p.pwinMouseY);
-        } else if (p.touches.length === 1 && this.inputHandler.isPanning) {
+        if (p.touches.length === 1) {
+          // Single touch - drag selected object
           this.inputHandler.handleDrag(p.touches[0].x, p.touches[0].y, p.pmouseX, p.pmouseY);
         } else if (p.touches.length === 2) {
-          this.inputHandler.prevPinchDist = this.inputHandler.handlePinchZoom(
-            { x: p.touches[0].x, y: p.touches[0].y },
-            { x: p.touches[1].x, y: p.touches[1].y },
-            this.inputHandler.prevPinchDist
+          const currentDist = p.dist(
+            p.touches[0].x, p.touches[0].y,
+            p.touches[1].x, p.touches[1].y
           );
+          const currentMidpoint = {
+            x: (p.touches[0].x + p.touches[1].x) / 2,
+            y: (p.touches[0].y + p.touches[1].y) / 2
+          };
+
+          // Check if it's a pinch (distance changing significantly)
+          const distChange = Math.abs(currentDist - this.inputHandler.prevPinchDist);
+          if (distChange > 2) {
+            // Pinch zoom
+            this.inputHandler.prevPinchDist = this.inputHandler.handlePinchZoom(
+              { x: p.touches[0].x, y: p.touches[0].y },
+              { x: p.touches[1].x, y: p.touches[1].y },
+              this.inputHandler.prevPinchDist
+            );
+          }
+
+          // Two-finger pan (always apply alongside zoom)
+          if (prevTouchMidpoint) {
+            const dx = currentMidpoint.x - prevTouchMidpoint.x;
+            const dy = currentMidpoint.y - prevTouchMidpoint.y;
+            this.camera.pan(dx, dy);
+          }
+
+          prevTouchMidpoint = currentMidpoint;
         }
         return false;
       };
@@ -174,6 +204,10 @@ class LinkageApp {
 
         if (p.touches.length === 0) {
           this.inputHandler.handleRelease(p.mouseX, p.mouseY);
+          prevTouchMidpoint = null;
+        } else if (p.touches.length === 1) {
+          // One finger lifted, reset for potential new gesture
+          prevTouchMidpoint = null;
         }
         return false;
       };
