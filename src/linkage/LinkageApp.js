@@ -74,10 +74,11 @@ class LinkageApp {
 
       p.draw = () => {
         // Update camera animations
-        this.camera.update(p.deltaTime / 1000); // deltaTime is in ms, convert to seconds
+        const dt = p.deltaTime / 1000; // deltaTime is in ms, convert to seconds
+        this.camera.update(dt);
 
-        // Update mechanism
-        this.mechanism.update();
+        // Update mechanism (time-based for consistent speed)
+        this.mechanism.update(dt);
 
         // Only add trace points when mechanism is playing
         if (this.mechanism.isPlaying) {

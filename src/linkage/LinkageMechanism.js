@@ -11,6 +11,7 @@ export class LinkageMechanism {
   constructor(width, height) {
     this.FRAMES_PER_ROUND = 360;
     this.crankSpeed = Math.PI * 2 / this.FRAMES_PER_ROUND;
+    this.crankAngularVelocity = (Math.PI * 2) / (this.FRAMES_PER_ROUND / 60); // radians per second at 60fps
     this.crankAngle = 0;
     this.isPlaying = true;
 
@@ -38,9 +39,9 @@ export class LinkageMechanism {
     this.rods[this.rods.length - 1].isTracing = true;
   }
 
-  update() {
+  update(deltaTime = 1/60) {
     if (this.isPlaying) {
-      this.crankAngle += this.crankSpeed;
+      this.crankAngle += this.crankAngularVelocity * deltaTime;
     }
 
     this.updateJoints();
