@@ -79,25 +79,26 @@ export class Renderer {
 
   drawSelectionHighlight(p) {
     if (!this.selectedObject) return;
-    
+
     let pos;
-    let radius = 20;
-    
+    // Much larger radius for better visibility, especially on touch devices
+    // Divide by zoom to keep constant screen size regardless of zoom level
+    let radius = 100 / this.camera.zoom;
+
     if (this.selectedObject.type === 'anchor') {
       pos = this.selectedObject.obj.pos;
-      radius = this.selectedObject.obj.radius + 5;
     } else if (this.selectedObject.type === 'guidePoint') {
       pos = this.selectedObject.obj.pos;
-      radius = this.selectedObject.obj.radius + 5;
     } else if (this.selectedObject.type === 'rod') {
       pos = this.mechanism.joints[this.selectedObject.obj.id];
-      radius = 15;
+    } else if (this.selectedObject.type === 'joint') {
+      pos = this.selectedObject.obj;
     }
-    
+
     if (pos) {
       p.noFill();
-      p.stroke(255, 204, 0);
-      p.strokeWeight(3);
+      p.stroke(0);
+      p.strokeWeight(4 / this.camera.zoom);
       p.ellipse(pos.x, pos.y, radius * 2, radius * 2);
     }
   }
