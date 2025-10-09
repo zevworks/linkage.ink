@@ -134,7 +134,7 @@ class LinkageApp {
         if (p.touches.length > 0) {
           const touch = p.touches[0];
           if (touch.x < 0 || touch.x > this.width || touch.y < 0 || touch.y > this.height) {
-            return; // Let buttons handle the touch
+            return true; // Let buttons handle the touch
           }
         }
 
@@ -150,6 +150,14 @@ class LinkageApp {
       };
 
       p.touchMoved = () => {
+        // Check if touch is on canvas
+        if (p.touches.length > 0) {
+          const touch = p.touches[0];
+          if (touch.x < 0 || touch.x > this.width || touch.y < 0 || touch.y > this.height) {
+            return true;
+          }
+        }
+
         if (p.touches.length === 1 && !this.inputHandler.isPanning) {
           this.inputHandler.handleDrag(p.touches[0].x, p.touches[0].y, p.pwinMouseX, p.pwinMouseY);
         } else if (p.touches.length === 1 && this.inputHandler.isPanning) {
