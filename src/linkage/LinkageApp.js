@@ -130,11 +130,19 @@ class LinkageApp {
 
       // Touch events
       p.touchStarted = () => {
+        // Only handle touches on canvas, allow buttons to work
+        if (p.touches.length > 0) {
+          const touch = p.touches[0];
+          if (touch.x < 0 || touch.x > this.width || touch.y < 0 || touch.y > this.height) {
+            return; // Let buttons handle the touch
+          }
+        }
+
         if (p.touches.length === 1) {
           this.inputHandler.handlePress(p.touches[0].x, p.touches[0].y);
         } else if (p.touches.length === 2) {
           this.inputHandler.prevPinchDist = p.dist(
-            p.touches[0].x, p.touches[0].y, 
+            p.touches[0].x, p.touches[0].y,
             p.touches[1].x, p.touches[1].y
           );
         }
