@@ -76,30 +76,29 @@ export class TraceSystem {
   }
 
   update() {
-    // Age all trace points and remove completely faded ones
+    // Age trace points using original "flowing" logic
     for (const rodId in this.tracePaths) {
       let path = this.tracePaths[rodId];
-      
-      // Age all points
-      for (let i = 0; i < path.length; i++) {
+
+      // Original logic: iterate backwards, age each point, and remove chunks when finding old point
+      for (let i = path.length - 1; i >= 0; i--) {
         path[i].age++;
-      }
-      
-      // Remove completely faded points (age >= fadeLifespan)
-      while (path.length > 0 && path[0].age >= this.fadeLifespan) {
-        path.shift();
+        if (path[i].age > this.fadeLifespan) {
+          path.splice(0, i + 1); // Remove from start to current position
+          break;
+        }
       }
     }
 
     // Age all full-rod trace points and remove completely faded ones
     for (const rodId in this.fullRodTracePaths) {
       let path = this.fullRodTracePaths[rodId];
-      
+
       // Age all rod traces
       for (let i = 0; i < path.length; i++) {
         path[i].age++;
       }
-      
+
       // Remove completely faded rod traces (age >= fadeLifespan)
       while (path.length > 0 && path[0].age >= this.fadeLifespan) {
         path.shift();
@@ -132,37 +131,62 @@ export class TraceSystem {
       }
     }
 
-    // Draw joint point traces on top with smooth curves
+    // Draw joint point traces on top with smooth curves and flowing bands
     p.strokeWeight(8);
     for (const rodId in this.tracePaths) {
       let path = this.tracePaths[rodId];
 
       if (path.length < 2) continue;
 
-      // Draw smooth curves using curveVertex
-      for (let i = 0; i < path.length - 1; i++) {
-        // Get 4 points for Catmull-Rom spline: p0, p1, p2, p3
-        // The curve is drawn between p1 and p2
-        let p0 = (i > 0) ? path[i - 1] : path[i];
-        let p1 = path[i];
-        let p2 = path[i + 1];
-        let p3 = (i < path.length - 2) ? path[i + 2] : path[i + 1];
+      // Draw smooth curves with batched alpha changes for flow effect
+      let i = 0;
+      while (i < path.length - 1) {
+        // Calculate alpha for current point
+        let currentAlpha = MathUtils.map(path[i].age, 0, this.fadeLifespan, 255, 0);
+        if (currentAlpha <= 0) {
+          i++;
+          continue;
+        }
 
-        // Calculate average age for this segment
-        let avgAge = (p1.age + p2.age) / 2;
-        let alpha = MathUtils.map(avgAge, 0, this.fadeLifespan, 255, 0);
+        // Set stroke for this band
+        p.stroke(this.traceColor[0], this.traceColor[1], this.traceColor[2], currentAlpha);
 
-        if (alpha <= 0) continue;
-
-        p.stroke(this.traceColor[0], this.traceColor[1], this.traceColor[2], alpha);
-
-        // Draw curve segment
+        // Start a curve segment
         p.beginShape();
+        p.noFill();
+
+        // Add first control point (before current)
+        let p0 = (i > 0) ? path[i - 1] : path[i];
         p.curveVertex(p0.pos.x, p0.pos.y);
-        p.curveVertex(p1.pos.x, p1.pos.y);
-        p.curveVertex(p2.pos.x, p2.pos.y);
-        p.curveVertex(p3.pos.x, p3.pos.y);
+
+        // Add current point
+        p.curveVertex(path[i].pos.x, path[i].pos.y);
+
+        // Continue adding points while alpha is similar (within 10 units)
+        let j = i + 1;
+        while (j < path.length) {
+          let nextAlpha = MathUtils.map(path[j].age, 0, this.fadeLifespan, 255, 0);
+
+          // If alpha difference is too large, stop this segment
+          if (Math.abs(nextAlpha - currentAlpha) > 10) {
+            break;
+          }
+
+          p.curveVertex(path[j].pos.x, path[j].pos.y);
+          j++;
+        }
+
+        // Add final control point (after last point)
+        if (j < path.length) {
+          p.curveVertex(path[j].pos.x, path[j].pos.y);
+        } else if (j - 1 < path.length) {
+          p.curveVertex(path[j - 1].pos.x, path[j - 1].pos.y);
+        }
+
         p.endShape();
+
+        // Move to next segment
+        i = Math.max(i + 1, j - 1);
       }
     }
   }

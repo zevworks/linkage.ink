@@ -89,15 +89,9 @@ class LinkageApp {
           for (let i = 0; i < this.mechanism.rods.length; i++) {
             const rod = this.mechanism.rods[i];
 
-            // Regular point tracing with adaptive sampling
+            // Regular point tracing - add every frame for flow effect
             if (rod.isTracing && this.mechanism.joints[i]) {
-              const currentPos = this.mechanism.joints[i];
-              const lastPoint = this.traceSystem.getLastPoint(i);
-
-              // Add point if no previous point exists OR if distance exceeds threshold
-              if (!lastPoint || Vector.dist(lastPoint.pos, currentPos) >= this.minTraceDistance) {
-                this.traceSystem.addTracePoint(i, currentPos);
-              }
+              this.traceSystem.addTracePoint(i, this.mechanism.joints[i]);
             }
 
             // Full-rod tracing
