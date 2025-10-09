@@ -6,8 +6,74 @@ export class ColorPicker {
     this.onColorChange = onColorChange;
     this.isOpen = false;
     this.currentColor = { r: 128, g: 0, b: 128 }; // Default purple
+    this.currentHSV = this.rgbToHSV(128, 0, 128); // Store HSV separately
     this.createElements();
     this.setupEventListeners();
+  }
+
+  /**
+   * Convert RGB to HSV
+   */
+  rgbToHSV(r, g, b) {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const delta = max - min;
+
+    let h = 0;
+    let s = max === 0 ? 0 : delta / max;
+    let v = max;
+
+    if (delta !== 0) {
+      if (max === r) {
+        h = ((g - b) / delta + (g < b ? 6 : 0)) / 6;
+      } else if (max === g) {
+        h = ((b - r) / delta + 2) / 6;
+      } else {
+        h = ((r - g) / delta + 4) / 6;
+      }
+    }
+
+    return {
+      h: Math.round(h * 360),
+      s: Math.round(s * 100),
+      v: Math.round(v * 100)
+    };
+  }
+
+  /**
+   * Convert HSV to RGB
+   */
+  hsvToRGB(h, s, v) {
+    h = h / 360;
+    s = s / 100;
+    v = v / 100;
+
+    let r, g, b;
+
+    const i = Math.floor(h * 6);
+    const f = h * 6 - i;
+    const p = v * (1 - s);
+    const q = v * (1 - f * s);
+    const t = v * (1 - (1 - f) * s);
+
+    switch (i % 6) {
+      case 0: r = v; g = t; b = p; break;
+      case 1: r = q; g = v; b = p; break;
+      case 2: r = p; g = v; b = t; break;
+      case 3: r = p; g = q; b = v; break;
+      case 4: r = t; g = p; b = v; break;
+      case 5: r = v; g = p; b = q; break;
+    }
+
+    return {
+      r: Math.round(r * 255),
+      g: Math.round(g * 255),
+      b: Math.round(b * 255)
+    };
   }
 
   createElements() {
@@ -66,15 +132,44 @@ export class ColorPicker {
       margin-bottom: 20px;
     `;
 
-    // Create RGB sliders
+    // Create HSV sliders
     this.sliders = {};
-    const colors = [
-      { name: 'r', label: 'Red', color: '#ff4444' },
-      { name: 'g', label: 'Green', color: '#44ff44' },
-      { name: 'b', label: 'Blue', color: '#4444ff' }
+    const sliderConfigs = [
+      {
+        name: 'h',
+        label: 'Hue',
+        min: 0,
+        max: 360,
+        suffix: '°',
+        gradient: 'linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000)'
+      },
+      {
+        name: 's',
+        label: 'Saturation',
+        min: 0,
+        max: 100,
+        suffix: '%',
+        getGradient: (hsv) => {
+          const rgb1 = this.hsvToRGB(hsv.h, 0, hsv.v);
+          const rgb2 = this.hsvToRGB(hsv.h, 100, hsv.v);
+          return `linear-gradient(to right, rgb(${rgb1.r},${rgb1.g},${rgb1.b}), rgb(${rgb2.r},${rgb2.g},${rgb2.b}))`;
+        }
+      },
+      {
+        name: 'v',
+        label: 'Brightness',
+        min: 0,
+        max: 100,
+        suffix: '%',
+        getGradient: (hsv) => {
+          const rgb1 = this.hsvToRGB(hsv.h, hsv.s, 0);
+          const rgb2 = this.hsvToRGB(hsv.h, hsv.s, 100);
+          return `linear-gradient(to right, rgb(${rgb1.r},${rgb1.g},${rgb1.b}), rgb(${rgb2.r},${rgb2.g},${rgb2.b}))`;
+        }
+      }
     ];
 
-    colors.forEach(({ name, label, color }) => {
+    sliderConfigs.forEach(({ name, label, min, max, suffix, gradient, getGradient }) => {
       const sliderGroup = document.createElement('div');
 
       const labelDiv = document.createElement('div');
@@ -90,10 +185,10 @@ export class ColorPicker {
       labelText.textContent = label;
 
       const valueText = document.createElement('span');
-      valueText.textContent = this.currentColor[name];
+      valueText.textContent = this.currentHSV[name] + suffix;
       valueText.style.cssText = `
         font-weight: 600;
-        color: ${color};
+        color: #333;
       `;
 
       labelDiv.appendChild(labelText);
@@ -101,9 +196,9 @@ export class ColorPicker {
 
       const slider = document.createElement('input');
       slider.type = 'range';
-      slider.min = '0';
-      slider.max = '255';
-      slider.value = this.currentColor[name];
+      slider.min = min.toString();
+      slider.max = max.toString();
+      slider.value = this.currentHSV[name];
       slider.style.cssText = `
         width: 100%;
         height: 8px;
@@ -111,10 +206,7 @@ export class ColorPicker {
         outline: none;
         -webkit-appearance: none;
         appearance: none;
-        background: linear-gradient(to right,
-          ${name === 'r' ? 'black' : `rgb(0, 0, 0)`},
-          ${name === 'r' ? 'red' : name === 'g' ? 'lime' : 'blue'}
-        );
+        background: ${gradient || ''};
         cursor: pointer;
       `;
 
@@ -128,7 +220,7 @@ export class ColorPicker {
           height: 20px;
           border-radius: 50%;
           background: white;
-          border: 2px solid ${color};
+          border: 2px solid #333;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
@@ -137,7 +229,7 @@ export class ColorPicker {
           height: 20px;
           border-radius: 50%;
           background: white;
-          border: 2px solid ${color};
+          border: 2px solid #333;
           cursor: pointer;
           box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
@@ -148,7 +240,7 @@ export class ColorPicker {
       sliderGroup.appendChild(slider);
       slidersContainer.appendChild(sliderGroup);
 
-      this.sliders[name] = { slider, valueText };
+      this.sliders[name] = { slider, valueText, suffix, gradient, getGradient };
     });
 
     // Create preset colors
@@ -191,6 +283,7 @@ export class ColorPicker {
       preset.title = color.name;
       preset.onclick = () => {
         this.currentColor = { r: color.r, g: color.g, b: color.b };
+        this.currentHSV = this.rgbToHSV(color.r, color.g, color.b);
         this.updateUI();
       };
       preset.onmouseover = () => {
@@ -256,11 +349,18 @@ export class ColorPicker {
 
   setupEventListeners() {
     // Slider input events
-    Object.entries(this.sliders).forEach(([name, { slider, valueText }]) => {
+    Object.entries(this.sliders).forEach(([name, { slider, valueText, suffix }]) => {
       slider.oninput = (e) => {
         e.stopPropagation();
-        this.currentColor[name] = parseInt(slider.value);
-        valueText.textContent = slider.value;
+        this.currentHSV[name] = parseInt(slider.value);
+        valueText.textContent = slider.value + suffix;
+
+        // Convert HSV to RGB
+        this.currentColor = this.hsvToRGB(this.currentHSV.h, this.currentHSV.s, this.currentHSV.v);
+
+        // Update dependent slider gradients
+        this.updateSliderGradients();
+
         this.updatePreview();
       };
 
@@ -325,12 +425,26 @@ export class ColorPicker {
   }
 
   updateUI() {
+    // Convert current RGB to HSV
+    this.currentHSV = this.rgbToHSV(this.currentColor.r, this.currentColor.g, this.currentColor.b);
+
     // Update sliders and preview
-    Object.entries(this.sliders).forEach(([name, { slider, valueText }]) => {
-      slider.value = this.currentColor[name];
-      valueText.textContent = this.currentColor[name];
+    Object.entries(this.sliders).forEach(([name, { slider, valueText, suffix }]) => {
+      slider.value = this.currentHSV[name];
+      valueText.textContent = this.currentHSV[name] + suffix;
     });
+
+    this.updateSliderGradients();
     this.updatePreview();
+  }
+
+  updateSliderGradients() {
+    // Update saturation and brightness gradients based on current hue
+    Object.entries(this.sliders).forEach(([name, config]) => {
+      if (config.getGradient) {
+        config.slider.style.background = config.getGradient(this.currentHSV);
+      }
+    });
   }
 
   updatePreview() {
