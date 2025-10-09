@@ -55,11 +55,17 @@ export class Camera {
     const eased = 1 - Math.pow(1 - t, 3);
 
     // Interpolate zoom
-    const targetZoom = this.animStartZoom + (this.animTargetZoom - this.animStartZoom) * eased;
+    const newZoom = this.animStartZoom + (this.animTargetZoom - this.animStartZoom) * eased;
 
-    // Apply zoom at the target world position
+    // Directly set the zoom while maintaining the world position at screen center
     if (this.animWorldPos) {
-      this.zoomAt(this.animWorldPos, targetZoom / this.zoom);
+      const oldZoom = this.zoom;
+      const screenX = this.animWorldPos.x * oldZoom + this.offset.x;
+      const screenY = this.animWorldPos.y * oldZoom + this.offset.y;
+
+      this.zoom = newZoom;
+      this.offset.x = screenX - this.animWorldPos.x * newZoom;
+      this.offset.y = screenY - this.animWorldPos.y * newZoom;
     }
   }
 
