@@ -73,6 +73,9 @@ class LinkageApp {
       };
 
       p.draw = () => {
+        // Update camera animations
+        this.camera.update(p.deltaTime / 1000); // deltaTime is in ms, convert to seconds
+
         // Update mechanism
         this.mechanism.update();
 
@@ -148,9 +151,9 @@ class LinkageApp {
               now - lastTapTime < 300 &&
               Math.abs(tapPos.x - lastTapPos.x) < 20 &&
               Math.abs(tapPos.y - lastTapPos.y) < 20) {
-            // Double tap detected - zoom in
+            // Double tap detected - zoom in with animation
             const worldPos = this.camera.screenToWorld(tapPos.x, tapPos.y);
-            this.camera.zoomAt(worldPos, 1.3);
+            this.camera.animatedZoomAt(worldPos, 1.3);
             this.urlStateManager.scheduleURLUpdate();
             lastTapTime = 0; // Reset to prevent triple tap
             lastTapPos = null;
