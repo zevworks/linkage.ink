@@ -175,17 +175,15 @@ class LinkageApp {
 
           // Check if it's a pinch (distance changing significantly)
           const distChange = Math.abs(currentDist - this.inputHandler.prevPinchDist);
-          if (distChange > 2) {
-            // Pinch zoom
+          if (distChange > 3) {
+            // Pinch zoom - only zoom, don't pan
             this.inputHandler.prevPinchDist = this.inputHandler.handlePinchZoom(
               { x: p.touches[0].x, y: p.touches[0].y },
               { x: p.touches[1].x, y: p.touches[1].y },
               this.inputHandler.prevPinchDist
             );
-          }
-
-          // Two-finger pan (always apply alongside zoom)
-          if (prevTouchMidpoint) {
+          } else if (prevTouchMidpoint) {
+            // Two-finger pan - only when not pinching
             const dx = currentMidpoint.x - prevTouchMidpoint.x;
             const dy = currentMidpoint.y - prevTouchMidpoint.y;
             this.camera.pan(dx, dy);
