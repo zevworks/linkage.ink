@@ -31,10 +31,17 @@ export class Camera {
   }
 
   zoomAt(worldPos, zoomFactor) {
+    const oldZoom = this.zoom;
     const newZoom = MathUtils.constrain(this.zoom * zoomFactor, this.minZoom, this.maxZoom);
-    
-    // Zoom towards the specified world position
-    this.offset.sub(worldPos).mult(newZoom / this.zoom).add(worldPos);
+
+    // Calculate screen position of the zoom center point
+    const screenX = worldPos.x * oldZoom + this.offset.x;
+    const screenY = worldPos.y * oldZoom + this.offset.y;
+
+    // Adjust offset so the same world point stays at the same screen position
+    this.offset.x = screenX - worldPos.x * newZoom;
+    this.offset.y = screenY - worldPos.y * newZoom;
+
     this.zoom = newZoom;
   }
 
