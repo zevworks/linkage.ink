@@ -10,7 +10,7 @@ export class GuidePoint {
     this.radius = 10;
   }
 
-  draw(p, cameraZoom, rodAngle, fillColor) {
+  draw(p, cameraZoom, rodAngle, fillColor, rodsWidth = 4) {
     p.push();
     p.translate(this.pos.x, this.pos.y);
 
@@ -18,10 +18,15 @@ export class GuidePoint {
       p.rotate(rodAngle);
     }
 
+    // GP circle size based on rod width
+    const gpSize = rodsWidth * 5;
+    const sleeveLength = gpSize;
+
+    // Sleeves are always double the rod width
     p.stroke(0);
-    p.strokeWeight(8);
+    p.strokeWeight(rodsWidth * 2);
     p.strokeCap(p.SQUARE);
-    p.line(-this.radius * 2, 0, this.radius * 2, 0);
+    p.line(-sleeveLength, 0, sleeveLength, 0);
 
     p.stroke(0);
     p.strokeWeight(2);
@@ -30,7 +35,7 @@ export class GuidePoint {
     } else {
       p.fill(255);
     }
-    p.ellipse(0, 0, this.radius * 2, this.radius * 2);
+    p.ellipse(0, 0, gpSize, gpSize);
 
     p.strokeCap(p.ROUND);
     p.pop();

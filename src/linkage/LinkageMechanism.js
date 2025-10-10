@@ -8,12 +8,13 @@ import { GuidePoint } from './GuidePoint.js';
  * Core linkage mechanism with physics simulation
  */
 export class LinkageMechanism {
-  constructor(width, height) {
+  constructor(width, height, traceSystem = null) {
     this.FRAMES_PER_ROUND = 360;
     this.crankSpeed = Math.PI * 2 / this.FRAMES_PER_ROUND;
     this.crankAngle = 0;
     this.isPlaying = true;
     this.isStretchingMode = true;
+    this.traceSystem = traceSystem;
 
     // Initialize mechanism components
     this.anchor = new Anchor(width / 2, height / 2 + 50);
@@ -68,12 +69,18 @@ export class LinkageMechanism {
       this.rods[i].angle = angle;
 
       // Stretching mode: grow rod if needed to keep joint beyond GP sleeves
-      if (this.isStretchingMode) {
+      if (this.isStretchingMode && this.traceSystem) {
         let distanceToGP = Vector.dist(parentJointPos, guide.pos);
-        // Add sleeve length (radius * 2) and joint radius to ensure joint extends beyond the sleeves
-        let sleeveLength = guide.radius * 2;
-        let jointRadius = 10; // Joint visual size from Renderer
-        let minLength = distanceToGP + sleeveLength + jointRadius;
+        // GP size calculation (same as in GuidePoint.draw)
+        const gpSize = this.traceSystem.rodsWidth * 5;
+        const sleeveLength = gpSize;
+        // Sleeves extend sleeveLength from GP center
+        let sleeveExtension = sleeveLength;
+        // Joint size from Renderer (depends on tracing state, 5x multiplier)
+        let jointRadius = this.rods[i].isTracing ?
+          this.traceSystem.traceWidth * 5 / 2 :
+          this.traceSystem.rodsWidth * 5 / 2;
+        let minLength = distanceToGP + sleeveExtension + jointRadius;
         if (minLength > this.rods[i].length) {
           this.rods[i].length = minLength;
         }

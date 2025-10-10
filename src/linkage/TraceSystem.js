@@ -14,6 +14,7 @@ export class TraceSystem {
     this.fullRodTraceSegments = 8; // Number of points to trace along rod length
     this.traceWidth = 8; // Trace stroke width
     this.rodsWidth = 4; // Rods stroke width
+    this.jointSizeMultiplier = 5; // Multiplier for joint size relative to trace/rod width
   }
 
   setTraceColor(color) {
@@ -150,7 +151,7 @@ export class TraceSystem {
     }
 
     // Draw joint point traces on top with smooth curves and flowing bands
-    p.strokeWeight(this.traceWidth);
+    p.strokeWeight(this.traceWidth * this.jointSizeMultiplier);
     for (const rodId in this.tracePaths) {
       let path = this.tracePaths[rodId];
 

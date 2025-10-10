@@ -26,13 +26,15 @@ export class Renderer {
   }
 
   drawMechanism(p) {
-    // Calculate joint size based on trace width (2.5x trace width)
-    const jointSize = this.traceSystem.traceWidth * 2.5;
-
     // Draw joints
     for (let i = 0; i < this.mechanism.joints.length; i++) {
       const endPos = this.mechanism.joints[i];
       const rod = this.mechanism.rods[i];
+
+      // Joint size: traced joints use traceWidth, non-traced use rodsWidth (multiplier to match GP)
+      const jointSize = rod.isTracing ?
+        this.traceSystem.traceWidth * this.traceSystem.jointSizeMultiplier :
+        this.traceSystem.rodsWidth * 4;
 
       if (rod.isTracing) {
         p.fill(this.traceSystem.traceColor[0], this.traceSystem.traceColor[1], this.traceSystem.traceColor[2]);
@@ -72,9 +74,9 @@ export class Renderer {
     for (let i = 0; i < this.mechanism.guidePoints.length; i++) {
       let correspondingRod = this.mechanism.rods[i + 1];
       if (correspondingRod) {
-        this.mechanism.guidePoints[i].draw(p, this.camera.zoom, correspondingRod.angle, correspondingRod.isFullRodTracing ? this.traceSystem.fullRodTraceColor : null);
+        this.mechanism.guidePoints[i].draw(p, this.camera.zoom, correspondingRod.angle, correspondingRod.isFullRodTracing ? this.traceSystem.fullRodTraceColor : null, this.traceSystem.rodsWidth);
       } else {
-        this.mechanism.guidePoints[i].draw(p, this.camera.zoom);
+        this.mechanism.guidePoints[i].draw(p, this.camera.zoom, null, null, this.traceSystem.rodsWidth);
       }
     }
   }

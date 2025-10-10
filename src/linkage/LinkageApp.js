@@ -19,9 +19,9 @@ class LinkageApp {
     this.height = Math.min(800, window.innerHeight - 120);
 
     // Initialize core systems
-    this.mechanism = new LinkageMechanism(this.width, this.height);
-    this.camera = new Camera();
     this.traceSystem = new TraceSystem();
+    this.mechanism = new LinkageMechanism(this.width, this.height, this.traceSystem);
+    this.camera = new Camera();
     this.videoExporter = new VideoExporter();
 
     // Auto-fit flag
