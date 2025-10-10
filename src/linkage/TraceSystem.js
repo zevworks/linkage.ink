@@ -205,4 +205,56 @@ export class TraceSystem {
     this.tracePaths = {};
     this.fullRodTracePaths = {};
   }
+
+  calculateBounds() {
+    const points = [];
+
+    // Collect all point trace positions
+    for (const rodId in this.tracePaths) {
+      const path = this.tracePaths[rodId];
+      path.forEach(tracePoint => {
+        points.push(tracePoint.pos);
+      });
+    }
+
+    // Collect all full rod trace positions
+    for (const rodId in this.fullRodTracePaths) {
+      const path = this.fullRodTracePaths[rodId];
+      path.forEach(frame => {
+        frame.points.forEach(point => {
+          points.push(point);
+        });
+      });
+    }
+
+    if (points.length === 0) {
+      return null; // No traces yet
+    }
+
+    // Find min/max coordinates
+    let minX = points[0].x;
+    let maxX = points[0].x;
+    let minY = points[0].y;
+    let maxY = points[0].y;
+
+    points.forEach(point => {
+      minX = Math.min(minX, point.x);
+      maxX = Math.max(maxX, point.x);
+      minY = Math.min(minY, point.y);
+      maxY = Math.max(maxY, point.y);
+    });
+
+    // Add padding for stroke width
+    const padding = 10; // Half of stroke weight
+    return {
+      minX: minX - padding,
+      maxX: maxX + padding,
+      minY: minY - padding,
+      maxY: maxY + padding,
+      width: maxX - minX + padding * 2,
+      height: maxY - minY + padding * 2,
+      centerX: (minX + maxX) / 2,
+      centerY: (minY + maxY) / 2
+    };
+  }
 }

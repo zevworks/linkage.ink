@@ -94,9 +94,14 @@ export class UIController {
     const fitViewBtn = document.getElementById('fitViewBtn');
     if (fitViewBtn) {
       fitViewBtn.onclick = () => {
-        const bounds = this.mechanism.calculateBounds();
+        // Use trace bounds if available, otherwise fall back to mechanism bounds
+        let bounds = this.traceSystem.calculateBounds();
+        if (!bounds) {
+          bounds = this.mechanism.calculateBounds();
+        }
+
         const canvas = document.querySelector('canvas');
-        if (canvas) {
+        if (canvas && bounds) {
           this.camera.fitToView(bounds, canvas.width, canvas.height, true);
           this.urlStateManager.scheduleURLUpdate();
         }
