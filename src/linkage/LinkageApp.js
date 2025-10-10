@@ -34,6 +34,9 @@ class LinkageApp {
       console.log('Loaded configuration from URL');
     }
 
+    // Always update URL to ensure all parameters (including stretch) are present
+    this.urlStateManager.updateURLNow();
+
     // Initialize rendering and interaction
     this.renderer = new Renderer(this.mechanism, this.camera, this.traceSystem);
     this.inputHandler = new InputHandler(this.mechanism, this.camera, this.renderer, this.urlStateManager);
