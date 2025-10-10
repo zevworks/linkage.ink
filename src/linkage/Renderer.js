@@ -33,7 +33,7 @@ export class Renderer {
 
       // Joint size: use traceWidth with multiplier for all joints
       const jointSize = this.traceSystem.traceWidth * this.traceSystem.jointSizeMultiplier;
-      const jointStrokeWeight = this.traceSystem.traceWidth / 2;
+      const jointStrokeWeight = this.traceSystem.traceWidth;
 
       if (rod.isTracing) {
         p.fill(this.traceSystem.traceColor[0], this.traceSystem.traceColor[1], this.traceSystem.traceColor[2]);
