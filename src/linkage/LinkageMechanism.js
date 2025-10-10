@@ -137,4 +137,45 @@ export class LinkageMechanism {
   getTracingRods() {
     return this.rods.filter(rod => rod.isTracing);
   }
+
+  calculateBounds() {
+    // Collect all points: anchor, joints, and guide points
+    const points = [this.anchor.pos];
+
+    // Add all joints
+    this.joints.forEach(joint => points.push(joint));
+
+    // Add all guide points
+    this.guidePoints.forEach(gp => points.push(gp.pos));
+
+    if (points.length === 0) {
+      return { minX: 0, minY: 0, maxX: 0, maxY: 0 };
+    }
+
+    // Find min/max coordinates
+    let minX = points[0].x;
+    let maxX = points[0].x;
+    let minY = points[0].y;
+    let maxY = points[0].y;
+
+    points.forEach(point => {
+      minX = Math.min(minX, point.x);
+      maxX = Math.max(maxX, point.x);
+      minY = Math.min(minY, point.y);
+      maxY = Math.max(maxY, point.y);
+    });
+
+    // Add padding (joint/gp radius)
+    const padding = 30;
+    return {
+      minX: minX - padding,
+      maxX: maxX + padding,
+      minY: minY - padding,
+      maxY: maxY + padding,
+      width: maxX - minX + padding * 2,
+      height: maxY - minY + padding * 2,
+      centerX: (minX + maxX) / 2,
+      centerY: (minY + maxY) / 2
+    };
+  }
 }

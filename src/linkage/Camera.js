@@ -19,6 +19,8 @@ export class Camera {
     this.animDuration = 0.3; // seconds
     this.animStartTime = 0;
     this.animWorldPos = null;
+    this.animTargetOffset = null;
+    this.animStartOffset = null;
   }
 
   screenToWorld(x, y) {
@@ -57,8 +59,20 @@ export class Camera {
     // Interpolate zoom
     const newZoom = this.animStartZoom + (this.animTargetZoom - this.animStartZoom) * eased;
 
-    // Directly set the zoom while maintaining the world position at screen center
-    if (this.animWorldPos) {
+    // Check if this is a fitToView animation (has target offset)
+    if (this.animTargetOffset && this.animStartOffset) {
+      // Animate both zoom and offset
+      this.zoom = newZoom;
+      this.offset.x = this.animStartOffset.x + (this.animTargetOffset.x - this.animStartOffset.x) * eased;
+      this.offset.y = this.animStartOffset.y + (this.animTargetOffset.y - this.animStartOffset.y) * eased;
+
+      // Clean up when animation completes
+      if (this.animProgress >= 1.0) {
+        this.animTargetOffset = null;
+        this.animStartOffset = null;
+      }
+    } else if (this.animWorldPos) {
+      // Regular zoom animation - maintain the world position at screen center
       const oldZoom = this.zoom;
       const screenX = this.animWorldPos.x * oldZoom + this.offset.x;
       const screenY = this.animWorldPos.y * oldZoom + this.offset.y;
@@ -95,5 +109,40 @@ export class Camera {
   applyTransform(p) {
     p.translate(this.offset.x, this.offset.y);
     p.scale(this.zoom);
+  }
+
+  fitToView(bounds, canvasWidth, canvasHeight, animate = true) {
+    // Calculate zoom to fit bounds in canvas with some margin
+    const margin = 50; // pixels of margin around the content
+    const availableWidth = canvasWidth - margin * 2;
+    const availableHeight = canvasHeight - margin * 2;
+
+    const zoomX = availableWidth / bounds.width;
+    const zoomY = availableHeight / bounds.height;
+    const targetZoom = MathUtils.constrain(Math.min(zoomX, zoomY), this.minZoom, this.maxZoom);
+
+    // Calculate center of bounds in world coordinates
+    const worldCenter = new Vector(bounds.centerX, bounds.centerY);
+
+    // Calculate offset to center the bounds
+    const targetOffsetX = canvasWidth / 2 - worldCenter.x * targetZoom;
+    const targetOffsetY = canvasHeight / 2 - worldCenter.y * targetZoom;
+
+    if (animate) {
+      // Animate to the new view
+      this.animStartZoom = this.zoom;
+      this.animTargetZoom = targetZoom;
+      this.animProgress = 0;
+      this.animWorldPos = worldCenter;
+      this.isAnimating = true;
+
+      // Store target offset for animation
+      this.animTargetOffset = new Vector(targetOffsetX, targetOffsetY);
+      this.animStartOffset = this.offset.copy();
+    } else {
+      // Instant change
+      this.zoom = targetZoom;
+      this.offset.set(targetOffsetX, targetOffsetY);
+    }
   }
 }

@@ -90,6 +90,19 @@ export class UIController {
       };
     }
 
+    // Fit View button
+    const fitViewBtn = document.getElementById('fitViewBtn');
+    if (fitViewBtn) {
+      fitViewBtn.onclick = () => {
+        const bounds = this.mechanism.calculateBounds();
+        const canvas = document.querySelector('canvas');
+        if (canvas) {
+          this.camera.fitToView(bounds, canvas.width, canvas.height, true);
+          this.urlStateManager.scheduleURLUpdate();
+        }
+      };
+    }
+
     // Add Rod button
     const addRodBtn = document.getElementById('addRodBtn');
     if (addRodBtn) {
