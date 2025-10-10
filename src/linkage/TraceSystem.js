@@ -12,7 +12,7 @@ export class TraceSystem {
     this.fullRodTraceColor = [0, 150, 0]; // Lighter green for full rod traces
     this.fadeLifespan = 360; // 1 full rotation (360 frames)
     this.fullRodTraceSegments = 8; // Number of points to trace along rod length
-    this.traceWidth = 8; // Trace stroke width
+    this.traceWidth = 4; // Trace stroke width
     this.rodsWidth = 4; // Rods stroke width
     this.jointSizeMultiplier = 5; // Multiplier for joint size relative to trace/rod width
   }

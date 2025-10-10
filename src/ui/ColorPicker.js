@@ -7,7 +7,7 @@ export class ColorPicker {
     this.isOpen = false;
     this.currentColor = { r: 128, g: 0, b: 128 }; // Default purple
     this.currentHSV = this.rgbToHSV(128, 0, 128); // Store HSV separately
-    this.traceWidth = 8; // Default trace width
+    this.traceWidth = 4; // Default trace width
     this.rodsWidth = 4; // Default rods width
     this.createElements();
     this.setupEventListeners();
