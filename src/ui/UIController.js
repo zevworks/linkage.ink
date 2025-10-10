@@ -60,7 +60,7 @@ export class UIController {
     // Sync stretching mode button
     const stretchingModeBtn = document.getElementById('stretchingModeBtn');
     if (stretchingModeBtn) {
-      stretchingModeBtn.textContent = this.mechanism.isStretchingMode ? 'Stretching: On' : 'Stretching: Off';
+      stretchingModeBtn.textContent = this.mechanism.isStretchingMode ? 'Stretch: On' : 'Stretch: Off';
     }
 
     // Sync play/pause button
@@ -85,7 +85,7 @@ export class UIController {
     if (stretchingModeBtn) {
       stretchingModeBtn.onclick = () => {
         const isStretching = this.mechanism.toggleStretchingMode();
-        stretchingModeBtn.textContent = isStretching ? 'Stretching: On' : 'Stretching: Off';
+        stretchingModeBtn.textContent = isStretching ? 'Stretch: On' : 'Stretch: Off';
         this.urlStateManager.updateURLNow();
       };
     }
