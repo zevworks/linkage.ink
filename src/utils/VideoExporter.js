@@ -25,8 +25,8 @@ export class VideoExporter {
       // Get the canvas element
       const canvasElement = canvas.elt || canvas;
 
-      // Create stream from canvas
-      this.stream = canvasElement.captureStream(60); // 60fps
+      // Create stream from canvas at 30fps (reduces recording overhead significantly)
+      this.stream = canvasElement.captureStream(30);
 
       // Check available MIME types
       const mimeTypes = [
@@ -53,7 +53,7 @@ export class VideoExporter {
       // Create MediaRecorder
       this.mediaRecorder = new MediaRecorder(this.stream, {
         mimeType: selectedMimeType,
-        videoBitsPerSecond: 5000000 // 5 Mbps - good quality, reasonable size
+        videoBitsPerSecond: 2500000 // 2.5 Mbps - good quality, less overhead
       });
 
       // Handle data available
