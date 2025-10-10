@@ -24,6 +24,10 @@ class LinkageApp {
     this.traceSystem = new TraceSystem();
     this.videoExporter = new VideoExporter();
 
+    // Auto-fit flag
+    this.hasAutoFitted = false;
+    this.frameCount = 0;
+
     // Initialize state serialization and URL state management
     this.stateSerializer = new StateSerializer(this.mechanism, this.camera, this.traceSystem);
     this.urlStateManager = new URLStateManager(this.stateSerializer);
@@ -105,6 +109,21 @@ class LinkageApp {
         
         // Update trace aging
         this.traceSystem.update();
+
+        // Auto-fit view on first load after some traces have been drawn
+        if (!this.hasAutoFitted && this.mechanism.isPlaying) {
+          this.frameCount++;
+          if (this.frameCount >= 90) { // Wait 1.5 seconds for traces to build up
+            this.hasAutoFitted = true;
+            let bounds = this.traceSystem.calculateBounds();
+            if (!bounds) {
+              bounds = this.mechanism.calculateBounds();
+            }
+            if (bounds) {
+              this.camera.fitToView(bounds, p.width, p.height, true);
+            }
+          }
+        }
 
         // Render everything
         this.renderer.draw(p);
