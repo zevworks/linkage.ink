@@ -104,15 +104,47 @@ export class ColorPicker {
       min-width: 300px;
     `;
 
-    // Create title
+    // Create title container with close button
+    const titleContainer = document.createElement('div');
+    titleContainer.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    `;
+
     const title = document.createElement('h3');
     title.textContent = 'Design';
     title.style.cssText = `
-      margin: 0 0 15px 0;
+      margin: 0;
       font-size: 18px;
       font-weight: 600;
       color: #333;
     `;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.textContent = '×';
+    closeBtn.style.cssText = `
+      background: none;
+      border: none;
+      font-size: 28px;
+      line-height: 1;
+      cursor: pointer;
+      color: #666;
+      padding: 0;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    `;
+    closeBtn.onmouseover = () => closeBtn.style.color = '#333';
+    closeBtn.onmouseout = () => closeBtn.style.color = '#666';
+    closeBtn.onclick = () => this.close();
+
+    titleContainer.appendChild(title);
+    titleContainer.appendChild(closeBtn);
 
     // Create color preview
     this.colorPreview = document.createElement('div');
@@ -260,53 +292,13 @@ export class ColorPicker {
     this.createWidthSlider(widthSlidersContainer, 'traceWidth', 'Trace Width', 2, 20, this.traceWidth, 'px');
 
     // Add rods width slider
-    this.createWidthSlider(widthSlidersContainer, 'rodsWidth', 'Rods Width', 1, 10, this.rodsWidth, 'px');
-
-    // Create buttons
-    const buttonsContainer = document.createElement('div');
-    buttonsContainer.style.cssText = `
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    `;
-
-    const cancelBtn = document.createElement('button');
-    cancelBtn.textContent = 'Cancel';
-    cancelBtn.style.cssText = `
-      padding: 8px 16px;
-      background: #f0f0f0;
-      color: #333;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.2s;
-    `;
-    cancelBtn.onclick = () => this.close();
-
-    const applyBtn = document.createElement('button');
-    applyBtn.textContent = 'Apply';
-    applyBtn.style.cssText = `
-      padding: 8px 16px;
-      background: #007aff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.2s;
-    `;
-    applyBtn.onclick = () => this.apply();
-
-    buttonsContainer.appendChild(cancelBtn);
-    buttonsContainer.appendChild(applyBtn);
+    this.createWidthSlider(widthSlidersContainer, 'rodsWidth', 'Rods Width', 1, 20, this.rodsWidth, 'px');
 
     // Assemble picker
-    this.picker.appendChild(title);
+    this.picker.appendChild(titleContainer);
     this.picker.appendChild(this.colorPreview);
     this.picker.appendChild(slidersContainer);
     this.picker.appendChild(widthSlidersContainer);
-    this.picker.appendChild(buttonsContainer);
     this.overlay.appendChild(this.picker);
     document.body.appendChild(this.overlay);
   }
@@ -356,6 +348,15 @@ export class ColorPicker {
       e.stopPropagation();
       this[propertyName] = parseInt(slider.value);
       valueText.textContent = slider.value + suffix;
+
+      // Apply changes live
+      if (this.onDesignChange) {
+        this.onDesignChange({
+          color: this.currentColor,
+          traceWidth: this.traceWidth,
+          rodsWidth: this.rodsWidth
+        });
+      }
     };
 
     // Prevent events from propagating
@@ -386,6 +387,15 @@ export class ColorPicker {
         this.updateSliderGradients();
 
         this.updatePreview();
+
+        // Apply changes live
+        if (this.onDesignChange) {
+          this.onDesignChange({
+            color: this.currentColor,
+            traceWidth: this.traceWidth,
+            rodsWidth: this.rodsWidth
+          });
+        }
       };
 
       // Prevent mouse events from propagating to canvas
@@ -509,10 +519,34 @@ export class ColorPicker {
     }
     if (design.traceWidth !== undefined) {
       this.traceWidth = design.traceWidth;
+      this.updateWidthSlider('traceWidth', design.traceWidth);
     }
     if (design.rodsWidth !== undefined) {
       this.rodsWidth = design.rodsWidth;
+      this.updateWidthSlider('rodsWidth', design.rodsWidth);
     }
+  }
+
+  updateWidthSlider(propertyName, value) {
+    // Find and update the width slider element
+    const allInputs = this.picker.querySelectorAll('input[type="range"]');
+    allInputs.forEach(slider => {
+      // Check if this is the right slider by checking its parent structure
+      const parent = slider.parentElement;
+      const labelDiv = parent.querySelector('div');
+      if (labelDiv) {
+        const labelText = labelDiv.querySelector('span:first-child');
+        const valueText = labelDiv.querySelector('span:last-child');
+        const expectedLabel = propertyName === 'traceWidth' ? 'Trace Width' : 'Rods Width';
+
+        if (labelText && labelText.textContent === expectedLabel) {
+          slider.value = value;
+          if (valueText) {
+            valueText.textContent = value + 'px';
+          }
+        }
+      }
+    });
   }
 
   getColor() {
