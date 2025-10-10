@@ -67,11 +67,14 @@ export class LinkageMechanism {
       let angle = Math.atan2(guide.pos.y - parentJointPos.y, guide.pos.x - parentJointPos.x);
       this.rods[i].angle = angle;
 
-      // Stretching mode: grow rod if needed to keep joint inside GP
+      // Stretching mode: grow rod if needed to keep joint beyond GP sleeves
       if (this.isStretchingMode) {
         let distanceToGP = Vector.dist(parentJointPos, guide.pos);
-        if (distanceToGP > this.rods[i].length) {
-          this.rods[i].length = distanceToGP;
+        // Add sleeve length (radius * 2) to ensure rod extends beyond the sleeves
+        let sleeveLength = guide.radius * 2;
+        let minLength = distanceToGP + sleeveLength;
+        if (minLength > this.rods[i].length) {
+          this.rods[i].length = minLength;
         }
       }
 
