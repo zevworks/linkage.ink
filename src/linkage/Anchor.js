@@ -14,14 +14,14 @@ export class Anchor {
     const anchorSize = rodsWidth * 5;
     const anchorStrokeWeight = rodsWidth / 2;
 
-    // Draw outer black circle
-    p.stroke(0);
+    // Draw outer white circle
+    p.stroke(255);
     p.strokeWeight(anchorStrokeWeight);
-    p.fill(0);
+    p.fill(255);
     p.ellipse(this.pos.x, this.pos.y, anchorSize, anchorSize);
 
-    // Draw inner white circle (hole)
-    p.fill(255);
+    // Draw inner black circle (hole)
+    p.fill(0);
     p.noStroke();
     p.ellipse(this.pos.x, this.pos.y, anchorSize / 2, anchorSize / 2);
   }

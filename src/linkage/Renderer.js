@@ -12,7 +12,7 @@ export class Renderer {
   }
 
   draw(p) {
-    p.background(245);
+    p.background(0);
 
     // Apply camera transformation
     p.push();
@@ -38,9 +38,9 @@ export class Renderer {
       if (rod.isTracing) {
         p.fill(this.traceSystem.traceColor[0], this.traceSystem.traceColor[1], this.traceSystem.traceColor[2]);
       } else {
-        p.fill(255);
+        p.fill(0);
       }
-      p.stroke(0);
+      p.stroke(255);
       p.strokeWeight(jointStrokeWeight);
       p.ellipse(endPos.x, endPos.y, jointSize, jointSize);
     }
@@ -49,7 +49,7 @@ export class Renderer {
     let startPos = this.mechanism.anchor.pos;
     for (let i = 0; i < this.mechanism.rods.length; i++) {
       let endPos = this.mechanism.joints[i];
-      p.stroke(50);
+      p.stroke(200);
       p.strokeWeight(this.traceSystem.rodsWidth);
       p.line(startPos.x, startPos.y, endPos.x, endPos.y);
       startPos = endPos;
@@ -61,7 +61,7 @@ export class Renderer {
       let guidedJoint = this.mechanism.joints[i];
       if (guidedJoint) {
         p.drawingContext.setLineDash([5, 5]);
-        p.stroke(150, 150, 150, 150);
+        p.stroke(100, 100, 100, 150);
         p.strokeWeight(1);
         p.line(gp.pos.x, gp.pos.y, guidedJoint.x, guidedJoint.y);
         p.drawingContext.setLineDash([]);
