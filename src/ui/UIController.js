@@ -100,9 +100,9 @@ export class UIController {
           bounds = this.mechanism.calculateBounds();
         }
 
-        const canvas = document.querySelector('canvas');
-        if (canvas && bounds) {
-          this.camera.fitToView(bounds, canvas.width, canvas.height, true);
+        if (bounds && this.p5Instance) {
+          // Use p5 instance width/height which accounts for display size
+          this.camera.fitToView(bounds, this.p5Instance.width, this.p5Instance.height, true);
           this.urlStateManager.scheduleURLUpdate();
         }
       };
