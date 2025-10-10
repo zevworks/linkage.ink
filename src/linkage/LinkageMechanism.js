@@ -70,9 +70,10 @@ export class LinkageMechanism {
       // Stretching mode: grow rod if needed to keep joint beyond GP sleeves
       if (this.isStretchingMode) {
         let distanceToGP = Vector.dist(parentJointPos, guide.pos);
-        // Add sleeve length (radius * 2) to ensure rod extends beyond the sleeves
+        // Add sleeve length (radius * 2) and joint radius to ensure joint extends beyond the sleeves
         let sleeveLength = guide.radius * 2;
-        let minLength = distanceToGP + sleeveLength;
+        let jointRadius = 10; // Joint visual size from Renderer
+        let minLength = distanceToGP + sleeveLength + jointRadius;
         if (minLength > this.rods[i].length) {
           this.rods[i].length = minLength;
         }
