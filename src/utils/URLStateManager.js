@@ -1,6 +1,6 @@
 /**
  * Manages encoding/decoding linkage state in URL hash
- * Format: #anchor=x,y&crank=len,trace,fulltrace&rod1=len,gpx,gpy,trace,fulltrace&camera=ox,oy,zoom&color=r,g,b
+ * Format: #anchor=x,y&crank=len,trace,fulltrace&rod1=len,gpx,gpy,trace,fulltrace&camera=ox,oy,zoom&color=r,g,b&stretch=0|1
  */
 export class URLStateManager {
   constructor(stateSerializer) {
@@ -37,6 +37,11 @@ export class URLStateManager {
     // Encode color: color=r,g,b
     const color = state.traceColor;
     params.set('color', `${color.r},${color.g},${color.b}`);
+
+    // Encode stretching mode: stretch=0|1
+    if (state.isStretchingMode !== undefined) {
+      params.set('stretch', state.isStretchingMode ? '1' : '0');
+    }
 
     // Update URL hash without triggering page reload
     window.history.replaceState(null, '', '#' + params.toString());
@@ -115,6 +120,12 @@ export class URLStateManager {
       if (colorStr) {
         const [r, g, b] = colorStr.split(',').map(Number);
         state.traceColor = { r, g, b };
+      }
+
+      // Decode stretching mode
+      const stretchStr = params.get('stretch');
+      if (stretchStr !== null) {
+        state.isStretchingMode = stretchStr === '1';
       }
 
       // Import the state
