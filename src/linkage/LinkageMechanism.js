@@ -13,7 +13,7 @@ export class LinkageMechanism {
     this.crankSpeed = Math.PI * 2 / this.FRAMES_PER_ROUND;
     this.crankAngle = 0;
     this.isPlaying = true;
-    this.isStretchingMode = false;
+    this.isStretchingMode = true;
 
     // Initialize mechanism components
     this.anchor = new Anchor(width / 2, height / 2 + 50);
