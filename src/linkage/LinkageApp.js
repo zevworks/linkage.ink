@@ -115,10 +115,28 @@ class LinkageApp {
           this.frameCount++;
           if (this.frameCount >= 90) { // Wait 1.5 seconds for traces to build up
             this.hasAutoFitted = true;
-            let bounds = this.traceSystem.calculateBounds();
-            if (!bounds) {
-              bounds = this.mechanism.calculateBounds();
+
+            // Get both trace and mechanism bounds
+            const traceBounds = this.traceSystem.calculateBounds();
+            const mechanismBounds = this.mechanism.calculateBounds();
+
+            // Merge bounds to get the larger extent
+            let bounds = null;
+            if (traceBounds && mechanismBounds) {
+              bounds = {
+                minX: Math.min(traceBounds.minX, mechanismBounds.minX),
+                maxX: Math.max(traceBounds.maxX, mechanismBounds.maxX),
+                minY: Math.min(traceBounds.minY, mechanismBounds.minY),
+                maxY: Math.max(traceBounds.maxY, mechanismBounds.maxY)
+              };
+              bounds.width = bounds.maxX - bounds.minX;
+              bounds.height = bounds.maxY - bounds.minY;
+              bounds.centerX = (bounds.minX + bounds.maxX) / 2;
+              bounds.centerY = (bounds.minY + bounds.maxY) / 2;
+            } else {
+              bounds = traceBounds || mechanismBounds;
             }
+
             if (bounds) {
               this.camera.fitToView(bounds, p.width, p.height, true);
             }
