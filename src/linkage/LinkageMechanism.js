@@ -76,10 +76,8 @@ export class LinkageMechanism {
         const sleeveLength = gpSize;
         // Sleeves extend sleeveLength from GP center
         let sleeveExtension = sleeveLength;
-        // Joint size from Renderer (depends on tracing state, 5x multiplier)
-        let jointRadius = this.rods[i].isTracing ?
-          this.traceSystem.traceWidth * 5 / 2 :
-          this.traceSystem.rodsWidth * 5 / 2;
+        // Joint size from Renderer (use traceWidth with multiplier for all joints)
+        let jointRadius = this.traceSystem.traceWidth * this.traceSystem.jointSizeMultiplier / 2;
         let minLength = distanceToGP + sleeveExtension + jointRadius;
         if (minLength > this.rods[i].length) {
           this.rods[i].length = minLength;

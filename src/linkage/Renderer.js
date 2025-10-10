@@ -31,10 +31,8 @@ export class Renderer {
       const endPos = this.mechanism.joints[i];
       const rod = this.mechanism.rods[i];
 
-      // Joint size: traced joints use traceWidth, non-traced use rodsWidth (multiplier to match GP)
-      const jointSize = rod.isTracing ?
-        this.traceSystem.traceWidth * this.traceSystem.jointSizeMultiplier :
-        this.traceSystem.rodsWidth * 4;
+      // Joint size: use traceWidth with multiplier for all joints
+      const jointSize = this.traceSystem.traceWidth * this.traceSystem.jointSizeMultiplier;
 
       if (rod.isTracing) {
         p.fill(this.traceSystem.traceColor[0], this.traceSystem.traceColor[1], this.traceSystem.traceColor[2]);
