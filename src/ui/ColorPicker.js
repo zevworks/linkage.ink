@@ -1,12 +1,14 @@
 /**
- * Color picker component for selecting trace colors
+ * Design panel component for selecting trace colors and widths
  */
 export class ColorPicker {
-  constructor(onColorChange) {
-    this.onColorChange = onColorChange;
+  constructor(onDesignChange) {
+    this.onDesignChange = onDesignChange;
     this.isOpen = false;
     this.currentColor = { r: 128, g: 0, b: 128 }; // Default purple
     this.currentHSV = this.rgbToHSV(128, 0, 128); // Store HSV separately
+    this.traceWidth = 8; // Default trace width
+    this.rodsWidth = 4; // Default rods width
     this.createElements();
     this.setupEventListeners();
   }
@@ -104,7 +106,7 @@ export class ColorPicker {
 
     // Create title
     const title = document.createElement('h3');
-    title.textContent = 'Select Trace Color';
+    title.textContent = 'Design';
     title.style.cssText = `
       margin: 0 0 15px 0;
       font-size: 18px;
@@ -243,59 +245,22 @@ export class ColorPicker {
       this.sliders[name] = { slider, valueText, suffix, gradient, getGradient };
     });
 
-    // Create preset colors
-    const presetsLabel = document.createElement('div');
-    presetsLabel.textContent = 'Presets';
-    presetsLabel.style.cssText = `
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 8px;
-    `;
-
-    const presetsContainer = document.createElement('div');
-    presetsContainer.style.cssText = `
+    // Create width sliders container
+    const widthSlidersContainer = document.createElement('div');
+    widthSlidersContainer.style.cssText = `
       display: flex;
-      gap: 10px;
+      flex-direction: column;
+      gap: 12px;
       margin-bottom: 20px;
-      flex-wrap: wrap;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
     `;
 
-    const presetColors = [
-      { r: 128, g: 0, b: 128, name: 'Purple' },
-      { r: 255, g: 0, b: 0, name: 'Red' },
-      { r: 0, g: 128, b: 255, name: 'Blue' },
-      { r: 0, g: 200, b: 0, name: 'Green' },
-      { r: 255, g: 165, b: 0, name: 'Orange' },
-      { r: 255, g: 192, b: 203, name: 'Pink' }
-    ];
+    // Add trace width slider
+    this.createWidthSlider(widthSlidersContainer, 'traceWidth', 'Trace Width', 2, 20, this.traceWidth, 'px');
 
-    presetColors.forEach(color => {
-      const preset = document.createElement('button');
-      preset.style.cssText = `
-        width: 40px;
-        height: 40px;
-        border-radius: 8px;
-        border: 2px solid #ddd;
-        background: rgb(${color.r}, ${color.g}, ${color.b});
-        cursor: pointer;
-        transition: transform 0.2s, border-color 0.2s;
-      `;
-      preset.title = color.name;
-      preset.onclick = () => {
-        this.currentColor = { r: color.r, g: color.g, b: color.b };
-        this.currentHSV = this.rgbToHSV(color.r, color.g, color.b);
-        this.updateUI();
-      };
-      preset.onmouseover = () => {
-        preset.style.transform = 'scale(1.1)';
-        preset.style.borderColor = '#007aff';
-      };
-      preset.onmouseout = () => {
-        preset.style.transform = 'scale(1)';
-        preset.style.borderColor = '#ddd';
-      };
-      presetsContainer.appendChild(preset);
-    });
+    // Add rods width slider
+    this.createWidthSlider(widthSlidersContainer, 'rodsWidth', 'Rods Width', 1, 10, this.rodsWidth, 'px');
 
     // Create buttons
     const buttonsContainer = document.createElement('div');
@@ -340,11 +305,70 @@ export class ColorPicker {
     this.picker.appendChild(title);
     this.picker.appendChild(this.colorPreview);
     this.picker.appendChild(slidersContainer);
-    this.picker.appendChild(presetsLabel);
-    this.picker.appendChild(presetsContainer);
+    this.picker.appendChild(widthSlidersContainer);
     this.picker.appendChild(buttonsContainer);
     this.overlay.appendChild(this.picker);
     document.body.appendChild(this.overlay);
+  }
+
+  createWidthSlider(container, propertyName, label, min, max, value, suffix) {
+    const sliderGroup = document.createElement('div');
+
+    const labelDiv = document.createElement('div');
+    labelDiv.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      font-size: 14px;
+      color: #666;
+    `;
+
+    const labelText = document.createElement('span');
+    labelText.textContent = label;
+
+    const valueText = document.createElement('span');
+    valueText.textContent = value + suffix;
+    valueText.style.cssText = `
+      font-weight: 600;
+      color: #333;
+    `;
+
+    labelDiv.appendChild(labelText);
+    labelDiv.appendChild(valueText);
+
+    const slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = min.toString();
+    slider.max = max.toString();
+    slider.value = value;
+    slider.style.cssText = `
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #ddd;
+      cursor: pointer;
+    `;
+
+    slider.oninput = (e) => {
+      e.stopPropagation();
+      this[propertyName] = parseInt(slider.value);
+      valueText.textContent = slider.value + suffix;
+    };
+
+    // Prevent events from propagating
+    slider.onmousedown = (e) => e.stopPropagation();
+    slider.onmousemove = (e) => e.stopPropagation();
+    slider.onmouseup = (e) => e.stopPropagation();
+    slider.ontouchstart = (e) => e.stopPropagation();
+    slider.ontouchmove = (e) => e.stopPropagation();
+    slider.ontouchend = (e) => e.stopPropagation();
+
+    sliderGroup.appendChild(labelDiv);
+    sliderGroup.appendChild(slider);
+    container.appendChild(sliderGroup);
   }
 
   setupEventListeners() {
@@ -463,8 +487,12 @@ export class ColorPicker {
   }
 
   apply() {
-    if (this.onColorChange) {
-      this.onColorChange(this.currentColor);
+    if (this.onDesignChange) {
+      this.onDesignChange({
+        color: this.currentColor,
+        traceWidth: this.traceWidth,
+        rodsWidth: this.rodsWidth
+      });
     }
     this.close();
   }
@@ -474,7 +502,28 @@ export class ColorPicker {
     this.updateUI();
   }
 
+  setDesign(design) {
+    if (design.color) {
+      this.currentColor = { ...design.color };
+      this.updateUI();
+    }
+    if (design.traceWidth !== undefined) {
+      this.traceWidth = design.traceWidth;
+    }
+    if (design.rodsWidth !== undefined) {
+      this.rodsWidth = design.rodsWidth;
+    }
+  }
+
   getColor() {
     return { ...this.currentColor };
+  }
+
+  getDesign() {
+    return {
+      color: { ...this.currentColor },
+      traceWidth: this.traceWidth,
+      rodsWidth: this.rodsWidth
+    };
   }
 }

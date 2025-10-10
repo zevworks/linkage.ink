@@ -26,6 +26,9 @@ export class Renderer {
   }
 
   drawMechanism(p) {
+    // Calculate joint size based on trace width (2.5x trace width)
+    const jointSize = this.traceSystem.traceWidth * 2.5;
+
     // Draw joints
     for (let i = 0; i < this.mechanism.joints.length; i++) {
       const endPos = this.mechanism.joints[i];
@@ -38,7 +41,7 @@ export class Renderer {
       }
       p.stroke(0);
       p.strokeWeight(2);
-      p.ellipse(endPos.x, endPos.y, 20, 20);
+      p.ellipse(endPos.x, endPos.y, jointSize, jointSize);
     }
 
     // Draw rods
@@ -46,7 +49,7 @@ export class Renderer {
     for (let i = 0; i < this.mechanism.rods.length; i++) {
       let endPos = this.mechanism.joints[i];
       p.stroke(50);
-      p.strokeWeight(4);
+      p.strokeWeight(this.traceSystem.rodsWidth);
       p.line(startPos.x, startPos.y, endPos.x, endPos.y);
       startPos = endPos;
     }

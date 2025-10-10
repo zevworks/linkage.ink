@@ -12,6 +12,8 @@ export class TraceSystem {
     this.fullRodTraceColor = [0, 150, 0]; // Lighter green for full rod traces
     this.fadeLifespan = 360; // 1 full rotation (360 frames)
     this.fullRodTraceSegments = 8; // Number of points to trace along rod length
+    this.traceWidth = 8; // Trace stroke width
+    this.rodsWidth = 4; // Rods stroke width
   }
 
   setTraceColor(color) {
@@ -33,6 +35,22 @@ export class TraceSystem {
       g: this.traceColor[1],
       b: this.traceColor[2]
     };
+  }
+
+  setTraceWidth(width) {
+    this.traceWidth = width;
+  }
+
+  getTraceWidth() {
+    return this.traceWidth;
+  }
+
+  setRodsWidth(width) {
+    this.rodsWidth = width;
+  }
+
+  getRodsWidth() {
+    return this.rodsWidth;
   }
 
   updateFadeLifespan(framesPerRound) {
@@ -110,7 +128,7 @@ export class TraceSystem {
     p.noFill();
 
     // Draw full-rod traces first (bottom layer)
-    p.strokeWeight(2);
+    p.strokeWeight(this.rodsWidth);
     for (const rodId in this.fullRodTracePaths) {
       let path = this.fullRodTracePaths[rodId];
 
@@ -132,7 +150,7 @@ export class TraceSystem {
     }
 
     // Draw joint point traces on top with smooth curves and flowing bands
-    p.strokeWeight(8);
+    p.strokeWeight(this.traceWidth);
     for (const rodId in this.tracePaths) {
       let path = this.tracePaths[rodId];
 

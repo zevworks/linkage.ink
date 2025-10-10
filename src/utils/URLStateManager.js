@@ -1,6 +1,6 @@
 /**
  * Manages encoding/decoding linkage state in URL hash
- * Format: #anchor=x,y&crank=len,trace,fulltrace&rod1=len,gpx,gpy,trace,fulltrace&camera=ox,oy,zoom&color=r,g,b&stretch=0|1
+ * Format: #anchor=x,y&crank=len,trace,fulltrace&rod1=len,gpx,gpy,trace,fulltrace&camera=ox,oy,zoom&color=r,g,b&traceWidth=n&rodsWidth=n&stretch=0|1
  */
 export class URLStateManager {
   constructor(stateSerializer) {
@@ -37,6 +37,14 @@ export class URLStateManager {
     // Encode color: color=r,g,b
     const color = state.traceColor;
     params.set('color', `${color.r},${color.g},${color.b}`);
+
+    // Encode widths
+    if (state.traceWidth !== undefined) {
+      params.set('traceWidth', state.traceWidth.toString());
+    }
+    if (state.rodsWidth !== undefined) {
+      params.set('rodsWidth', state.rodsWidth.toString());
+    }
 
     // Encode stretching mode: stretch=0|1
     if (state.isStretchingMode !== undefined) {
@@ -120,6 +128,17 @@ export class URLStateManager {
       if (colorStr) {
         const [r, g, b] = colorStr.split(',').map(Number);
         state.traceColor = { r, g, b };
+      }
+
+      // Decode widths
+      const traceWidthStr = params.get('traceWidth');
+      if (traceWidthStr !== null) {
+        state.traceWidth = parseInt(traceWidthStr);
+      }
+
+      const rodsWidthStr = params.get('rodsWidth');
+      if (rodsWidthStr !== null) {
+        state.rodsWidth = parseInt(rodsWidthStr);
       }
 
       // Decode stretching mode

@@ -55,6 +55,8 @@ export class StateSerializer {
         zoom: this.camera.zoom
       },
       traceColor: this.traceSystem.getTraceColor(),
+      traceWidth: this.traceSystem.getTraceWidth(),
+      rodsWidth: this.traceSystem.getRodsWidth(),
       isStretchingMode: this.mechanism.isStretchingMode
     };
   }
@@ -102,6 +104,16 @@ export class StateSerializer {
     // Restore trace color
     if (state.traceColor) {
       this.traceSystem.setTraceColor(state.traceColor);
+    }
+
+    // Restore trace width
+    if (state.traceWidth !== undefined) {
+      this.traceSystem.setTraceWidth(state.traceWidth);
+    }
+
+    // Restore rods width
+    if (state.rodsWidth !== undefined) {
+      this.traceSystem.setRodsWidth(state.rodsWidth);
     }
 
     // Restore stretching mode

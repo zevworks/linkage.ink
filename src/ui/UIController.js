@@ -11,7 +11,7 @@ export class UIController {
     this.camera = camera;
     this.urlStateManager = urlStateManager;
     this.p5Instance = null;
-    this.colorPicker = new ColorPicker((color) => this.handleColorChange(color));
+    this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design));
     this.setupEventListeners();
 
     // Set initial button colors based on current trace color
@@ -21,9 +21,11 @@ export class UIController {
     this.syncButtonStates();
   }
 
-  handleColorChange(color) {
-    this.traceSystem.setTraceColor(color);
-    this.updateButtonColors(color);
+  handleDesignChange(design) {
+    this.traceSystem.setTraceColor(design.color);
+    this.traceSystem.setTraceWidth(design.traceWidth);
+    this.traceSystem.setRodsWidth(design.rodsWidth);
+    this.updateButtonColors(design.color);
     this.urlStateManager.updateURLNow();
   }
 
@@ -157,12 +159,16 @@ export class UIController {
       };
     }
 
-    // Color Picker button
+    // Design Picker button
     const colorPickerBtn = document.getElementById('colorPickerBtn');
     if (colorPickerBtn) {
       colorPickerBtn.onclick = () => {
-        // Set current color before opening
-        this.colorPicker.setColor(this.traceSystem.getTraceColor());
+        // Set current design before opening
+        this.colorPicker.setDesign({
+          color: this.traceSystem.getTraceColor(),
+          traceWidth: this.traceSystem.getTraceWidth(),
+          rodsWidth: this.traceSystem.getRodsWidth()
+        });
         this.colorPicker.open();
       };
     }
