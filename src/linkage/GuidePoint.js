@@ -21,6 +21,7 @@ export class GuidePoint {
     // GP circle size based on rod width
     const gpSize = rodsWidth * 5;
     const sleeveLength = gpSize;
+    const gpStrokeWeight = rodsWidth / 2;
 
     // Sleeves are always double the rod width
     p.stroke(0);
@@ -29,7 +30,7 @@ export class GuidePoint {
     p.line(-sleeveLength, 0, sleeveLength, 0);
 
     p.stroke(0);
-    p.strokeWeight(2);
+    p.strokeWeight(gpStrokeWeight);
     if (fillColor) {
       p.fill(fillColor[0], fillColor[1], fillColor[2]);
     } else {

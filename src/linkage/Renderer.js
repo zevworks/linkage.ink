@@ -33,6 +33,7 @@ export class Renderer {
 
       // Joint size: use traceWidth with multiplier for all joints
       const jointSize = this.traceSystem.traceWidth * this.traceSystem.jointSizeMultiplier;
+      const jointStrokeWeight = this.traceSystem.traceWidth / 2;
 
       if (rod.isTracing) {
         p.fill(this.traceSystem.traceColor[0], this.traceSystem.traceColor[1], this.traceSystem.traceColor[2]);
@@ -40,7 +41,7 @@ export class Renderer {
         p.fill(255);
       }
       p.stroke(0);
-      p.strokeWeight(2);
+      p.strokeWeight(jointStrokeWeight);
       p.ellipse(endPos.x, endPos.y, jointSize, jointSize);
     }
 
@@ -68,7 +69,7 @@ export class Renderer {
     }
 
     // Draw anchor and guide points on top
-    this.mechanism.anchor.draw(p, this.camera.zoom);
+    this.mechanism.anchor.draw(p, this.camera.zoom, this.traceSystem.rodsWidth);
     for (let i = 0; i < this.mechanism.guidePoints.length; i++) {
       let correspondingRod = this.mechanism.rods[i + 1];
       if (correspondingRod) {
