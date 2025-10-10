@@ -15,7 +15,7 @@ export class VideoExporter {
   startRecording(canvas, framesPerRound, onComplete) {
     this.isRecording = true;
     this.frameCount = 0;
-    this.targetFrames = framesPerRound * 2; // 2 full rotations
+    this.targetFrames = framesPerRound * 3 - 1; // 3 full rotations minus 1 frame for seamless loop
     this.onComplete = onComplete;
     this.chunks = [];
 
