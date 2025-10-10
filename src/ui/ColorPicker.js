@@ -292,7 +292,7 @@ export class ColorPicker {
     this.createWidthSlider(widthSlidersContainer, 'traceWidth', 'Trace Width', 2, 20, this.traceWidth, 'px');
 
     // Add rods width slider
-    this.createWidthSlider(widthSlidersContainer, 'rodsWidth', 'Rods Width', 1, 20, this.rodsWidth, 'px');
+    this.createWidthSlider(widthSlidersContainer, 'rodsWidth', 'Rods Width', 2, 20, this.rodsWidth, 'px');
 
     // Assemble picker
     this.picker.appendChild(titleContainer);
