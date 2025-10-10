@@ -16,6 +16,9 @@ export class UIController {
 
     // Set initial button colors based on current trace color
     this.updateButtonColors(this.traceSystem.getTraceColor());
+
+    // Sync button states with mechanism state (for loading from URL)
+    this.syncButtonStates();
   }
 
   handleColorChange(color) {
@@ -53,6 +56,20 @@ export class UIController {
     this.mechanism = mechanism;
   }
 
+  syncButtonStates() {
+    // Sync stretching mode button
+    const stretchingModeBtn = document.getElementById('stretchingModeBtn');
+    if (stretchingModeBtn) {
+      stretchingModeBtn.textContent = this.mechanism.isStretchingMode ? 'Stretching: On' : 'Stretching: Off';
+    }
+
+    // Sync play/pause button
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    if (playPauseBtn) {
+      playPauseBtn.textContent = this.mechanism.isPlaying ? 'Pause' : 'Play';
+    }
+  }
+
   setupEventListeners() {
     // Play/Pause button
     const playPauseBtn = document.getElementById('playPauseBtn');
@@ -60,6 +77,16 @@ export class UIController {
       playPauseBtn.onclick = () => {
         const isPlaying = this.mechanism.togglePlayPause();
         playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+      };
+    }
+
+    // Stretching Mode button
+    const stretchingModeBtn = document.getElementById('stretchingModeBtn');
+    if (stretchingModeBtn) {
+      stretchingModeBtn.onclick = () => {
+        const isStretching = this.mechanism.toggleStretchingMode();
+        stretchingModeBtn.textContent = isStretching ? 'Stretching: On' : 'Stretching: Off';
+        this.urlStateManager.updateURLNow();
       };
     }
 

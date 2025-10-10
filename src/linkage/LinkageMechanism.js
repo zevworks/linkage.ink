@@ -13,6 +13,7 @@ export class LinkageMechanism {
     this.crankSpeed = Math.PI * 2 / this.FRAMES_PER_ROUND;
     this.crankAngle = 0;
     this.isPlaying = true;
+    this.isStretchingMode = false;
 
     // Initialize mechanism components
     this.anchor = new Anchor(width / 2, height / 2 + 50);
@@ -48,7 +49,7 @@ export class LinkageMechanism {
 
   updateJoints() {
     this.joints = [];
-    
+
     // Calculate crank endpoint
     let currentPos = this.anchor.pos.copy();
     this.rods[0].angle = this.crankAngle;
@@ -57,15 +58,23 @@ export class LinkageMechanism {
       currentPos.y + this.rods[0].length * Math.sin(this.rods[0].angle)
     );
     this.joints.push(crankEndpoint);
-    
+
     // Calculate follower rod endpoints
     for (let i = 1; i < this.rods.length; i++) {
       let parentJointPos = this.joints[i - 1];
       let guide = this.guidePoints[i - 1];
-      
+
       let angle = Math.atan2(guide.pos.y - parentJointPos.y, guide.pos.x - parentJointPos.x);
       this.rods[i].angle = angle;
-      
+
+      // Stretching mode: grow rod if needed to keep joint inside GP
+      if (this.isStretchingMode) {
+        let distanceToGP = Vector.dist(parentJointPos, guide.pos);
+        if (distanceToGP > this.rods[i].length) {
+          this.rods[i].length = distanceToGP;
+        }
+      }
+
       let nextJointPos = new Vector(
         parentJointPos.x + this.rods[i].length * Math.cos(angle),
         parentJointPos.y + this.rods[i].length * Math.sin(angle)
@@ -114,6 +123,11 @@ export class LinkageMechanism {
   togglePlayPause() {
     this.isPlaying = !this.isPlaying;
     return this.isPlaying;
+  }
+
+  toggleStretchingMode() {
+    this.isStretchingMode = !this.isStretchingMode;
+    return this.isStretchingMode;
   }
 
   getTracingRods() {

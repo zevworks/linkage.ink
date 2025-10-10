@@ -54,7 +54,8 @@ export class StateSerializer {
         offsetY: this.camera.offset.y,
         zoom: this.camera.zoom
       },
-      traceColor: this.traceSystem.getTraceColor()
+      traceColor: this.traceSystem.getTraceColor(),
+      isStretchingMode: this.mechanism.isStretchingMode
     };
   }
 
@@ -101,6 +102,11 @@ export class StateSerializer {
     // Restore trace color
     if (state.traceColor) {
       this.traceSystem.setTraceColor(state.traceColor);
+    }
+
+    // Restore stretching mode
+    if (state.isStretchingMode !== undefined) {
+      this.mechanism.isStretchingMode = state.isStretchingMode;
     }
 
     // Update joints
