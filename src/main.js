@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeIcon = document.getElementById('closeIcon');
   let isMenuOpen = false;
 
-  menuToggle.addEventListener('click', () => {
+  const toggleMenu = () => {
     isMenuOpen = !isMenuOpen;
 
     if (isMenuOpen) {
@@ -28,6 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
       menuIcon.style.display = 'block';
       closeIcon.style.display = 'none';
     }
+  };
+
+  menuToggle.addEventListener('click', toggleMenu);
+  menuToggle.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleMenu();
   });
 
   // Close menu when clicking or tapping outside
