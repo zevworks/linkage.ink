@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isMenuOpen) {
       menuPanel.classList.remove('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
       menuPanel.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
-      menuIconSvg.style.transform = 'rotate(90deg)';
+      menuIconSvg.style.transform = 'rotate(-90deg)';
     } else {
       menuPanel.classList.add('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
       menuPanel.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
