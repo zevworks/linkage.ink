@@ -14,6 +14,30 @@ export class Renderer {
 
   setInverse(isInverse) {
     this.isInverse = isInverse;
+    this.updateMenuIconColor();
+  }
+
+  updateMenuIconColor() {
+    const color = this.isInverse ? '#ffffff' : '#000000';
+    const menuIcon = document.getElementById('menuIcon');
+    const closeIcon = document.getElementById('closeIcon');
+
+    if (menuIcon) {
+      const circles = menuIcon.querySelectorAll('circle');
+      circles.forEach(circle => {
+        circle.setAttribute('stroke', color);
+        if (circle.getAttribute('fill') !== 'none') {
+          circle.setAttribute('fill', color);
+        }
+      });
+    }
+
+    if (closeIcon) {
+      const lines = closeIcon.querySelectorAll('line');
+      lines.forEach(line => {
+        line.setAttribute('stroke', color);
+      });
+    }
   }
 
   getInverse() {

@@ -291,5 +291,5 @@ class LinkageApp {
   }
 }
 
-// Initialize the application
-new LinkageApp();
+// Initialize and export the application
+export const app = new LinkageApp();
