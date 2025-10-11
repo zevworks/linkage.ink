@@ -27,10 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Close menu when clicking outside
-  document.addEventListener('click', (e) => {
+  // Close menu when clicking or tapping outside
+  const closeMenuIfOutside = (e) => {
     if (isMenuOpen && !menuPanel.contains(e.target) && !menuToggle.contains(e.target)) {
       menuToggle.click();
     }
-  });
+  };
+
+  document.addEventListener('click', closeMenuIfOutside);
+  document.addEventListener('touchstart', closeMenuIfOutside);
 });
