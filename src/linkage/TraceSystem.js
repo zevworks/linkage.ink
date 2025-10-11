@@ -15,19 +15,41 @@ export class TraceSystem {
     this.traceWidth = 4; // Trace stroke width
     this.rodsWidth = 4; // Rods stroke width
     this.jointSizeMultiplier = 5; // Multiplier for joint size relative to trace/rod width
+    this.isInverse = false; // Track inverse mode
   }
 
   setTraceColor(color) {
     // Convert color object {r, g, b} to array [r, g, b]
-    this.traceColor = [color.r, color.g, color.b];
+    const baseColor = [color.r, color.g, color.b];
 
-    // Calculate lighter version for rod traces
-    // Increase each component by 50%, capping at 255
-    this.fullRodTraceColor = [
-      Math.min(255, Math.floor(color.r * 1.5)),
-      Math.min(255, Math.floor(color.g * 1.5)),
-      Math.min(255, Math.floor(color.b * 1.5))
-    ];
+    // In normal mode: joint trace is darker, rod trace is lighter
+    // In inverse mode: joint trace is lighter, rod trace is darker
+    if (this.isInverse) {
+      // Joint trace should be lighter (1.5x)
+      this.traceColor = [
+        Math.min(255, Math.floor(color.r * 1.5)),
+        Math.min(255, Math.floor(color.g * 1.5)),
+        Math.min(255, Math.floor(color.b * 1.5))
+      ];
+      // Rod trace should be darker (base color)
+      this.fullRodTraceColor = baseColor;
+    } else {
+      // Joint trace should be darker (base color)
+      this.traceColor = baseColor;
+      // Rod trace should be lighter (1.5x)
+      this.fullRodTraceColor = [
+        Math.min(255, Math.floor(color.r * 1.5)),
+        Math.min(255, Math.floor(color.g * 1.5)),
+        Math.min(255, Math.floor(color.b * 1.5))
+      ];
+    }
+  }
+
+  setInverse(isInverse) {
+    this.isInverse = isInverse;
+    // Reapply current trace color with new inverse mode
+    const currentColor = this.getTraceColor();
+    this.setTraceColor(currentColor);
   }
 
   getTraceColor() {

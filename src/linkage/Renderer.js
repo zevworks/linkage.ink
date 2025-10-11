@@ -14,6 +14,7 @@ export class Renderer {
 
   setInverse(isInverse) {
     this.isInverse = isInverse;
+    this.traceSystem.setInverse(isInverse);
     this.updateMenuIconColor();
     this.updateBodyBackground();
   }
