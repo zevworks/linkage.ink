@@ -5,8 +5,8 @@ export class ColorPicker {
   constructor(onDesignChange) {
     this.onDesignChange = onDesignChange;
     this.isOpen = false;
-    this.currentColor = { r: 255, g: 255, b: 255 }; // Default white
-    this.currentHSV = this.rgbToHSV(255, 255, 255); // Store HSV separately
+    this.currentColor = { r: 128, g: 0, b: 128 }; // Default purple
+    this.currentHSV = this.rgbToHSV(128, 0, 128); // Store HSV separately
     this.traceWidth = 4; // Default trace width
     this.rodsWidth = 4; // Default rods width
     this.createElements();

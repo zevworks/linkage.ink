@@ -24,17 +24,17 @@ export class GuidePoint {
     const gpStrokeWeight = rodsWidth;
 
     // Sleeves are always double the rod width
-    p.stroke(255);
+    p.stroke(0);
     p.strokeWeight(rodsWidth * 2);
     p.strokeCap(p.SQUARE);
     p.line(-sleeveLength, 0, sleeveLength, 0);
 
-    p.stroke(255);
+    p.stroke(0);
     p.strokeWeight(gpStrokeWeight);
     if (fillColor) {
       p.fill(fillColor[0], fillColor[1], fillColor[2]);
     } else {
-      p.fill(0);
+      p.fill(255);
     }
     p.ellipse(0, 0, gpSize, gpSize);
 
