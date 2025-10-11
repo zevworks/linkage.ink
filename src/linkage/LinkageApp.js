@@ -14,9 +14,9 @@ import { URLStateManager } from '../utils/URLStateManager.js';
  */
 class LinkageApp {
   constructor() {
-    // Make canvas responsive to screen size
-    this.width = Math.min(1000, window.innerWidth - 40);
-    this.height = Math.min(800, window.innerHeight - 120);
+    // Full screen canvas
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
 
     // Initialize core systems
     this.traceSystem = new TraceSystem();
@@ -60,6 +60,15 @@ class LinkageApp {
 
     // Setup p5.js sketch
     this.setupP5();
+
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      this.width = window.innerWidth;
+      this.height = window.innerHeight;
+      if (this.p5Instance) {
+        this.p5Instance.resizeCanvas(this.width, this.height);
+      }
+    });
   }
 
   setupP5() {

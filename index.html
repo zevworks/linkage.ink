@@ -4,101 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive 2D Linkage Simulator</title>
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-            min-height: 100vh;
-        }
-        
-        main {
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        canvas {
-            touch-action: none;
-        }
-        
-        #controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        
-        button {
-            padding: 10px 18px;
-            font-size: 16px;
-            border: none;
-            border-radius: 8px;
-            background-color: rgb(0, 100, 0);
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            touch-action: auto;
-        }
-
-        button:hover {
-            background-color: rgb(0, 72, 0);
-        }
-        
-        button:active {
-            transform: scale(0.98);
-        }
-        
-        /* Mobile responsiveness */
-        @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-            
-            button {
-                padding: 12px 20px;
-                font-size: 14px;
-                min-width: 80px;
-            }
-            
-            #controls {
-                gap: 8px;
-                margin-bottom: 15px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            button {
-                padding: 10px 16px;
-                font-size: 13px;
-            }
-            
-            #controls {
-                gap: 6px;
-            }
-        }
-    </style>
 </head>
-<body>
-    <div id="controls">
-        <button id="playPauseBtn">Pause</button>
-        <button id="stretchingModeBtn">Stretch: Off</button>
-        <button id="fitViewBtn">Fit</button>
-        <button id="addRodBtn">Add Rod</button>
-        <button id="removeRodBtn">Remove Rod</button>
-        <button id="colorPickerBtn">Design</button>
-        <button id="copyLinkBtn">Copy Link</button>
-        <button id="saveVideoBtn">Save Video</button>
+<body class="m-0 p-0 overflow-hidden">
+    <!-- Collapsible Menu Button -->
+    <button id="menuToggle" class="fixed top-4 left-4 z-50 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 rounded-full p-3 shadow-lg transition-all duration-200 hover:scale-110">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path id="menuIcon" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            <path id="closeIcon" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+    </button>
+
+    <!-- Collapsible Menu Panel -->
+    <div id="menuPanel" class="fixed top-4 left-20 z-40 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-4 transition-all duration-300 transform -translate-x-[500px] opacity-0 pointer-events-none">
+        <div class="flex flex-col gap-2 min-w-[200px]">
+            <button id="playPauseBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Pause</button>
+            <button id="stretchingModeBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Stretch: Off</button>
+            <button id="fitViewBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Fit</button>
+            <button id="addRodBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Add Rod</button>
+            <button id="removeRodBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Remove Rod</button>
+            <button id="colorPickerBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Design</button>
+            <button id="copyLinkBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Copy Link</button>
+            <button id="saveVideoBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Save Video</button>
+        </div>
     </div>
 
-    <main id="canvas-container"></main>
+    <!-- Full Screen Canvas Container -->
+    <main id="canvas-container" class="w-screen h-screen"></main>
 
     <script type="module" src="src/main.js"></script>
 </body>

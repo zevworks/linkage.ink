@@ -26,7 +26,8 @@
       "Bash(gh api:*)",
       "Bash(gh run cancel:*)",
       "Bash(git revert:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(./node_modules/.bin/tailwindcss:*)"
     ],
     "deny": [],
     "ask": []
