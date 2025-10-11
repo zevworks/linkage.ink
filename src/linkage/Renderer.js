@@ -30,6 +30,12 @@ export class Renderer {
           circle.setAttribute('fill', color);
         }
       });
+
+      const rects = menuIcon.querySelectorAll('rect');
+      rects.forEach(rect => {
+        rect.setAttribute('stroke', color);
+        rect.setAttribute('fill', color);
+      });
     }
 
     if (closeIcon) {
