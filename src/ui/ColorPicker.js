@@ -567,6 +567,10 @@ export class ColorPicker {
       this.rodsWidth = design.rodsWidth;
       this.updateWidthSlider('rodsWidth', design.rodsWidth);
     }
+    // Sync inverse checkbox with current renderer state
+    if (this.inverseCheckbox) {
+      this.inverseCheckbox.checked = this.renderer.getInverse();
+    }
   }
 
   updateWidthSlider(propertyName, value) {
