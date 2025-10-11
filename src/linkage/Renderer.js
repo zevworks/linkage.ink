@@ -15,6 +15,11 @@ export class Renderer {
   setInverse(isInverse) {
     this.isInverse = isInverse;
     this.updateMenuIconColor();
+    this.updateBodyBackground();
+  }
+
+  updateBodyBackground() {
+    document.body.style.backgroundColor = this.isInverse ? '#000000' : '#f5f5f5';
   }
 
   updateMenuIconColor() {

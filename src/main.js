@@ -5,8 +5,9 @@ import { app } from './linkage/LinkageApp.js';
 document.addEventListener('DOMContentLoaded', () => {
   console.log('Linkage Simulator initialized');
 
-  // Set initial menu icon color based on inverse mode
+  // Set initial menu icon color and body background based on inverse mode
   app.renderer.updateMenuIconColor();
+  app.renderer.updateBodyBackground();
 
   const menuToggle = document.getElementById('menuToggle');
   const menuPanel = document.getElementById('menuPanel');
