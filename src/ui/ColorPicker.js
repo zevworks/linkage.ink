@@ -2,8 +2,9 @@
  * Design panel component for selecting trace colors and widths
  */
 export class ColorPicker {
-  constructor(onDesignChange) {
+  constructor(onDesignChange, renderer) {
     this.onDesignChange = onDesignChange;
+    this.renderer = renderer;
     this.isOpen = false;
     this.currentColor = { r: 128, g: 0, b: 128 }; // Default purple
     this.currentHSV = this.rgbToHSV(128, 0, 128); // Store HSV separately
@@ -294,11 +295,52 @@ export class ColorPicker {
     // Add rods width slider
     this.createWidthSlider(widthSlidersContainer, 'rodsWidth', 'Rods Width', 2, 20, this.rodsWidth, 'px');
 
+    // Create inverse toggle
+    const inverseContainer = document.createElement('div');
+    inverseContainer.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
+    `;
+
+    const inverseLabel = document.createElement('span');
+    inverseLabel.textContent = 'Inverse Colors';
+    inverseLabel.style.cssText = `
+      font-size: 14px;
+      color: #666;
+    `;
+
+    this.inverseCheckbox = document.createElement('input');
+    this.inverseCheckbox.type = 'checkbox';
+    this.inverseCheckbox.checked = this.renderer.getInverse();
+    this.inverseCheckbox.style.cssText = `
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    `;
+    this.inverseCheckbox.onchange = (e) => {
+      e.stopPropagation();
+      this.renderer.setInverse(this.inverseCheckbox.checked);
+      if (this.onDesignChange) {
+        this.onDesignChange({
+          color: this.currentColor,
+          traceWidth: this.traceWidth,
+          rodsWidth: this.rodsWidth
+        });
+      }
+    };
+
+    inverseContainer.appendChild(inverseLabel);
+    inverseContainer.appendChild(this.inverseCheckbox);
+
     // Assemble picker
     this.picker.appendChild(titleContainer);
     this.picker.appendChild(this.colorPreview);
     this.picker.appendChild(slidersContainer);
     this.picker.appendChild(widthSlidersContainer);
+    this.picker.appendChild(inverseContainer);
     this.overlay.appendChild(this.picker);
     document.body.appendChild(this.overlay);
   }

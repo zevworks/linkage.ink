@@ -12,7 +12,7 @@ export class UIController {
     this.urlStateManager = urlStateManager;
     this.renderer = renderer;
     this.p5Instance = null;
-    this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design));
+    this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer);
     this.setupEventListeners();
 
     // Set initial button colors based on current trace color
@@ -89,16 +89,6 @@ export class UIController {
       stretchingModeBtn.onclick = () => {
         const isStretching = this.mechanism.toggleStretchingMode();
         stretchingModeBtn.textContent = isStretching ? 'Stretch: On' : 'Stretch: Off';
-        this.urlStateManager.updateURLNow();
-      };
-    }
-
-    // Inverse button
-    const inverseBtn = document.getElementById('inverseBtn');
-    if (inverseBtn) {
-      inverseBtn.onclick = () => {
-        const isInverse = !this.renderer.getInverse();
-        this.renderer.setInverse(isInverse);
         this.urlStateManager.updateURLNow();
       };
     }
