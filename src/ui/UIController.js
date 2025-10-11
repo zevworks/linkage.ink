@@ -31,12 +31,12 @@ export class UIController {
   }
 
   updateButtonColors(color) {
-    const buttons = document.querySelectorAll('#controls button');
-    const rgbColor = `rgb(${color.r}, ${color.g}, ${color.b})`;
-    const hoverColor = `rgb(${Math.max(0, color.r - 28)}, ${Math.max(0, color.g - 28)}, ${Math.max(0, color.b - 28)})`;
+    const buttons = document.querySelectorAll('#menuPanel button');
+    const rgbaColor = `rgba(${color.r}, ${color.g}, ${color.b}, 0.7)`;
+    const hoverColor = `rgba(${Math.max(0, color.r - 28)}, ${Math.max(0, color.g - 28)}, ${Math.max(0, color.b - 28)}, 0.8)`;
 
     buttons.forEach(button => {
-      button.style.backgroundColor = rgbColor;
+      button.style.backgroundColor = rgbaColor;
     });
 
     // Update hover style
@@ -48,7 +48,7 @@ export class UIController {
       document.head.appendChild(style);
     }
     style.textContent = `
-      #controls button:hover {
+      #menuPanel button:hover {
         background-color: ${hoverColor} !important;
       }
     `;
