@@ -9,19 +9,19 @@ export class Anchor {
     this.radius = 10;
   }
 
-  draw(p, cameraZoom, rodsWidth = 4) {
+  draw(p, cameraZoom, rodsWidth = 4, isInverse = false) {
     // Anchor size based on rod width
     const anchorSize = rodsWidth * 5;
     const anchorStrokeWeight = rodsWidth / 2;
 
-    // Draw outer black circle
-    p.stroke(0);
+    // Draw outer circle
+    p.stroke(isInverse ? 255 : 0);
     p.strokeWeight(anchorStrokeWeight);
-    p.fill(0);
+    p.fill(isInverse ? 255 : 0);
     p.ellipse(this.pos.x, this.pos.y, anchorSize, anchorSize);
 
-    // Draw inner white circle (hole)
-    p.fill(255);
+    // Draw inner circle (hole)
+    p.fill(isInverse ? 0 : 255);
     p.noStroke();
     p.ellipse(this.pos.x, this.pos.y, anchorSize / 2, anchorSize / 2);
   }

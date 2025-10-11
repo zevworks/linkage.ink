@@ -9,10 +9,19 @@ export class Renderer {
     this.camera = camera;
     this.traceSystem = traceSystem;
     this.selectedObject = null;
+    this.isInverse = false;
+  }
+
+  setInverse(isInverse) {
+    this.isInverse = isInverse;
+  }
+
+  getInverse() {
+    return this.isInverse;
   }
 
   draw(p) {
-    p.background(245);
+    p.background(this.isInverse ? 0 : 245);
 
     // Apply camera transformation
     p.push();
@@ -38,9 +47,9 @@ export class Renderer {
       if (rod.isTracing) {
         p.fill(this.traceSystem.traceColor[0], this.traceSystem.traceColor[1], this.traceSystem.traceColor[2]);
       } else {
-        p.fill(255);
+        p.fill(this.isInverse ? 0 : 255);
       }
-      p.stroke(0);
+      p.stroke(this.isInverse ? 255 : 0);
       p.strokeWeight(jointStrokeWeight);
       p.ellipse(endPos.x, endPos.y, jointSize, jointSize);
     }
@@ -49,7 +58,7 @@ export class Renderer {
     let startPos = this.mechanism.anchor.pos;
     for (let i = 0; i < this.mechanism.rods.length; i++) {
       let endPos = this.mechanism.joints[i];
-      p.stroke(50);
+      p.stroke(this.isInverse ? 200 : 50);
       p.strokeWeight(this.traceSystem.rodsWidth);
       p.line(startPos.x, startPos.y, endPos.x, endPos.y);
       startPos = endPos;
@@ -61,7 +70,7 @@ export class Renderer {
       let guidedJoint = this.mechanism.joints[i];
       if (guidedJoint) {
         p.drawingContext.setLineDash([5, 5]);
-        p.stroke(150, 150, 150, 150);
+        p.stroke(this.isInverse ? 100 : 150, this.isInverse ? 100 : 150, this.isInverse ? 100 : 150, 150);
         p.strokeWeight(1);
         p.line(gp.pos.x, gp.pos.y, guidedJoint.x, guidedJoint.y);
         p.drawingContext.setLineDash([]);
@@ -69,13 +78,13 @@ export class Renderer {
     }
 
     // Draw anchor and guide points on top
-    this.mechanism.anchor.draw(p, this.camera.zoom, this.traceSystem.rodsWidth);
+    this.mechanism.anchor.draw(p, this.camera.zoom, this.traceSystem.rodsWidth, this.isInverse);
     for (let i = 0; i < this.mechanism.guidePoints.length; i++) {
       let correspondingRod = this.mechanism.rods[i + 1];
       if (correspondingRod) {
-        this.mechanism.guidePoints[i].draw(p, this.camera.zoom, correspondingRod.angle, correspondingRod.isFullRodTracing ? this.traceSystem.fullRodTraceColor : null, this.traceSystem.rodsWidth);
+        this.mechanism.guidePoints[i].draw(p, this.camera.zoom, correspondingRod.angle, correspondingRod.isFullRodTracing ? this.traceSystem.fullRodTraceColor : null, this.traceSystem.rodsWidth, this.isInverse);
       } else {
-        this.mechanism.guidePoints[i].draw(p, this.camera.zoom, null, null, this.traceSystem.rodsWidth);
+        this.mechanism.guidePoints[i].draw(p, this.camera.zoom, null, null, this.traceSystem.rodsWidth, this.isInverse);
       }
     }
   }

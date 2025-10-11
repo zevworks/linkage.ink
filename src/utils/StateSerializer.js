@@ -5,10 +5,11 @@ import { GuidePoint } from '../linkage/GuidePoint.js';
  * Serializes and deserializes linkage state for URL encoding
  */
 export class StateSerializer {
-  constructor(mechanism, camera, traceSystem) {
+  constructor(mechanism, camera, traceSystem, renderer) {
     this.mechanism = mechanism;
     this.camera = camera;
     this.traceSystem = traceSystem;
+    this.renderer = renderer;
   }
 
   /**
@@ -57,7 +58,8 @@ export class StateSerializer {
       traceColor: this.traceSystem.getTraceColor(),
       traceWidth: this.traceSystem.getTraceWidth(),
       rodsWidth: this.traceSystem.getRodsWidth(),
-      isStretchingMode: this.mechanism.isStretchingMode
+      isStretchingMode: this.mechanism.isStretchingMode,
+      isInverse: this.renderer.getInverse()
     };
   }
 
@@ -119,6 +121,11 @@ export class StateSerializer {
     // Restore stretching mode
     if (state.isStretchingMode !== undefined) {
       this.mechanism.isStretchingMode = state.isStretchingMode;
+    }
+
+    // Restore inverse mode
+    if (state.isInverse !== undefined) {
+      this.renderer.setInverse(state.isInverse);
     }
 
     // Update joints

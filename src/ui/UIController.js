@@ -4,12 +4,13 @@ import { ColorPicker } from './ColorPicker.js';
  * Manages UI button interactions and state updates
  */
 export class UIController {
-  constructor(mechanism, traceSystem, videoExporter, camera, urlStateManager) {
+  constructor(mechanism, traceSystem, videoExporter, camera, urlStateManager, renderer) {
     this.mechanism = mechanism;
     this.traceSystem = traceSystem;
     this.videoExporter = videoExporter;
     this.camera = camera;
     this.urlStateManager = urlStateManager;
+    this.renderer = renderer;
     this.p5Instance = null;
     this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design));
     this.setupEventListeners();
@@ -88,6 +89,16 @@ export class UIController {
       stretchingModeBtn.onclick = () => {
         const isStretching = this.mechanism.toggleStretchingMode();
         stretchingModeBtn.textContent = isStretching ? 'Stretch: On' : 'Stretch: Off';
+        this.urlStateManager.updateURLNow();
+      };
+    }
+
+    // Inverse button
+    const inverseBtn = document.getElementById('inverseBtn');
+    if (inverseBtn) {
+      inverseBtn.onclick = () => {
+        const isInverse = !this.renderer.getInverse();
+        this.renderer.setInverse(isInverse);
         this.urlStateManager.updateURLNow();
       };
     }

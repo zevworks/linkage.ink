@@ -28,8 +28,11 @@ class LinkageApp {
     this.hasAutoFitted = false;
     this.frameCount = 0;
 
+    // Initialize rendering first (needed for state serialization)
+    this.renderer = new Renderer(this.mechanism, this.camera, this.traceSystem);
+
     // Initialize state serialization and URL state management
-    this.stateSerializer = new StateSerializer(this.mechanism, this.camera, this.traceSystem);
+    this.stateSerializer = new StateSerializer(this.mechanism, this.camera, this.traceSystem, this.renderer);
     this.urlStateManager = new URLStateManager(this.stateSerializer);
 
     // Try to load state from URL, if not present, use default configuration
@@ -41,15 +44,15 @@ class LinkageApp {
     // Always update URL to ensure all parameters (including stretch) are present
     this.urlStateManager.updateURLNow();
 
-    // Initialize rendering and interaction
-    this.renderer = new Renderer(this.mechanism, this.camera, this.traceSystem);
+    // Initialize interaction
     this.inputHandler = new InputHandler(this.mechanism, this.camera, this.renderer, this.urlStateManager);
     this.uiController = new UIController(
       this.mechanism,
       this.traceSystem,
       this.videoExporter,
       this.camera,
-      this.urlStateManager
+      this.urlStateManager,
+      this.renderer
     );
 
     // Store p5 instance for GIF export
