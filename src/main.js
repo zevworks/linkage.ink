@@ -10,23 +10,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const menuToggle = document.getElementById('menuToggle');
   const menuPanel = document.getElementById('menuPanel');
-  const menuIcon = document.getElementById('menuIcon');
-  const closeIcon = document.getElementById('closeIcon');
+  const menuIconSvg = document.getElementById('menuIconSvg');
   let isMenuOpen = false;
 
   const toggleMenu = () => {
     isMenuOpen = !isMenuOpen;
 
     if (isMenuOpen) {
-      menuPanel.classList.remove('-translate-x-[500px]', 'opacity-0', 'pointer-events-none');
-      menuPanel.classList.add('translate-x-0', 'opacity-100', 'pointer-events-auto');
-      menuIcon.style.display = 'none';
-      closeIcon.style.display = 'block';
+      menuPanel.classList.remove('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
+      menuPanel.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      menuIconSvg.style.transform = 'rotate(90deg)';
     } else {
-      menuPanel.classList.add('-translate-x-[500px]', 'opacity-0', 'pointer-events-none');
-      menuPanel.classList.remove('translate-x-0', 'opacity-100', 'pointer-events-auto');
-      menuIcon.style.display = 'block';
-      closeIcon.style.display = 'none';
+      menuPanel.classList.add('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
+      menuPanel.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+      menuIconSvg.style.transform = 'rotate(0deg)';
     }
   };
 

@@ -7,24 +7,19 @@
 </head>
 <body class="m-0 p-0 overflow-hidden">
     <!-- Collapsible Menu Button -->
-    <button id="menuToggle" class="fixed z-50 transition-all duration-200 hover:scale-110 bg-transparent border-0 p-0 cursor-pointer" style="top: 18px; left: 20px;">
-        <svg width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <button id="menuToggle" class="fixed z-50 bg-transparent border-0 p-0 cursor-pointer" style="top: 18px; left: 20px;">
+        <svg id="menuIconSvg" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s ease;">
             <!-- GP Icon: center circle with two sleeves (rectangles) -->
             <g id="menuIcon">
                 <circle cx="12" cy="12" r="6" stroke="#000000" stroke-width="2.5" fill="none"/>
                 <rect x="1" y="9.5" width="6" height="4" stroke="#000000" stroke-width="2" fill="#000000"/>
                 <rect x="18" y="9.5" width="6" height="4" stroke="#000000" stroke-width="2" fill="#000000"/>
             </g>
-            <!-- Close Icon -->
-            <g id="closeIcon" style="display: none;">
-                <line x1="6" y1="6" x2="18" y2="18" stroke="#000000" stroke-width="2.5" stroke-linecap="round"/>
-                <line x1="18" y1="6" x2="6" y2="18" stroke="#000000" stroke-width="2.5" stroke-linecap="round"/>
-            </g>
         </svg>
     </button>
 
     <!-- Collapsible Menu Panel -->
-    <div id="menuPanel" class="fixed top-4 left-20 z-40 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-4 transition-all duration-300 transform -translate-x-[500px] opacity-0 pointer-events-none">
+    <div id="menuPanel" class="fixed z-40 bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-4 transition-all duration-300 transform -translate-y-[500px] opacity-0 pointer-events-none" style="top: 62px; left: 20px;">
         <div class="flex flex-col gap-2 min-w-[200px]">
             <button id="playPauseBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Pause</button>
             <button id="stretchingModeBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Stretch: Off</button>
