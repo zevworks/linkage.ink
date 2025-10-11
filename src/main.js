@@ -17,13 +17,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isMenuOpen) {
       menuPanel.classList.remove('-translate-x-[500px]', 'opacity-0', 'pointer-events-none');
       menuPanel.classList.add('translate-x-0', 'opacity-100', 'pointer-events-auto');
-      menuIcon.classList.add('hidden');
-      closeIcon.classList.remove('hidden');
+      menuIcon.style.display = 'none';
+      closeIcon.style.display = 'block';
     } else {
       menuPanel.classList.add('-translate-x-[500px]', 'opacity-0', 'pointer-events-none');
       menuPanel.classList.remove('translate-x-0', 'opacity-100', 'pointer-events-auto');
-      menuIcon.classList.remove('hidden');
-      closeIcon.classList.add('hidden');
+      menuIcon.style.display = 'block';
+      closeIcon.style.display = 'none';
     }
   });
 
