@@ -15,9 +15,6 @@ export class UIController {
     this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer);
     this.setupEventListeners();
 
-    // Set initial button colors based on current trace color
-    this.updateButtonColors(this.traceSystem.getTraceColor());
-
     // Sync button states with mechanism state (for loading from URL)
     this.syncButtonStates();
   }
@@ -26,32 +23,7 @@ export class UIController {
     this.traceSystem.setTraceColor(design.color);
     this.traceSystem.setTraceWidth(design.traceWidth);
     this.traceSystem.setRodsWidth(design.rodsWidth);
-    this.updateButtonColors(design.color);
     this.urlStateManager.updateURLNow();
-  }
-
-  updateButtonColors(color) {
-    const buttons = document.querySelectorAll('#menuPanel button');
-    const rgbaColor = `rgba(${color.r}, ${color.g}, ${color.b}, 0.7)`;
-    const hoverColor = `rgba(${Math.max(0, color.r - 28)}, ${Math.max(0, color.g - 28)}, ${Math.max(0, color.b - 28)}, 0.8)`;
-
-    buttons.forEach(button => {
-      button.style.backgroundColor = rgbaColor;
-    });
-
-    // Update hover style
-    const styleId = 'button-hover-style';
-    let style = document.getElementById(styleId);
-    if (!style) {
-      style = document.createElement('style');
-      style.id = styleId;
-      document.head.appendChild(style);
-    }
-    style.textContent = `
-      #menuPanel button:hover {
-        background-color: ${hoverColor} !important;
-      }
-    `;
   }
 
   setP5Instance(p5Instance, mechanism) {

@@ -16,4 +16,12 @@
     margin: 0;
     padding: 0;
   }
+
+  #menuPanel button {
+    background-color: rgba(59, 130, 246, 0.7);
+  }
+
+  #menuPanel button:hover {
+    background-color: rgba(59, 130, 246, 0.85);
+  }
 }
