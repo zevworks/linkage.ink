@@ -357,7 +357,7 @@ export class ColorPicker {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 6px 0;
+        padding: 2px 0;
         border-radius: 6px;
         transition: background 0.15s ease;
       `;

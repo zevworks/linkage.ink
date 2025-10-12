@@ -58,10 +58,8 @@ export class Renderer {
       const btn = document.getElementById(btnId);
       if (btn) {
         if (this.isInverse) {
-          btn.style.background = 'rgba(100, 100, 255, 0.5)';
           btn.style.color = 'white';
         } else {
-          btn.style.background = 'rgba(100, 100, 255, 0.3)';
           btn.style.color = 'black';
         }
       }
@@ -76,15 +74,6 @@ export class Renderer {
         menuPanel.style.background = 'rgba(255, 255, 255, 0.92)';
       }
     }
-
-    // Update separators
-    const separators = ['menuSeparator1', 'menuSeparator2', 'menuSeparator3'];
-    separators.forEach(sepId => {
-      const sep = document.getElementById(sepId);
-      if (sep) {
-        sep.style.background = this.isInverse ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)';
-      }
-    });
 
     // Update all slider labels and values
     const labels = document.querySelectorAll('#menuPanel span');

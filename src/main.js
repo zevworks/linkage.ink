@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const menuIconSvg = document.getElementById('menuIconSvg');
   let isMenuOpen = false;
 
+  let firstMenuOpen = true;
+
   const toggleMenu = () => {
     isMenuOpen = !isMenuOpen;
 
@@ -21,6 +23,22 @@ document.addEventListener('DOMContentLoaded', () => {
       menuPanel.classList.remove('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
       menuPanel.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
       menuIconSvg.style.transform = 'rotate(-90deg)';
+
+      // Force slider repaint on first menu open (fixes visibility issue)
+      if (firstMenuOpen) {
+        firstMenuOpen = false;
+        setTimeout(() => {
+          // Trigger a style recalculation by reading offsetHeight
+          const sliders = document.querySelectorAll('#hsvSlidersContainer input[type="range"], #widthSlidersContainer input[type="range"]');
+          sliders.forEach(slider => {
+            slider.offsetHeight; // Force reflow
+            const bg = slider.style.background;
+            slider.style.background = '';
+            slider.offsetHeight; // Force reflow
+            slider.style.background = bg;
+          });
+        }, 50);
+      }
     } else {
       menuPanel.classList.add('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
       menuPanel.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
