@@ -351,7 +351,7 @@ export class ColorPicker {
   createToggles() {
     const toggleConfigs = [
       { name: 'inverse', label: 'Dark', getValue: () => this.renderer.getInverse() },
-      { name: 'fade', label: 'Fade Traces', getValue: () => this.traceSystem.getFading() },
+      { name: 'fade', label: 'Fade Trace', getValue: () => this.traceSystem.getFading() },
       { name: 'stretch', label: 'Stretch Mode', getValue: () => this.mechanism.isStretchingMode }
     ];
 

@@ -57,10 +57,25 @@ export class UIController {
     const fitViewBtn = document.getElementById('fitViewBtn');
     if (fitViewBtn) {
       fitViewBtn.onclick = () => {
-        // Use trace bounds if available, otherwise fall back to mechanism bounds
-        let bounds = this.traceSystem.calculateBounds();
-        if (!bounds) {
-          bounds = this.mechanism.calculateBounds();
+        // Get both trace and mechanism bounds and merge them
+        const traceBounds = this.traceSystem.calculateBounds();
+        const mechanismBounds = this.mechanism.calculateBounds();
+
+        // Merge bounds to get the larger extent
+        let bounds = null;
+        if (traceBounds && mechanismBounds) {
+          bounds = {
+            minX: Math.min(traceBounds.minX, mechanismBounds.minX),
+            maxX: Math.max(traceBounds.maxX, mechanismBounds.maxX),
+            minY: Math.min(traceBounds.minY, mechanismBounds.minY),
+            maxY: Math.max(traceBounds.maxY, mechanismBounds.maxY)
+          };
+          bounds.width = bounds.maxX - bounds.minX;
+          bounds.height = bounds.maxY - bounds.minY;
+          bounds.centerX = (bounds.minX + bounds.maxX) / 2;
+          bounds.centerY = (bounds.minY + bounds.maxY) / 2;
+        } else {
+          bounds = traceBounds || mechanismBounds;
         }
 
         if (bounds && this.p5Instance) {
