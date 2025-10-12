@@ -340,25 +340,50 @@ export class ColorPicker {
         display: flex;
         justify-content: space-between;
         align-items: center;
+        padding: 8px 0;
       `;
 
-      const toggleLabel = document.createElement('span');
+      const toggleLabel = document.createElement('label');
       toggleLabel.textContent = label;
       toggleLabel.style.cssText = `
         font-size: 13px;
         color: #555;
+        cursor: pointer;
+        flex: 1;
+      `;
+
+      const checkboxWrapper = document.createElement('div');
+      checkboxWrapper.style.cssText = `
+        padding: 8px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       `;
 
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.checked = getValue();
       checkbox.style.cssText = `
-        width: 18px;
-        height: 18px;
+        width: 20px;
+        height: 20px;
         cursor: pointer;
+        pointer-events: auto;
       `;
 
-      checkbox.onchange = (e) => {
+      const handleToggle = () => {
+        checkbox.checked = !checkbox.checked;
+        if (name === 'inverse') {
+          this.renderer.setInverse(checkbox.checked);
+        } else if (name === 'stretch') {
+          this.mechanism.toggleStretchingMode();
+        }
+        if (this.onDesignChange) {
+          this.onDesignChange(this.getDesign());
+        }
+      };
+
+      checkbox.onclick = (e) => {
         e.stopPropagation();
         if (name === 'inverse') {
           this.renderer.setInverse(checkbox.checked);
@@ -370,8 +395,14 @@ export class ColorPicker {
         }
       };
 
+      toggleLabel.onclick = (e) => {
+        e.stopPropagation();
+        handleToggle();
+      };
+
+      checkboxWrapper.appendChild(checkbox);
       toggleContainer.appendChild(toggleLabel);
-      toggleContainer.appendChild(checkbox);
+      toggleContainer.appendChild(checkboxWrapper);
       this.togglesContainer.appendChild(toggleContainer);
 
       this.sliders[name] = { checkbox };

@@ -52,16 +52,16 @@ export class Renderer {
       });
     }
 
-    // Update header button styles for inverse mode
-    const headerButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'copyLinkBtn'];
-    headerButtons.forEach(btnId => {
+    // Update menu button styles for inverse mode
+    const menuButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'copyLinkBtn'];
+    menuButtons.forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {
         if (this.isInverse) {
-          btn.style.background = 'rgba(0, 0, 0, 0.7)';
+          btn.style.background = 'rgba(100, 100, 255, 0.5)';
           btn.style.color = 'white';
         } else {
-          btn.style.background = 'rgba(255, 255, 255, 0.7)';
+          btn.style.background = 'rgba(100, 100, 255, 0.3)';
           btn.style.color = 'black';
         }
       }
