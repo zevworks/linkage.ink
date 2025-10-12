@@ -67,6 +67,16 @@ export class Renderer {
       }
     });
 
+    // Update menu panel background
+    const menuPanel = document.getElementById('menuPanel');
+    if (menuPanel) {
+      if (this.isInverse) {
+        menuPanel.style.background = 'rgba(0, 0, 0, 0.7)';
+      } else {
+        menuPanel.style.background = 'rgba(255, 255, 255, 0.7)';
+      }
+    }
+
     const labels = document.querySelectorAll('#menuPanel span');
     labels.forEach(label => {
       // Skip value texts (they have font-weight 600)

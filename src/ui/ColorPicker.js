@@ -149,7 +149,8 @@ export class ColorPicker {
       labelDiv.style.cssText = `
         display: flex;
         justify-content: space-between;
-        margin-bottom: 5px;
+        align-items: baseline;
+        margin-bottom: 2px;
         font-size: 13px;
         color: #555;
       `;
@@ -162,6 +163,8 @@ export class ColorPicker {
       valueText.style.cssText = `
         font-weight: 600;
         color: #333;
+        font-size: 12px;
+        margin-left: -8px;
       `;
 
       labelDiv.appendChild(labelText);
@@ -260,7 +263,8 @@ export class ColorPicker {
       labelDiv.style.cssText = `
         display: flex;
         justify-content: space-between;
-        margin-bottom: 5px;
+        align-items: baseline;
+        margin-bottom: 2px;
         font-size: 13px;
         color: #555;
       `;
@@ -273,6 +277,8 @@ export class ColorPicker {
       valueText.style.cssText = `
         font-weight: 600;
         color: #333;
+        font-size: 12px;
+        margin-left: -8px;
       `;
 
       labelDiv.appendChild(labelText);
