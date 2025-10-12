@@ -71,19 +71,48 @@ export class Renderer {
     const menuPanel = document.getElementById('menuPanel');
     if (menuPanel) {
       if (this.isInverse) {
-        menuPanel.style.background = 'rgba(0, 0, 0, 0.7)';
+        menuPanel.style.background = 'rgba(0, 0, 0, 0.85)';
       } else {
-        menuPanel.style.background = 'rgba(255, 255, 255, 0.7)';
+        menuPanel.style.background = 'rgba(255, 255, 255, 0.85)';
       }
     }
 
+    // Update section labels
+    const sectionLabels = ['colorSectionLabel', 'widthsSectionLabel', 'optionsSectionLabel'];
+    sectionLabels.forEach(labelId => {
+      const label = document.getElementById(labelId);
+      if (label) {
+        label.style.color = this.isInverse ? '#888' : '#666';
+      }
+    });
+
+    // Update separators
+    const separators = ['menuSeparator1', 'menuSeparator2', 'menuSeparator3'];
+    separators.forEach(sepId => {
+      const sep = document.getElementById(sepId);
+      if (sep) {
+        sep.style.background = this.isInverse ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.1)';
+      }
+    });
+
+    // Update color preview border
+    const colorPreview = document.getElementById('colorPreview');
+    if (colorPreview) {
+      colorPreview.style.border = this.isInverse ? '2px solid rgba(255, 255, 255, 0.2)' : '2px solid rgba(0, 0, 0, 0.15)';
+    }
+
+    // Update all slider labels and values
     const labels = document.querySelectorAll('#menuPanel span');
     labels.forEach(label => {
-      // Skip value texts (they have font-weight 600)
-      if (label.style.fontWeight !== '600') {
-        label.style.color = this.isInverse ? '#aaa' : '#555';
-      } else {
-        label.style.color = this.isInverse ? '#fff' : '#333';
+      // Skip section labels (they're handled above)
+      if (!label.id || !label.id.includes('SectionLabel')) {
+        // Value texts have monospace font
+        if (label.style.fontFamily === 'monospace') {
+          label.style.color = this.isInverse ? '#eee' : '#333';
+        } else if (label.style.fontWeight === '500') {
+          // Regular labels
+          label.style.color = this.isInverse ? '#aaa' : '#555';
+        }
       }
     });
   }

@@ -150,21 +150,24 @@ export class ColorPicker {
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        margin-bottom: 2px;
-        font-size: 13px;
+        margin-bottom: 4px;
+        font-size: 12px;
         color: #555;
       `;
 
       const labelText = document.createElement('span');
       labelText.textContent = label;
+      labelText.style.cssText = `
+        font-weight: 500;
+      `;
 
       const valueText = document.createElement('span');
       valueText.textContent = this.currentHSV[name] + suffix;
       valueText.style.cssText = `
         font-weight: 600;
         color: #333;
-        font-size: 12px;
-        margin-left: -8px;
+        font-size: 11px;
+        font-family: monospace;
       `;
 
       labelDiv.appendChild(labelText);
@@ -177,8 +180,8 @@ export class ColorPicker {
       slider.value = this.currentHSV[name];
       slider.style.cssText = `
         width: 100%;
-        height: 8px;
-        border-radius: 4px;
+        height: 6px;
+        border-radius: 3px;
         outline: none;
         -webkit-appearance: none;
         appearance: none;
@@ -194,22 +197,36 @@ export class ColorPicker {
           input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: white;
-            border: 2px solid #333;
+            border: 2px solid #444;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            transition: transform 0.15s ease;
+          }
+          input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+          }
+          input[type="range"]::-webkit-slider-thumb:active {
+            transform: scale(1.05);
           }
           input[type="range"]::-moz-range-thumb {
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: white;
-            border: 2px solid #333;
+            border: 2px solid #444;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            transition: transform 0.15s ease;
+          }
+          input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.1);
+          }
+          input[type="range"]::-moz-range-thumb:active {
+            transform: scale(1.05);
           }
         `;
         document.head.appendChild(style);
@@ -264,21 +281,24 @@ export class ColorPicker {
         display: flex;
         justify-content: space-between;
         align-items: baseline;
-        margin-bottom: 2px;
-        font-size: 13px;
+        margin-bottom: 4px;
+        font-size: 12px;
         color: #555;
       `;
 
       const labelText = document.createElement('span');
       labelText.textContent = label;
+      labelText.style.cssText = `
+        font-weight: 500;
+      `;
 
       const valueText = document.createElement('span');
       valueText.textContent = value + 'px';
       valueText.style.cssText = `
         font-weight: 600;
         color: #333;
-        font-size: 12px;
-        margin-left: -8px;
+        font-size: 11px;
+        font-family: monospace;
       `;
 
       labelDiv.appendChild(labelText);
@@ -291,12 +311,12 @@ export class ColorPicker {
       slider.value = value;
       slider.style.cssText = `
         width: 100%;
-        height: 8px;
-        border-radius: 4px;
+        height: 6px;
+        border-radius: 3px;
         outline: none;
         -webkit-appearance: none;
         appearance: none;
-        background: #ddd;
+        background: linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15));
         cursor: pointer;
       `;
 
@@ -340,16 +360,19 @@ export class ColorPicker {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 8px 0;
+        padding: 10px 0;
+        border-radius: 6px;
+        transition: background 0.15s ease;
       `;
 
       const toggleLabel = document.createElement('label');
       toggleLabel.textContent = label;
       toggleLabel.style.cssText = `
-        font-size: 13px;
+        font-size: 12px;
         color: #555;
         cursor: pointer;
         flex: 1;
+        font-weight: 500;
       `;
 
       const checkboxWrapper = document.createElement('div');
@@ -365,10 +388,11 @@ export class ColorPicker {
       checkbox.type = 'checkbox';
       checkbox.checked = getValue();
       checkbox.style.cssText = `
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         cursor: pointer;
         pointer-events: auto;
+        accent-color: rgba(100, 100, 255, 0.8);
       `;
 
       const handleToggle = () => {
