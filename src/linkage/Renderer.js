@@ -53,7 +53,7 @@ export class Renderer {
     }
 
     // Update header button text colors
-    const headerButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'copyLinkBtn'];
+    const headerButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'copyLinkBtn'];
     headerButtons.forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {
@@ -62,19 +62,13 @@ export class Renderer {
     });
 
     // Update menu button text colors
-    const menuButtons = ['stretchingModeBtn', 'fitViewBtn', 'saveVideoBtn'];
+    const menuButtons = ['saveVideoBtn'];
     menuButtons.forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {
         btn.style.color = textColor;
       }
     });
-
-    // Update design section text colors
-    const designTitle = document.querySelector('#menuPanel h3');
-    if (designTitle) {
-      designTitle.style.color = this.isInverse ? '#ccc' : '#333';
-    }
 
     const labels = document.querySelectorAll('#menuPanel span');
     labels.forEach(label => {

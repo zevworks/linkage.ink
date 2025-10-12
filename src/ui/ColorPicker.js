@@ -2,10 +2,11 @@
  * Design panel component embedded in menu for selecting trace colors and widths
  */
 export class ColorPicker {
-  constructor(onDesignChange, renderer, traceSystem) {
+  constructor(onDesignChange, renderer, traceSystem, mechanism) {
     this.onDesignChange = onDesignChange;
     this.renderer = renderer;
     this.traceSystem = traceSystem;
+    this.mechanism = mechanism;
     this.currentColor = { r: 128, g: 0, b: 128 }; // Default purple
     this.currentHSV = this.rgbToHSV(128, 0, 128); // Store HSV separately
     this.traceWidth = 4; // Default trace width
@@ -323,7 +324,8 @@ export class ColorPicker {
   createToggles() {
     const toggleConfigs = [
       { name: 'inverse', label: 'Inverse Colors', getValue: () => this.renderer.getInverse() },
-      { name: 'fade', label: 'Fade Traces', getValue: () => this.traceSystem.getFading() }
+      { name: 'fade', label: 'Fade Traces', getValue: () => this.traceSystem.getFading() },
+      { name: 'stretch', label: 'Stretch Mode', getValue: () => this.mechanism.isStretchingMode }
     ];
 
     toggleConfigs.forEach(({ name, label, getValue }) => {
@@ -354,6 +356,8 @@ export class ColorPicker {
         e.stopPropagation();
         if (name === 'inverse') {
           this.renderer.setInverse(checkbox.checked);
+        } else if (name === 'stretch') {
+          this.mechanism.toggleStretchingMode();
         }
         if (this.onDesignChange) {
           this.onDesignChange(this.getDesign());
@@ -422,6 +426,11 @@ export class ColorPicker {
     // Sync inverse checkbox with current renderer state
     if (this.sliders.inverse) {
       this.sliders.inverse.checkbox.checked = this.renderer.getInverse();
+    }
+
+    // Sync stretch checkbox with mechanism state
+    if (this.sliders.stretch) {
+      this.sliders.stretch.checkbox.checked = this.mechanism.isStretchingMode;
     }
   }
 

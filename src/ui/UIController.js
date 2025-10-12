@@ -12,7 +12,7 @@ export class UIController {
     this.urlStateManager = urlStateManager;
     this.renderer = renderer;
     this.p5Instance = null;
-    this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer, traceSystem);
+    this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer, traceSystem, mechanism);
     this.setupEventListeners();
 
     // Sync button states with mechanism state (for loading from URL)
@@ -35,12 +35,6 @@ export class UIController {
   }
 
   syncButtonStates() {
-    // Sync stretching mode button
-    const stretchingModeBtn = document.getElementById('stretchingModeBtn');
-    if (stretchingModeBtn) {
-      stretchingModeBtn.textContent = this.mechanism.isStretchingMode ? 'Stretch: On' : 'Stretch: Off';
-    }
-
     // Sync play/pause button
     const playPauseBtn = document.getElementById('playPauseBtn');
     if (playPauseBtn) {
@@ -55,16 +49,6 @@ export class UIController {
       playPauseBtn.onclick = () => {
         const isPlaying = this.mechanism.togglePlayPause();
         playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
-      };
-    }
-
-    // Stretching Mode button
-    const stretchingModeBtn = document.getElementById('stretchingModeBtn');
-    if (stretchingModeBtn) {
-      stretchingModeBtn.onclick = () => {
-        const isStretching = this.mechanism.toggleStretchingMode();
-        stretchingModeBtn.textContent = isStretching ? 'Stretch: On' : 'Stretch: Off';
-        this.urlStateManager.updateURLNow();
       };
     }
 
