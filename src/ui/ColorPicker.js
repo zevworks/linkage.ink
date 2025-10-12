@@ -82,7 +82,6 @@ export class ColorPicker {
 
   initialize() {
     // Get containers
-    this.colorPreview = document.getElementById('colorPreview');
     this.hsvSlidersContainer = document.getElementById('hsvSlidersContainer');
     this.widthSlidersContainer = document.getElementById('widthSlidersContainer');
     this.togglesContainer = document.getElementById('togglesContainer');
@@ -101,9 +100,6 @@ export class ColorPicker {
 
     // Create toggles
     this.createToggles();
-
-    // Update color preview
-    this.updatePreview();
   }
 
   createHSVSliders() {
@@ -243,8 +239,6 @@ export class ColorPicker {
         // Update dependent slider gradients
         this.updateSliderGradients();
 
-        this.updatePreview();
-
         // Apply changes live
         if (this.onDesignChange) {
           this.onDesignChange(this.getDesign());
@@ -360,7 +354,7 @@ export class ColorPicker {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 10px 0;
+        padding: 6px 0;
         border-radius: 6px;
         transition: background 0.15s ease;
       `;
@@ -442,11 +436,6 @@ export class ColorPicker {
     });
   }
 
-  updatePreview() {
-    this.colorPreview.style.background =
-      `rgb(${this.currentColor.r}, ${this.currentColor.g}, ${this.currentColor.b})`;
-  }
-
   setDesign(design) {
     if (design.color) {
       this.currentColor = { ...design.color };
@@ -461,7 +450,6 @@ export class ColorPicker {
       });
 
       this.updateSliderGradients();
-      this.updatePreview();
     }
 
     if (design.traceWidth !== undefined) {
