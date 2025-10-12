@@ -26,7 +26,8 @@ export class UIController {
     if (design.fadingEnabled !== undefined) {
       this.traceSystem.setFading(design.fadingEnabled);
     }
-    this.urlStateManager.updateURLNow();
+    // Use debounced update to avoid rate limiting when dragging sliders
+    this.urlStateManager.scheduleURLUpdate();
   }
 
   setP5Instance(p5Instance, mechanism) {
