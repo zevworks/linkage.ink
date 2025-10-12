@@ -52,50 +52,50 @@ export class Renderer {
       });
     }
 
-    // Update menu button styles for inverse mode
+    // Update menu button styles (inverted: white text in light mode, black text in dark mode)
     const menuButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'copyLinkBtn', 'saveVideoBtn'];
     menuButtons.forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {
         if (this.isInverse) {
-          btn.style.color = 'white';
-          btn.style.border = '1px solid white';
-          btn.style.background = 'transparent';
-        } else {
           btn.style.color = 'black';
           btn.style.border = '1px solid black';
+          btn.style.background = 'transparent';
+        } else {
+          btn.style.color = 'white';
+          btn.style.border = '1px solid white';
           btn.style.background = 'transparent';
         }
       }
     });
 
-    // Update menu panel background
+    // Update menu panel background (inverted: black in light mode, white in dark mode)
     const menuPanel = document.getElementById('menuPanel');
     if (menuPanel) {
       if (this.isInverse) {
-        menuPanel.style.background = 'rgba(0, 0, 0, 0.92)';
+        menuPanel.style.background = 'rgba(255, 255, 255, 0.85)';
       } else {
-        menuPanel.style.background = 'rgba(255, 255, 255, 0.92)';
+        menuPanel.style.background = 'rgba(0, 0, 0, 0.85)';
       }
     }
 
-    // Update all slider labels and values
+    // Update all slider labels and values (inverted to match menu background)
     const labels = document.querySelectorAll('#menuPanel span');
     labels.forEach(label => {
       // Value texts have monospace font
       if (label.style.fontFamily === 'monospace') {
-        label.style.color = this.isInverse ? '#eee' : '#333';
+        label.style.color = this.isInverse ? '#333' : '#eee';
       } else if (label.style.fontWeight === '500') {
         // Regular labels
-        label.style.color = this.isInverse ? '#aaa' : '#555';
+        label.style.color = this.isInverse ? '#555' : '#aaa';
       }
     });
 
-    // Update width slider backgrounds for dark mode
+    // Update width slider backgrounds (inverted to match menu background)
     const widthSliders = document.querySelectorAll('#widthSlidersContainer input[type="range"]');
     const sliderBg = this.isInverse
-      ? 'linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3))'
-      : 'linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15))';
+      ? 'linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15))'
+      : 'linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3))';
     widthSliders.forEach(slider => {
       slider.style.background = sliderBg;
     });

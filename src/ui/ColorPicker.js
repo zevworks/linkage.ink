@@ -151,7 +151,7 @@ export class ColorPicker {
         align-items: baseline;
         margin-bottom: 4px;
         font-size: 12px;
-        color: #555;
+        color: #aaa;
       `;
 
       const labelText = document.createElement('span');
@@ -164,7 +164,7 @@ export class ColorPicker {
       valueText.textContent = this.currentHSV[name] + suffix;
       valueText.style.cssText = `
         font-weight: 600;
-        color: #333;
+        color: #eee;
         font-size: 11px;
         font-family: monospace;
       `;
@@ -280,7 +280,7 @@ export class ColorPicker {
         align-items: baseline;
         margin-bottom: 4px;
         font-size: 12px;
-        color: #555;
+        color: #aaa;
       `;
 
       const labelText = document.createElement('span');
@@ -293,7 +293,7 @@ export class ColorPicker {
       valueText.textContent = value + 'px';
       valueText.style.cssText = `
         font-weight: 600;
-        color: #333;
+        color: #eee;
         font-size: 11px;
         font-family: monospace;
       `;
@@ -306,9 +306,10 @@ export class ColorPicker {
       slider.min = '2';
       slider.max = '20';
       slider.value = value;
+      // Inverted: white gradient in light mode (black menu), black gradient in dark mode (white menu)
       const sliderBg = this.renderer.getInverse()
-        ? 'linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3))'
-        : 'linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15))';
+        ? 'linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15))'
+        : 'linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3))';
       slider.style.cssText = `
         width: 100%;
         height: 6px;
@@ -360,7 +361,7 @@ export class ColorPicker {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 2px 0;
+        padding: 0;
         border-radius: 6px;
         transition: background 0.15s ease;
       `;
@@ -369,7 +370,7 @@ export class ColorPicker {
       toggleLabel.textContent = label;
       toggleLabel.style.cssText = `
         font-size: 12px;
-        color: #555;
+        color: #aaa;
         cursor: pointer;
         flex: 1;
         font-weight: 500;
@@ -377,7 +378,7 @@ export class ColorPicker {
 
       const checkboxWrapper = document.createElement('div');
       checkboxWrapper.style.cssText = `
-        padding: 8px;
+        padding: 4px;
         cursor: pointer;
         display: flex;
         align-items: center;
