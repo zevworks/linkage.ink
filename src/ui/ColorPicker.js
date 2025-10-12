@@ -335,12 +335,53 @@ export class ColorPicker {
     inverseContainer.appendChild(inverseLabel);
     inverseContainer.appendChild(this.inverseCheckbox);
 
+    // Create fade toggle
+    const fadeContainer = document.createElement('div');
+    fadeContainer.style.cssText = `
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid #ddd;
+    `;
+
+    const fadeLabel = document.createElement('span');
+    fadeLabel.textContent = 'Fade Traces';
+    fadeLabel.style.cssText = `
+      font-size: 14px;
+      color: #666;
+    `;
+
+    this.fadeCheckbox = document.createElement('input');
+    this.fadeCheckbox.type = 'checkbox';
+    this.fadeCheckbox.checked = true; // Default to enabled
+    this.fadeCheckbox.style.cssText = `
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    `;
+    this.fadeCheckbox.onchange = (e) => {
+      e.stopPropagation();
+      if (this.onDesignChange) {
+        this.onDesignChange({
+          color: this.currentColor,
+          traceWidth: this.traceWidth,
+          rodsWidth: this.rodsWidth,
+          fadingEnabled: this.fadeCheckbox.checked
+        });
+      }
+    };
+
+    fadeContainer.appendChild(fadeLabel);
+    fadeContainer.appendChild(this.fadeCheckbox);
+
     // Assemble picker
     this.picker.appendChild(titleContainer);
     this.picker.appendChild(this.colorPreview);
     this.picker.appendChild(slidersContainer);
     this.picker.appendChild(widthSlidersContainer);
     this.picker.appendChild(inverseContainer);
+    this.picker.appendChild(fadeContainer);
     this.overlay.appendChild(this.picker);
     document.body.appendChild(this.overlay);
   }
@@ -435,7 +476,8 @@ export class ColorPicker {
           this.onDesignChange({
             color: this.currentColor,
             traceWidth: this.traceWidth,
-            rodsWidth: this.rodsWidth
+            rodsWidth: this.rodsWidth,
+            fadingEnabled: this.fadeCheckbox.checked
           });
         }
       };
@@ -567,6 +609,9 @@ export class ColorPicker {
       this.rodsWidth = design.rodsWidth;
       this.updateWidthSlider('rodsWidth', design.rodsWidth);
     }
+    if (design.fadingEnabled !== undefined && this.fadeCheckbox) {
+      this.fadeCheckbox.checked = design.fadingEnabled;
+    }
     // Sync inverse checkbox with current renderer state
     if (this.inverseCheckbox) {
       this.inverseCheckbox.checked = this.renderer.getInverse();
@@ -603,7 +648,8 @@ export class ColorPicker {
     return {
       color: { ...this.currentColor },
       traceWidth: this.traceWidth,
-      rodsWidth: this.rodsWidth
+      rodsWidth: this.rodsWidth,
+      fadingEnabled: this.fadeCheckbox ? this.fadeCheckbox.checked : true
     };
   }
 }

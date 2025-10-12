@@ -23,6 +23,9 @@ export class UIController {
     this.traceSystem.setTraceColor(design.color);
     this.traceSystem.setTraceWidth(design.traceWidth);
     this.traceSystem.setRodsWidth(design.rodsWidth);
+    if (design.fadingEnabled !== undefined) {
+      this.traceSystem.setFading(design.fadingEnabled);
+    }
     this.urlStateManager.updateURLNow();
   }
 
@@ -140,7 +143,8 @@ export class UIController {
         this.colorPicker.setDesign({
           color: this.traceSystem.getTraceColor(),
           traceWidth: this.traceSystem.getTraceWidth(),
-          rodsWidth: this.traceSystem.getRodsWidth()
+          rodsWidth: this.traceSystem.getRodsWidth(),
+          fadingEnabled: this.traceSystem.getFading()
         });
         this.colorPicker.open();
       };

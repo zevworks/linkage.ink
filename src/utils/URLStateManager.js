@@ -1,6 +1,6 @@
 /**
  * Manages encoding/decoding linkage state in URL hash
- * Format: #anchor=x,y&crank=len,trace,fulltrace&rod1=len,gpx,gpy,trace,fulltrace&camera=ox,oy,zoom&color=r,g,b&traceWidth=n&rodsWidth=n&stretch=0|1&inverse=0|1
+ * Format: #anchor=x,y&crank=len,trace,fulltrace&rod1=len,gpx,gpy,trace,fulltrace&camera=ox,oy,zoom&color=r,g,b&traceWidth=n&rodsWidth=n&stretch=0|1&inverse=0|1&fade=0|1
  */
 export class URLStateManager {
   constructor(stateSerializer) {
@@ -54,6 +54,11 @@ export class URLStateManager {
     // Encode inverse mode: inverse=0|1
     if (state.isInverse !== undefined) {
       params.set('inverse', state.isInverse ? '1' : '0');
+    }
+
+    // Encode fading enabled: fade=0|1
+    if (state.fadingEnabled !== undefined) {
+      params.set('fade', state.fadingEnabled ? '1' : '0');
     }
 
     // Update URL hash without triggering page reload
@@ -156,6 +161,12 @@ export class URLStateManager {
       const inverseStr = params.get('inverse');
       if (inverseStr !== null) {
         state.isInverse = inverseStr === '1';
+      }
+
+      // Decode fading enabled
+      const fadeStr = params.get('fade');
+      if (fadeStr !== null) {
+        state.fadingEnabled = fadeStr === '1';
       }
 
       // Import the state

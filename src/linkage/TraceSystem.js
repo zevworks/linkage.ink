@@ -16,6 +16,7 @@ export class TraceSystem {
     this.rodsWidth = 4; // Rods stroke width
     this.jointSizeMultiplier = 5; // Multiplier for joint size relative to trace/rod width
     this.isInverse = false; // Track inverse mode
+    this.fadingEnabled = true; // Control whether traces fade over time
   }
 
   setTraceColor(color) {
@@ -50,6 +51,14 @@ export class TraceSystem {
     // Reapply current trace color with new inverse mode
     const currentColor = this.getTraceColor();
     this.setTraceColor(currentColor);
+  }
+
+  setFading(enabled) {
+    this.fadingEnabled = enabled;
+  }
+
+  getFading() {
+    return this.fadingEnabled;
   }
 
   getTraceColor() {
@@ -117,6 +126,11 @@ export class TraceSystem {
   }
 
   update() {
+    // Skip aging if fading is disabled
+    if (!this.fadingEnabled) {
+      return;
+    }
+
     // Age trace points using original "flowing" logic
     for (const rodId in this.tracePaths) {
       let path = this.tracePaths[rodId];
@@ -160,7 +174,7 @@ export class TraceSystem {
       // Use beginShape for better performance
       for (let frameIdx = 0; frameIdx < path.length; frameIdx++) {
         let frame = path[frameIdx];
-        let alpha = MathUtils.map(frame.age, 0, this.fadeLifespan, 255, 0);
+        let alpha = this.fadingEnabled ? MathUtils.map(frame.age, 0, this.fadeLifespan, 255, 0) : 255;
         if (alpha <= 0) continue;
 
         p.stroke(this.fullRodTraceColor[0], this.fullRodTraceColor[1], this.fullRodTraceColor[2], alpha);
@@ -183,7 +197,7 @@ export class TraceSystem {
       let i = 0;
       while (i < path.length - 1) {
         // Calculate alpha for current point
-        let currentAlpha = MathUtils.map(path[i].age, 0, this.fadeLifespan, 255, 0);
+        let currentAlpha = this.fadingEnabled ? MathUtils.map(path[i].age, 0, this.fadeLifespan, 255, 0) : 255;
         if (currentAlpha <= 0) {
           i++;
           continue;
@@ -206,10 +220,10 @@ export class TraceSystem {
         // Continue adding points while alpha is similar (within 10 units)
         let j = i + 1;
         while (j < path.length) {
-          let nextAlpha = MathUtils.map(path[j].age, 0, this.fadeLifespan, 255, 0);
+          let nextAlpha = this.fadingEnabled ? MathUtils.map(path[j].age, 0, this.fadeLifespan, 255, 0) : 255;
 
-          // If alpha difference is too large, stop this segment
-          if (Math.abs(nextAlpha - currentAlpha) > 10) {
+          // If alpha difference is too large, stop this segment (skip check when fading is disabled)
+          if (this.fadingEnabled && Math.abs(nextAlpha - currentAlpha) > 10) {
             break;
           }
 

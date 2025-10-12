@@ -58,6 +58,7 @@ export class StateSerializer {
       traceColor: this.traceSystem.getTraceColor(),
       traceWidth: this.traceSystem.getTraceWidth(),
       rodsWidth: this.traceSystem.getRodsWidth(),
+      fadingEnabled: this.traceSystem.getFading(),
       isStretchingMode: this.mechanism.isStretchingMode,
       isInverse: this.renderer.getInverse()
     };
@@ -116,6 +117,11 @@ export class StateSerializer {
     // Restore rods width
     if (state.rodsWidth !== undefined) {
       this.traceSystem.setRodsWidth(state.rodsWidth);
+    }
+
+    // Restore fading enabled
+    if (state.fadingEnabled !== undefined) {
+      this.traceSystem.setFading(state.fadingEnabled);
     }
 
     // Restore stretching mode
