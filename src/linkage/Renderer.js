@@ -59,8 +59,12 @@ export class Renderer {
       if (btn) {
         if (this.isInverse) {
           btn.style.color = 'white';
+          btn.style.border = '1px solid white';
+          btn.style.background = 'transparent';
         } else {
           btn.style.color = 'black';
+          btn.style.border = '1px solid black';
+          btn.style.background = 'transparent';
         }
       }
     });

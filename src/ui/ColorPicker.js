@@ -95,6 +95,9 @@ export class ColorPicker {
     // Create HSV sliders
     this.createHSVSliders();
 
+    // Update slider gradients immediately after creation
+    this.updateSliderGradients();
+
     // Create width sliders
     this.createWidthSliders();
 
