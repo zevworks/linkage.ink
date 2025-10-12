@@ -6,29 +6,51 @@
     <title>Interactive 2D Linkage Simulator</title>
 </head>
 <body class="m-0 p-0 overflow-hidden">
-    <!-- Collapsible Menu Button -->
-    <button id="menuToggle" class="fixed z-50 bg-transparent border-0 p-0 cursor-pointer" style="top: 18px; left: 19px;">
-        <svg id="menuIconSvg" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s ease;">
-            <!-- GP Icon: center circle with two sleeves (rectangles) -->
-            <g id="menuIcon">
-                <circle cx="12" cy="12" r="6" stroke="#000000" stroke-width="2.5" fill="none"/>
-                <rect x="0" y="9.5" width="6" height="4" stroke="#000000" stroke-width="2" fill="#000000"/>
-                <rect x="18" y="9.5" width="6" height="4" stroke="#000000" stroke-width="2" fill="#000000"/>
-            </g>
-        </svg>
-    </button>
+    <!-- Header with Menu Icon and Action Buttons -->
+    <div class="fixed z-50 flex items-center gap-2" style="top: 18px; left: 19px;">
+        <!-- Menu Toggle Button -->
+        <button id="menuToggle" class="bg-transparent border-0 p-0 cursor-pointer">
+            <svg id="menuIconSvg" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s ease;">
+                <!-- GP Icon: center circle with two sleeves (rectangles) -->
+                <g id="menuIcon">
+                    <circle cx="12" cy="12" r="6" stroke="#000000" stroke-width="2.5" fill="none"/>
+                    <rect x="0" y="9.5" width="6" height="4" stroke="#000000" stroke-width="2" fill="#000000"/>
+                    <rect x="18" y="9.5" width="6" height="4" stroke="#000000" stroke-width="2" fill="#000000"/>
+                </g>
+            </svg>
+        </button>
 
-    <!-- Collapsible Menu Panel -->
-    <div id="menuPanel" class="fixed z-40 bg-white/70 backdrop-blur-sm rounded-2xl shadow-2xl p-4 transition-all duration-300 transform -translate-y-[500px] opacity-0 pointer-events-none" style="top: 62px; left: 19px;">
-        <div class="flex flex-col gap-2 min-w-[200px]">
-            <button id="playPauseBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Pause</button>
-            <button id="stretchingModeBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Stretch: Off</button>
-            <button id="fitViewBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Fit</button>
-            <button id="addRodBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Add Rod</button>
-            <button id="removeRodBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Remove Rod</button>
-            <button id="colorPickerBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Design</button>
-            <button id="copyLinkBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Copy Link</button>
-            <button id="saveVideoBtn" class="px-4 py-2 rounded-lg text-white font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Save Video</button>
+        <!-- Header Action Buttons -->
+        <button id="playPauseBtn" class="px-3 py-1.5 rounded-lg bg-white/70 backdrop-blur-sm text-black text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg">Pause</button>
+        <button id="addRodBtn" class="px-3 py-1.5 rounded-lg bg-white/70 backdrop-blur-sm text-black text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg">Add</button>
+        <button id="removeRodBtn" class="px-3 py-1.5 rounded-lg bg-white/70 backdrop-blur-sm text-black text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg">Remove</button>
+        <button id="copyLinkBtn" class="px-3 py-1.5 rounded-lg bg-white/70 backdrop-blur-sm text-black text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg">Copy</button>
+    </div>
+
+    <!-- Collapsible Menu Panel with Design Controls -->
+    <div id="menuPanel" class="fixed z-40 bg-white/70 backdrop-blur-sm rounded-2xl shadow-2xl p-4 transition-all duration-300 transform -translate-y-[500px] opacity-0 pointer-events-none" style="top: 62px; left: 19px; min-width: 280px; max-height: 80vh; overflow-y: auto;">
+        <div class="flex flex-col gap-3">
+            <!-- Menu Buttons -->
+            <button id="stretchingModeBtn" class="px-4 py-2 rounded-lg bg-blue-500/30 text-black font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Stretch: Off</button>
+            <button id="fitViewBtn" class="px-4 py-2 rounded-lg bg-blue-500/30 text-black font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Fit</button>
+            <button id="saveVideoBtn" class="px-4 py-2 rounded-lg bg-blue-500/30 text-black font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Save Video</button>
+
+            <!-- Design Controls -->
+            <div class="border-t border-gray-300 pt-3 mt-1">
+                <h3 class="text-sm font-semibold text-gray-700 mb-3">Design</h3>
+
+                <!-- Color Preview -->
+                <div id="colorPreview" class="w-full h-12 rounded-lg mb-3 border-2 border-gray-300"></div>
+
+                <!-- HSV Sliders Container -->
+                <div id="hsvSlidersContainer" class="flex flex-col gap-3 mb-3"></div>
+
+                <!-- Width Sliders Container -->
+                <div id="widthSlidersContainer" class="flex flex-col gap-3 mb-3 pt-3 border-t border-gray-300"></div>
+
+                <!-- Toggles Container -->
+                <div id="togglesContainer" class="flex flex-col gap-3 pt-3 border-t border-gray-300"></div>
+            </div>
         </div>
     </div>
 

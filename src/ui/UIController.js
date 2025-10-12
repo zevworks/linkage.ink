@@ -12,7 +12,7 @@ export class UIController {
     this.urlStateManager = urlStateManager;
     this.renderer = renderer;
     this.p5Instance = null;
-    this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer);
+    this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer, traceSystem);
     this.setupEventListeners();
 
     // Sync button states with mechanism state (for loading from URL)
@@ -132,21 +132,6 @@ export class UIController {
             saveVideoBtn.disabled = false;
           }
         );
-      };
-    }
-
-    // Design Picker button
-    const colorPickerBtn = document.getElementById('colorPickerBtn');
-    if (colorPickerBtn) {
-      colorPickerBtn.onclick = () => {
-        // Set current design before opening
-        this.colorPicker.setDesign({
-          color: this.traceSystem.getTraceColor(),
-          traceWidth: this.traceSystem.getTraceWidth(),
-          rodsWidth: this.traceSystem.getRodsWidth(),
-          fadingEnabled: this.traceSystem.getFading()
-        });
-        this.colorPicker.open();
       };
     }
 

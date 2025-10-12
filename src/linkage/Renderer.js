@@ -25,6 +25,7 @@ export class Renderer {
 
   updateMenuIconColor() {
     const color = this.isInverse ? '#ffffff' : '#000000';
+    const textColor = this.isInverse ? 'white' : 'black';
     const menuIcon = document.getElementById('menuIcon');
     const closeIcon = document.getElementById('closeIcon');
 
@@ -50,6 +51,40 @@ export class Renderer {
         line.setAttribute('stroke', color);
       });
     }
+
+    // Update header button text colors
+    const headerButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'copyLinkBtn'];
+    headerButtons.forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.style.color = textColor;
+      }
+    });
+
+    // Update menu button text colors
+    const menuButtons = ['stretchingModeBtn', 'fitViewBtn', 'saveVideoBtn'];
+    menuButtons.forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        btn.style.color = textColor;
+      }
+    });
+
+    // Update design section text colors
+    const designTitle = document.querySelector('#menuPanel h3');
+    if (designTitle) {
+      designTitle.style.color = this.isInverse ? '#ccc' : '#333';
+    }
+
+    const labels = document.querySelectorAll('#menuPanel span');
+    labels.forEach(label => {
+      // Skip value texts (they have font-weight 600)
+      if (label.style.fontWeight !== '600') {
+        label.style.color = this.isInverse ? '#aaa' : '#555';
+      } else {
+        label.style.color = this.isInverse ? '#fff' : '#333';
+      }
+    });
   }
 
   getInverse() {

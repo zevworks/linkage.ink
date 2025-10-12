@@ -1,17 +1,17 @@
 /**
- * Design panel component for selecting trace colors and widths
+ * Design panel component embedded in menu for selecting trace colors and widths
  */
 export class ColorPicker {
-  constructor(onDesignChange, renderer) {
+  constructor(onDesignChange, renderer, traceSystem) {
     this.onDesignChange = onDesignChange;
     this.renderer = renderer;
-    this.isOpen = false;
+    this.traceSystem = traceSystem;
     this.currentColor = { r: 128, g: 0, b: 128 }; // Default purple
     this.currentHSV = this.rgbToHSV(128, 0, 128); // Store HSV separately
     this.traceWidth = 4; // Default trace width
     this.rodsWidth = 4; // Default rods width
-    this.createElements();
-    this.setupEventListeners();
+    this.sliders = {};
+    this.initialize();
   }
 
   /**
@@ -79,96 +79,33 @@ export class ColorPicker {
     };
   }
 
-  createElements() {
-    // Create overlay
-    this.overlay = document.createElement('div');
-    this.overlay.style.cssText = `
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    `;
+  initialize() {
+    // Get containers
+    this.colorPreview = document.getElementById('colorPreview');
+    this.hsvSlidersContainer = document.getElementById('hsvSlidersContainer');
+    this.widthSlidersContainer = document.getElementById('widthSlidersContainer');
+    this.togglesContainer = document.getElementById('togglesContainer');
 
-    // Create picker container
-    this.picker = document.createElement('div');
-    this.picker.style.cssText = `
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-      min-width: 300px;
-    `;
-
-    // Create title container with close button
-    const titleContainer = document.createElement('div');
-    titleContainer.style.cssText = `
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    `;
-
-    const title = document.createElement('h3');
-    title.textContent = 'Design';
-    title.style.cssText = `
-      margin: 0;
-      font-size: 18px;
-      font-weight: 600;
-      color: #333;
-    `;
-
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = '×';
-    closeBtn.style.cssText = `
-      background: none;
-      border: none;
-      font-size: 28px;
-      line-height: 1;
-      cursor: pointer;
-      color: #666;
-      padding: 0;
-      width: 28px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: color 0.2s;
-    `;
-    closeBtn.onmouseover = () => closeBtn.style.color = '#333';
-    closeBtn.onmouseout = () => closeBtn.style.color = '#666';
-    closeBtn.onclick = () => this.close();
-
-    titleContainer.appendChild(title);
-    titleContainer.appendChild(closeBtn);
-
-    // Create color preview
-    this.colorPreview = document.createElement('div');
-    this.colorPreview.style.cssText = `
-      width: 100%;
-      height: 60px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      border: 2px solid #ddd;
-      background: rgb(${this.currentColor.r}, ${this.currentColor.g}, ${this.currentColor.b});
-    `;
-
-    // Create sliders container
-    const slidersContainer = document.createElement('div');
-    slidersContainer.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
-    `;
+    // Load current design values
+    this.currentColor = this.traceSystem.getTraceColor();
+    this.currentHSV = this.rgbToHSV(this.currentColor.r, this.currentColor.g, this.currentColor.b);
+    this.traceWidth = this.traceSystem.getTraceWidth();
+    this.rodsWidth = this.traceSystem.getRodsWidth();
 
     // Create HSV sliders
-    this.sliders = {};
+    this.createHSVSliders();
+
+    // Create width sliders
+    this.createWidthSliders();
+
+    // Create toggles
+    this.createToggles();
+
+    // Update color preview
+    this.updatePreview();
+  }
+
+  createHSVSliders() {
     const sliderConfigs = [
       {
         name: 'h',
@@ -212,8 +149,8 @@ export class ColorPicker {
         display: flex;
         justify-content: space-between;
         margin-bottom: 5px;
-        font-size: 14px;
-        color: #666;
+        font-size: 13px;
+        color: #555;
       `;
 
       const labelText = document.createElement('span');
@@ -246,218 +183,34 @@ export class ColorPicker {
       `;
 
       // Style the slider thumb
-      const style = document.createElement('style');
-      style.textContent = `
-        input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: white;
-          border: 2px solid #333;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-        input[type="range"]::-moz-range-thumb {
-          width: 20px;
-          height: 20px;
-          border-radius: 50%;
-          background: white;
-          border: 2px solid #333;
-          cursor: pointer;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-        }
-      `;
-      document.head.appendChild(style);
-
-      sliderGroup.appendChild(labelDiv);
-      sliderGroup.appendChild(slider);
-      slidersContainer.appendChild(sliderGroup);
-
-      this.sliders[name] = { slider, valueText, suffix, gradient, getGradient };
-    });
-
-    // Create width sliders container
-    const widthSlidersContainer = document.createElement('div');
-    widthSlidersContainer.style.cssText = `
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #ddd;
-    `;
-
-    // Add trace width slider
-    this.createWidthSlider(widthSlidersContainer, 'traceWidth', 'Trace Width', 2, 20, this.traceWidth, 'px');
-
-    // Add rods width slider
-    this.createWidthSlider(widthSlidersContainer, 'rodsWidth', 'Rods Width', 2, 20, this.rodsWidth, 'px');
-
-    // Create inverse toggle
-    const inverseContainer = document.createElement('div');
-    inverseContainer.style.cssText = `
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 15px;
-      border-top: 1px solid #ddd;
-    `;
-
-    const inverseLabel = document.createElement('span');
-    inverseLabel.textContent = 'Inverse Colors';
-    inverseLabel.style.cssText = `
-      font-size: 14px;
-      color: #666;
-    `;
-
-    this.inverseCheckbox = document.createElement('input');
-    this.inverseCheckbox.type = 'checkbox';
-    this.inverseCheckbox.checked = this.renderer.getInverse();
-    this.inverseCheckbox.style.cssText = `
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    `;
-    this.inverseCheckbox.onchange = (e) => {
-      e.stopPropagation();
-      this.renderer.setInverse(this.inverseCheckbox.checked);
-      if (this.onDesignChange) {
-        this.onDesignChange({
-          color: this.currentColor,
-          traceWidth: this.traceWidth,
-          rodsWidth: this.rodsWidth
-        });
+      if (!document.getElementById('slider-styles')) {
+        const style = document.createElement('style');
+        style.id = 'slider-styles';
+        style.textContent = `
+          input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #333;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          }
+          input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #333;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+          }
+        `;
+        document.head.appendChild(style);
       }
-    };
 
-    inverseContainer.appendChild(inverseLabel);
-    inverseContainer.appendChild(this.inverseCheckbox);
-
-    // Create fade toggle
-    const fadeContainer = document.createElement('div');
-    fadeContainer.style.cssText = `
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 15px;
-      border-top: 1px solid #ddd;
-    `;
-
-    const fadeLabel = document.createElement('span');
-    fadeLabel.textContent = 'Fade Traces';
-    fadeLabel.style.cssText = `
-      font-size: 14px;
-      color: #666;
-    `;
-
-    this.fadeCheckbox = document.createElement('input');
-    this.fadeCheckbox.type = 'checkbox';
-    this.fadeCheckbox.checked = true; // Default to enabled
-    this.fadeCheckbox.style.cssText = `
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-    `;
-    this.fadeCheckbox.onchange = (e) => {
-      e.stopPropagation();
-      if (this.onDesignChange) {
-        this.onDesignChange({
-          color: this.currentColor,
-          traceWidth: this.traceWidth,
-          rodsWidth: this.rodsWidth,
-          fadingEnabled: this.fadeCheckbox.checked
-        });
-      }
-    };
-
-    fadeContainer.appendChild(fadeLabel);
-    fadeContainer.appendChild(this.fadeCheckbox);
-
-    // Assemble picker
-    this.picker.appendChild(titleContainer);
-    this.picker.appendChild(this.colorPreview);
-    this.picker.appendChild(slidersContainer);
-    this.picker.appendChild(widthSlidersContainer);
-    this.picker.appendChild(inverseContainer);
-    this.picker.appendChild(fadeContainer);
-    this.overlay.appendChild(this.picker);
-    document.body.appendChild(this.overlay);
-  }
-
-  createWidthSlider(container, propertyName, label, min, max, value, suffix) {
-    const sliderGroup = document.createElement('div');
-
-    const labelDiv = document.createElement('div');
-    labelDiv.style.cssText = `
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 5px;
-      font-size: 14px;
-      color: #666;
-    `;
-
-    const labelText = document.createElement('span');
-    labelText.textContent = label;
-
-    const valueText = document.createElement('span');
-    valueText.textContent = value + suffix;
-    valueText.style.cssText = `
-      font-weight: 600;
-      color: #333;
-    `;
-
-    labelDiv.appendChild(labelText);
-    labelDiv.appendChild(valueText);
-
-    const slider = document.createElement('input');
-    slider.type = 'range';
-    slider.min = min.toString();
-    slider.max = max.toString();
-    slider.value = value;
-    slider.style.cssText = `
-      width: 100%;
-      height: 8px;
-      border-radius: 4px;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
-      background: #ddd;
-      cursor: pointer;
-    `;
-
-    slider.oninput = (e) => {
-      e.stopPropagation();
-      this[propertyName] = parseInt(slider.value);
-      valueText.textContent = slider.value + suffix;
-
-      // Apply changes live
-      if (this.onDesignChange) {
-        this.onDesignChange({
-          color: this.currentColor,
-          traceWidth: this.traceWidth,
-          rodsWidth: this.rodsWidth
-        });
-      }
-    };
-
-    // Prevent events from propagating
-    slider.onmousedown = (e) => e.stopPropagation();
-    slider.onmousemove = (e) => e.stopPropagation();
-    slider.onmouseup = (e) => e.stopPropagation();
-    slider.ontouchstart = (e) => e.stopPropagation();
-    slider.ontouchmove = (e) => e.stopPropagation();
-    slider.ontouchend = (e) => e.stopPropagation();
-
-    sliderGroup.appendChild(labelDiv);
-    sliderGroup.appendChild(slider);
-    container.appendChild(sliderGroup);
-  }
-
-  setupEventListeners() {
-    // Slider input events
-    Object.entries(this.sliders).forEach(([name, { slider, valueText, suffix }]) => {
       slider.oninput = (e) => {
         e.stopPropagation();
         this.currentHSV[name] = parseInt(slider.value);
@@ -473,87 +226,146 @@ export class ColorPicker {
 
         // Apply changes live
         if (this.onDesignChange) {
-          this.onDesignChange({
-            color: this.currentColor,
-            traceWidth: this.traceWidth,
-            rodsWidth: this.rodsWidth,
-            fadingEnabled: this.fadeCheckbox.checked
-          });
+          this.onDesignChange(this.getDesign());
         }
       };
 
-      // Prevent mouse events from propagating to canvas
-      slider.onmousedown = (e) => {
-        e.stopPropagation();
-      };
+      // Prevent events from propagating
+      slider.onmousedown = (e) => e.stopPropagation();
+      slider.onmousemove = (e) => e.stopPropagation();
+      slider.onmouseup = (e) => e.stopPropagation();
+      slider.ontouchstart = (e) => e.stopPropagation();
+      slider.ontouchmove = (e) => e.stopPropagation();
+      slider.ontouchend = (e) => e.stopPropagation();
 
-      slider.onmousemove = (e) => {
-        e.stopPropagation();
-      };
+      sliderGroup.appendChild(labelDiv);
+      sliderGroup.appendChild(slider);
+      this.hsvSlidersContainer.appendChild(sliderGroup);
 
-      slider.onmouseup = (e) => {
-        e.stopPropagation();
-      };
-
-      // Prevent touch events from propagating to canvas
-      slider.ontouchstart = (e) => {
-        e.stopPropagation();
-      };
-
-      slider.ontouchmove = (e) => {
-        e.stopPropagation();
-      };
-
-      slider.ontouchend = (e) => {
-        e.stopPropagation();
-      };
+      this.sliders[name] = { slider, valueText, suffix, gradient, getGradient };
     });
-
-    // Click overlay to close
-    this.overlay.onclick = (e) => {
-      if (e.target === this.overlay) {
-        this.close();
-      }
-    };
-
-    // Prevent all mouse/touch events on the picker from reaching the canvas
-    this.picker.onmousedown = (e) => {
-      e.stopPropagation();
-    };
-
-    this.picker.onmousemove = (e) => {
-      e.stopPropagation();
-    };
-
-    this.picker.onmouseup = (e) => {
-      e.stopPropagation();
-    };
-
-    this.picker.ontouchstart = (e) => {
-      e.stopPropagation();
-    };
-
-    this.picker.ontouchmove = (e) => {
-      e.stopPropagation();
-    };
-
-    this.picker.ontouchend = (e) => {
-      e.stopPropagation();
-    };
   }
 
-  updateUI() {
-    // Convert current RGB to HSV
-    this.currentHSV = this.rgbToHSV(this.currentColor.r, this.currentColor.g, this.currentColor.b);
+  createWidthSliders() {
+    const widthConfigs = [
+      { name: 'traceWidth', label: 'Trace Width', value: this.traceWidth },
+      { name: 'rodsWidth', label: 'Rods Width', value: this.rodsWidth }
+    ];
 
-    // Update sliders and preview
-    Object.entries(this.sliders).forEach(([name, { slider, valueText, suffix }]) => {
-      slider.value = this.currentHSV[name];
-      valueText.textContent = this.currentHSV[name] + suffix;
+    widthConfigs.forEach(({ name, label, value }) => {
+      const sliderGroup = document.createElement('div');
+
+      const labelDiv = document.createElement('div');
+      labelDiv.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+        font-size: 13px;
+        color: #555;
+      `;
+
+      const labelText = document.createElement('span');
+      labelText.textContent = label;
+
+      const valueText = document.createElement('span');
+      valueText.textContent = value + 'px';
+      valueText.style.cssText = `
+        font-weight: 600;
+        color: #333;
+      `;
+
+      labelDiv.appendChild(labelText);
+      labelDiv.appendChild(valueText);
+
+      const slider = document.createElement('input');
+      slider.type = 'range';
+      slider.min = '2';
+      slider.max = '20';
+      slider.value = value;
+      slider.style.cssText = `
+        width: 100%;
+        height: 8px;
+        border-radius: 4px;
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+        background: #ddd;
+        cursor: pointer;
+      `;
+
+      slider.oninput = (e) => {
+        e.stopPropagation();
+        this[name] = parseInt(slider.value);
+        valueText.textContent = slider.value + 'px';
+
+        // Apply changes live
+        if (this.onDesignChange) {
+          this.onDesignChange(this.getDesign());
+        }
+      };
+
+      // Prevent events from propagating
+      slider.onmousedown = (e) => e.stopPropagation();
+      slider.onmousemove = (e) => e.stopPropagation();
+      slider.onmouseup = (e) => e.stopPropagation();
+      slider.ontouchstart = (e) => e.stopPropagation();
+      slider.ontouchmove = (e) => e.stopPropagation();
+      slider.ontouchend = (e) => e.stopPropagation();
+
+      sliderGroup.appendChild(labelDiv);
+      sliderGroup.appendChild(slider);
+      this.widthSlidersContainer.appendChild(sliderGroup);
+
+      this.sliders[name] = { slider, valueText };
     });
+  }
 
-    this.updateSliderGradients();
-    this.updatePreview();
+  createToggles() {
+    const toggleConfigs = [
+      { name: 'inverse', label: 'Inverse Colors', getValue: () => this.renderer.getInverse() },
+      { name: 'fade', label: 'Fade Traces', getValue: () => this.traceSystem.getFading() }
+    ];
+
+    toggleConfigs.forEach(({ name, label, getValue }) => {
+      const toggleContainer = document.createElement('div');
+      toggleContainer.style.cssText = `
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      `;
+
+      const toggleLabel = document.createElement('span');
+      toggleLabel.textContent = label;
+      toggleLabel.style.cssText = `
+        font-size: 13px;
+        color: #555;
+      `;
+
+      const checkbox = document.createElement('input');
+      checkbox.type = 'checkbox';
+      checkbox.checked = getValue();
+      checkbox.style.cssText = `
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      `;
+
+      checkbox.onchange = (e) => {
+        e.stopPropagation();
+        if (name === 'inverse') {
+          this.renderer.setInverse(checkbox.checked);
+        }
+        if (this.onDesignChange) {
+          this.onDesignChange(this.getDesign());
+        }
+      };
+
+      toggleContainer.appendChild(toggleLabel);
+      toggleContainer.appendChild(checkbox);
+      this.togglesContainer.appendChild(toggleContainer);
+
+      this.sliders[name] = { checkbox };
+    });
   }
 
   updateSliderGradients() {
@@ -570,78 +382,47 @@ export class ColorPicker {
       `rgb(${this.currentColor.r}, ${this.currentColor.g}, ${this.currentColor.b})`;
   }
 
-  open() {
-    this.isOpen = true;
-    this.overlay.style.display = 'flex';
-  }
-
-  close() {
-    this.isOpen = false;
-    this.overlay.style.display = 'none';
-  }
-
-  apply() {
-    if (this.onDesignChange) {
-      this.onDesignChange({
-        color: this.currentColor,
-        traceWidth: this.traceWidth,
-        rodsWidth: this.rodsWidth
-      });
-    }
-    this.close();
-  }
-
-  setColor(color) {
-    this.currentColor = { ...color };
-    this.updateUI();
-  }
-
   setDesign(design) {
     if (design.color) {
       this.currentColor = { ...design.color };
-      this.updateUI();
+      this.currentHSV = this.rgbToHSV(this.currentColor.r, this.currentColor.g, this.currentColor.b);
+
+      // Update HSV sliders
+      ['h', 's', 'v'].forEach(name => {
+        if (this.sliders[name]) {
+          this.sliders[name].slider.value = this.currentHSV[name];
+          this.sliders[name].valueText.textContent = this.currentHSV[name] + this.sliders[name].suffix;
+        }
+      });
+
+      this.updateSliderGradients();
+      this.updatePreview();
     }
+
     if (design.traceWidth !== undefined) {
       this.traceWidth = design.traceWidth;
-      this.updateWidthSlider('traceWidth', design.traceWidth);
+      if (this.sliders.traceWidth) {
+        this.sliders.traceWidth.slider.value = design.traceWidth;
+        this.sliders.traceWidth.valueText.textContent = design.traceWidth + 'px';
+      }
     }
+
     if (design.rodsWidth !== undefined) {
       this.rodsWidth = design.rodsWidth;
-      this.updateWidthSlider('rodsWidth', design.rodsWidth);
-    }
-    if (design.fadingEnabled !== undefined && this.fadeCheckbox) {
-      this.fadeCheckbox.checked = design.fadingEnabled;
-    }
-    // Sync inverse checkbox with current renderer state
-    if (this.inverseCheckbox) {
-      this.inverseCheckbox.checked = this.renderer.getInverse();
-    }
-  }
-
-  updateWidthSlider(propertyName, value) {
-    // Find and update the width slider element
-    const allInputs = this.picker.querySelectorAll('input[type="range"]');
-    allInputs.forEach(slider => {
-      // Check if this is the right slider by checking its parent structure
-      const parent = slider.parentElement;
-      const labelDiv = parent.querySelector('div');
-      if (labelDiv) {
-        const labelText = labelDiv.querySelector('span:first-child');
-        const valueText = labelDiv.querySelector('span:last-child');
-        const expectedLabel = propertyName === 'traceWidth' ? 'Trace Width' : 'Rods Width';
-
-        if (labelText && labelText.textContent === expectedLabel) {
-          slider.value = value;
-          if (valueText) {
-            valueText.textContent = value + 'px';
-          }
-        }
+      if (this.sliders.rodsWidth) {
+        this.sliders.rodsWidth.slider.value = design.rodsWidth;
+        this.sliders.rodsWidth.valueText.textContent = design.rodsWidth + 'px';
       }
-    });
-  }
+    }
 
-  getColor() {
-    return { ...this.currentColor };
+    if (design.fadingEnabled !== undefined && this.sliders.fade) {
+      this.sliders.fade.checkbox.checked = design.fadingEnabled;
+    }
+
+    // Sync inverse checkbox with current renderer state
+    if (this.sliders.inverse) {
+      this.sliders.inverse.checkbox.checked = this.renderer.getInverse();
+    }
   }
 
   getDesign() {
@@ -649,7 +430,7 @@ export class ColorPicker {
       color: { ...this.currentColor },
       traceWidth: this.traceWidth,
       rodsWidth: this.rodsWidth,
-      fadingEnabled: this.fadeCheckbox ? this.fadeCheckbox.checked : true
+      fadingEnabled: this.sliders.fade ? this.sliders.fade.checkbox.checked : true
     };
   }
 }
