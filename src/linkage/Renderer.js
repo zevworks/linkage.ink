@@ -80,9 +80,19 @@ export class Renderer {
     }
 
     // Update all slider labels and values to match button text colors
-    const labels = document.querySelectorAll('#menuPanel span');
-    labels.forEach(label => {
+    const spans = document.querySelectorAll('#menuPanel span');
+    spans.forEach(span => {
       // All labels should match button colors: white in normal mode, black in dark mode
+      if (this.isInverse) {
+        span.style.color = 'black';
+      } else {
+        span.style.color = 'white';
+      }
+    });
+
+    // Update checkbox labels (label elements)
+    const labelElements = document.querySelectorAll('#menuPanel label');
+    labelElements.forEach(label => {
       if (this.isInverse) {
         label.style.color = 'black';
       } else {
