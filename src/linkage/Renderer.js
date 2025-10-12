@@ -79,15 +79,14 @@ export class Renderer {
       }
     }
 
-    // Update all slider labels and values (inverted to match menu background)
+    // Update all slider labels and values to match button text colors
     const labels = document.querySelectorAll('#menuPanel span');
     labels.forEach(label => {
-      // Value texts have monospace font
-      if (label.style.fontFamily === 'monospace') {
-        label.style.color = this.isInverse ? '#333' : '#eee';
-      } else if (label.style.fontWeight === '500') {
-        // Regular labels
-        label.style.color = this.isInverse ? '#555' : '#aaa';
+      // All labels should match button colors: white in light mode, black in dark mode
+      if (this.isInverse) {
+        label.style.color = 'black';
+      } else {
+        label.style.color = 'white';
       }
     });
 

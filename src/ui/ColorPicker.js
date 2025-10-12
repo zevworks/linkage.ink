@@ -151,7 +151,7 @@ export class ColorPicker {
         align-items: baseline;
         margin-bottom: 4px;
         font-size: 12px;
-        color: #aaa;
+        color: white;
       `;
 
       const labelText = document.createElement('span');
@@ -164,7 +164,7 @@ export class ColorPicker {
       valueText.textContent = this.currentHSV[name] + suffix;
       valueText.style.cssText = `
         font-weight: 600;
-        color: #eee;
+        color: white;
         font-size: 11px;
         font-family: monospace;
       `;
@@ -280,7 +280,7 @@ export class ColorPicker {
         align-items: baseline;
         margin-bottom: 4px;
         font-size: 12px;
-        color: #aaa;
+        color: white;
       `;
 
       const labelText = document.createElement('span');
@@ -293,7 +293,7 @@ export class ColorPicker {
       valueText.textContent = value + 'px';
       valueText.style.cssText = `
         font-weight: 600;
-        color: #eee;
+        color: white;
         font-size: 11px;
         font-family: monospace;
       `;
@@ -370,7 +370,7 @@ export class ColorPicker {
       toggleLabel.textContent = label;
       toggleLabel.style.cssText = `
         font-size: 12px;
-        color: #aaa;
+        color: white;
         cursor: pointer;
         flex: 1;
         font-weight: 500;
