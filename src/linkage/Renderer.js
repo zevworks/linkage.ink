@@ -52,49 +52,49 @@ export class Renderer {
       });
     }
 
-    // Update menu button styles (inverted: white text in light mode, black text in dark mode)
+    // Update menu button styles - normal: black on white, dark: white on black
     const menuButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'copyLinkBtn', 'saveVideoBtn'];
     menuButtons.forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {
         if (this.isInverse) {
-          btn.style.color = 'black';
-          btn.style.border = '1px solid black';
-          btn.style.background = 'transparent';
-        } else {
           btn.style.color = 'white';
           btn.style.border = '1px solid white';
+          btn.style.background = 'transparent';
+        } else {
+          btn.style.color = 'black';
+          btn.style.border = '1px solid black';
           btn.style.background = 'transparent';
         }
       }
     });
 
-    // Update menu panel background (inverted: black in light mode, white in dark mode)
+    // Update menu panel background - normal: white, dark: black
     const menuPanel = document.getElementById('menuPanel');
     if (menuPanel) {
       if (this.isInverse) {
-        menuPanel.style.background = 'rgba(255, 255, 255, 0.5)';
-      } else {
         menuPanel.style.background = 'rgba(0, 0, 0, 0.5)';
+      } else {
+        menuPanel.style.background = 'rgba(255, 255, 255, 0.5)';
       }
     }
 
     // Update all slider labels and values to match button text colors
     const labels = document.querySelectorAll('#menuPanel span');
     labels.forEach(label => {
-      // All labels should match button colors: white in light mode, black in dark mode
+      // All labels should match button colors: black in normal mode, white in dark mode
       if (this.isInverse) {
-        label.style.color = 'black';
-      } else {
         label.style.color = 'white';
+      } else {
+        label.style.color = 'black';
       }
     });
 
-    // Update width slider backgrounds (inverted to match menu background)
+    // Update width slider backgrounds to match menu
     const widthSliders = document.querySelectorAll('#widthSlidersContainer input[type="range"]');
     const sliderBg = this.isInverse
-      ? 'linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15))'
-      : 'linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3))';
+      ? 'linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3))'
+      : 'linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15))';
     widthSliders.forEach(slider => {
       slider.style.background = sliderBg;
     });
