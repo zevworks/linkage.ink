@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive 2D Linkage Simulator</title>
+    <style>
+        .flex-col {
+            gap: 0.5rem;
+        }
+    </style>
 </head>
 <body class="m-0 p-0 overflow-hidden">
     <!-- Menu Toggle Button -->
@@ -20,7 +25,7 @@
 
     <!-- Collapsible Menu Panel with Design Controls -->
     <div id="menuPanel" class="fixed z-40 backdrop-blur-md rounded-2xl shadow-2xl transition-all duration-300 transform -translate-y-[500px] opacity-0 pointer-events-none" style="top: 70px; left: 24px; width: 320px; background: rgba(0, 0, 0, 0.5); padding: 6px;">
-        <div class="flex flex-col" style="gap: 0.5rem;">
+        <div class="flex flex-col">
             <!-- Action Buttons Section -->
             <div>
                 <div class="grid grid-cols-2" style="gap: 3px;">
