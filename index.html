@@ -7,7 +7,7 @@
 </head>
 <body class="m-0 p-0 overflow-hidden">
     <!-- Header with Menu Icon and Action Buttons -->
-    <div class="fixed z-50 w-full flex items-center justify-between px-5" style="top: 18px;">
+    <div class="fixed z-50 w-full flex items-center justify-between" style="top: 18px; padding-left: 19px; padding-right: 24px;">
         <!-- Menu Toggle Button -->
         <button id="menuToggle" class="bg-transparent border-0 p-0 cursor-pointer">
             <svg id="menuIconSvg" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s ease;">
@@ -22,11 +22,11 @@
 
         <!-- Header Action Buttons -->
         <div class="flex items-center gap-4">
-            <button id="playPauseBtn" class="px-3 py-1.5 rounded-lg bg-white/70 backdrop-blur-sm text-black text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg">Pause</button>
-            <button id="addRodBtn" class="px-3 py-1.5 rounded-lg bg-white/70 backdrop-blur-sm text-black text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg">Add</button>
-            <button id="removeRodBtn" class="px-3 py-1.5 rounded-lg bg-white/70 backdrop-blur-sm text-black text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg">Remove</button>
-            <button id="fitViewBtn" class="px-3 py-1.5 rounded-lg bg-white/70 backdrop-blur-sm text-black text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg">Fit</button>
-            <button id="copyLinkBtn" class="px-3 py-1.5 rounded-lg bg-white/70 backdrop-blur-sm text-black text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg">Copy</button>
+            <button id="playPauseBtn" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); color: black;">Pause</button>
+            <button id="addRodBtn" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); color: black;">Add</button>
+            <button id="removeRodBtn" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); color: black;">Remove</button>
+            <button id="fitViewBtn" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); color: black;">Fit</button>
+            <button id="copyLinkBtn" class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 shadow-lg" style="background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(8px); color: black;">Copy</button>
         </div>
     </div>
 
@@ -44,9 +44,6 @@
 
             <!-- Toggles Container -->
             <div id="togglesContainer" class="flex flex-col gap-3"></div>
-
-            <!-- Save Video Button -->
-            <button id="saveVideoBtn" class="px-4 py-2 rounded-lg bg-blue-500/30 text-black font-medium transition-all duration-200 hover:brightness-90 active:scale-95">Save Video</button>
         </div>
     </div>
 

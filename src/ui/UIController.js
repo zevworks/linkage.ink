@@ -94,31 +94,6 @@ export class UIController {
       };
     }
 
-    // Save Video button
-    const saveVideoBtn = document.getElementById('saveVideoBtn');
-    if (saveVideoBtn) {
-      saveVideoBtn.onclick = () => {
-        if (this.videoExporter.isCurrentlyRecording()) {
-          return; // Already recording
-        }
-
-        // Update button text
-        saveVideoBtn.textContent = 'Recording...';
-        saveVideoBtn.disabled = true;
-
-        // Start recording
-        this.videoExporter.startRecording(
-          this.p5Instance.canvas,
-          this.mechanism.FRAMES_PER_ROUND,
-          () => {
-            // Reset button when complete
-            saveVideoBtn.textContent = 'Save Video';
-            saveVideoBtn.disabled = false;
-          }
-        );
-      };
-    }
-
     // Copy Link button
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     if (copyLinkBtn) {

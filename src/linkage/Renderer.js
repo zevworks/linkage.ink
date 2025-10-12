@@ -52,21 +52,18 @@ export class Renderer {
       });
     }
 
-    // Update header button text colors
+    // Update header button styles for inverse mode
     const headerButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'copyLinkBtn'];
     headerButtons.forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {
-        btn.style.color = textColor;
-      }
-    });
-
-    // Update menu button text colors
-    const menuButtons = ['saveVideoBtn'];
-    menuButtons.forEach(btnId => {
-      const btn = document.getElementById(btnId);
-      if (btn) {
-        btn.style.color = textColor;
+        if (this.isInverse) {
+          btn.style.background = 'rgba(0, 0, 0, 0.7)';
+          btn.style.color = 'white';
+        } else {
+          btn.style.background = 'rgba(255, 255, 255, 0.7)';
+          btn.style.color = 'black';
+        }
       }
     });
 
