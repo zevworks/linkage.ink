@@ -35,6 +35,15 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleMenu();
   });
 
+  // Prevent menu interactions from affecting canvas
+  const preventCanvasInteraction = (e) => {
+    e.stopPropagation();
+  };
+
+  ['mousedown', 'mouseup', 'mousemove', 'click', 'touchstart', 'touchmove', 'touchend', 'wheel'].forEach(eventType => {
+    menuPanel.addEventListener(eventType, preventCanvasInteraction);
+  });
+
   // Close menu when clicking or tapping outside
   const closeMenuIfOutside = (e) => {
     if (isMenuOpen && !menuPanel.contains(e.target) && !menuToggle.contains(e.target)) {
