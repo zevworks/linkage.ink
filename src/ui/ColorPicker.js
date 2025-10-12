@@ -303,6 +303,9 @@ export class ColorPicker {
       slider.min = '2';
       slider.max = '20';
       slider.value = value;
+      const sliderBg = this.renderer.getInverse()
+        ? 'linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3))'
+        : 'linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15))';
       slider.style.cssText = `
         width: 100%;
         height: 6px;
@@ -310,7 +313,7 @@ export class ColorPicker {
         outline: none;
         -webkit-appearance: none;
         appearance: none;
-        background: linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15));
+        background: ${sliderBg};
         cursor: pointer;
       `;
 
@@ -337,7 +340,7 @@ export class ColorPicker {
       sliderGroup.appendChild(slider);
       this.widthSlidersContainer.appendChild(sliderGroup);
 
-      this.sliders[name] = { slider, valueText };
+      this.sliders[name] = { slider, valueText, isWidthSlider: true };
     });
   }
 

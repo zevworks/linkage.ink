@@ -53,7 +53,7 @@ export class Renderer {
     }
 
     // Update menu button styles for inverse mode
-    const menuButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'copyLinkBtn'];
+    const menuButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'copyLinkBtn', 'saveVideoBtn'];
     menuButtons.forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {
@@ -96,6 +96,15 @@ export class Renderer {
         // Regular labels
         label.style.color = this.isInverse ? '#aaa' : '#555';
       }
+    });
+
+    // Update width slider backgrounds for dark mode
+    const widthSliders = document.querySelectorAll('#widthSlidersContainer input[type="range"]');
+    const sliderBg = this.isInverse
+      ? 'linear-gradient(to right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.3))'
+      : 'linear-gradient(to right, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.15))';
+    widthSliders.forEach(slider => {
+      slider.style.background = sliderBg;
     });
   }
 

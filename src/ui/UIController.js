@@ -114,5 +114,27 @@ export class UIController {
         }
       };
     }
+
+    // Save Video button
+    const saveVideoBtn = document.getElementById('saveVideoBtn');
+    if (saveVideoBtn) {
+      saveVideoBtn.onclick = () => {
+        if (this.videoExporter.isCurrentlyRecording()) {
+          // Cancel recording
+          this.videoExporter.cancel();
+          saveVideoBtn.textContent = 'Save Video';
+        } else {
+          // Start recording
+          const canvas = this.p5Instance.canvas;
+          const framesPerRound = this.mechanism.FRAMES_PER_ROUND;
+
+          saveVideoBtn.textContent = 'Recording...';
+
+          this.videoExporter.startRecording(canvas, framesPerRound, () => {
+            saveVideoBtn.textContent = 'Save Video';
+          });
+        }
+      };
+    }
   }
 }
