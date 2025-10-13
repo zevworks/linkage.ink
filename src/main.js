@@ -12,7 +12,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const menuToggle = document.getElementById('menuToggle');
   const menuPanel = document.getElementById('menuPanel');
   const menuIconSvg = document.getElementById('menuIconSvg');
-  const sidebarBackdrop = document.getElementById('sidebarBackdrop');
   let isMenuOpen = false;
 
   let firstMenuOpen = true;
@@ -21,10 +20,8 @@ document.addEventListener('DOMContentLoaded', () => {
     isMenuOpen = !isMenuOpen;
 
     if (isMenuOpen) {
-      menuPanel.classList.remove('translate-x-full');
-      menuPanel.classList.add('translate-x-0');
-      sidebarBackdrop.classList.remove('opacity-0', 'pointer-events-none');
-      sidebarBackdrop.classList.add('opacity-100', 'pointer-events-auto');
+      menuPanel.classList.remove('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
+      menuPanel.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
       menuIconSvg.style.transform = 'rotate(-90deg)';
 
       // Force slider repaint on first menu open (fixes visibility issue)
@@ -43,10 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 50);
       }
     } else {
-      menuPanel.classList.add('translate-x-full');
-      menuPanel.classList.remove('translate-x-0');
-      sidebarBackdrop.classList.add('opacity-0', 'pointer-events-none');
-      sidebarBackdrop.classList.remove('opacity-100', 'pointer-events-auto');
+      menuPanel.classList.add('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
+      menuPanel.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
       menuIconSvg.style.transform = 'rotate(0deg)';
     }
   };
@@ -66,11 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
   ['mousedown', 'mouseup', 'mousemove', 'click', 'touchstart', 'touchmove', 'touchend', 'wheel'].forEach(eventType => {
     menuPanel.addEventListener(eventType, preventCanvasInteraction);
   });
-
-  // Close menu when clicking backdrop
-  if (sidebarBackdrop) {
-    sidebarBackdrop.addEventListener('click', toggleMenu);
-  }
 
   // Close menu when clicking or tapping outside
   const closeMenuIfOutside = (e) => {
