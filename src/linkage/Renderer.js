@@ -53,7 +53,7 @@ export class Renderer {
     }
 
     // Update menu button styles - normal: white on black, dark: black on white
-    const menuButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'copyLinkBtn', 'saveVideoBtn'];
+    const menuButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'saveStateBtn', 'openStatesBtn', 'copyLinkBtn', 'saveVideoBtn'];
     menuButtons.forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {

@@ -1,22 +1,32 @@
 import { ColorPicker } from './ColorPicker.js';
+import { presets } from '../data/presets.js';
 
 /**
  * Manages UI button interactions and state updates
  */
 export class UIController {
-  constructor(mechanism, traceSystem, videoExporter, camera, urlStateManager, renderer) {
+  constructor(mechanism, traceSystem, videoExporter, camera, urlStateManager, renderer, stateSerializer, localStorageManager) {
     this.mechanism = mechanism;
     this.traceSystem = traceSystem;
     this.videoExporter = videoExporter;
     this.camera = camera;
     this.urlStateManager = urlStateManager;
     this.renderer = renderer;
+    this.stateSerializer = stateSerializer;
+    this.localStorageManager = localStorageManager;
     this.p5Instance = null;
     this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer, traceSystem, mechanism);
-    this.setupEventListeners();
 
-    // Sync button states with mechanism state (for loading from URL)
-    this.syncButtonStates();
+    // Defer event listener setup until DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        this.setupEventListeners();
+        this.syncButtonStates();
+      });
+    } else {
+      this.setupEventListeners();
+      this.syncButtonStates();
+    }
   }
 
   handleDesignChange(design) {
@@ -151,6 +161,238 @@ export class UIController {
           });
         }
       };
+    }
+
+    // Save State button
+    const saveStateBtn = document.getElementById('saveStateBtn');
+    if (saveStateBtn) {
+      saveStateBtn.onclick = () => {
+        this.saveCurrentState();
+      };
+    }
+
+    // Open States button
+    const openStatesBtn = document.getElementById('openStatesBtn');
+    if (openStatesBtn) {
+      openStatesBtn.onclick = () => {
+        this.openStatesBrowser();
+      };
+    }
+
+    // Close modal button
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+    if (closeModalBtn) {
+      closeModalBtn.onclick = () => this.closeStatesBrowser();
+    }
+    if (modalBackdrop) {
+      modalBackdrop.onclick = () => this.closeStatesBrowser();
+    }
+  }
+
+  /**
+   * Capture current canvas as thumbnail and save state
+   */
+  saveCurrentState() {
+    if (!this.p5Instance) {
+      console.error('p5 instance not available');
+      return;
+    }
+
+    try {
+      // Capture canvas as data URL
+      const canvas = this.p5Instance.canvas;
+      const thumbnail = canvas.toDataURL('image/png', 0.8);
+
+      // Get current state
+      const stateData = this.stateSerializer.exportState();
+
+      // Save to localStorage
+      const id = this.localStorageManager.saveState(stateData, thumbnail);
+
+      if (id) {
+        // Visual feedback
+        const saveStateBtn = document.getElementById('saveStateBtn');
+        if (saveStateBtn) {
+          const originalText = saveStateBtn.textContent;
+          saveStateBtn.textContent = 'Saved!';
+          setTimeout(() => {
+            saveStateBtn.textContent = originalText;
+          }, 1500);
+        }
+      }
+    } catch (error) {
+      console.error('Error saving state:', error);
+      alert('Failed to save state. Please try again.');
+    }
+  }
+
+  /**
+   * Open the states browser modal
+   */
+  openStatesBrowser() {
+    const modal = document.getElementById('statesBrowserModal');
+    if (!modal) return;
+
+    // Show modal
+    modal.style.display = 'block';
+    modal.classList.remove('hidden');
+
+    // Populate grids
+    this.populatePresetsGrid();
+    this.populateSavedGrid();
+  }
+
+  /**
+   * Close the states browser modal
+   */
+  closeStatesBrowser() {
+    const modal = document.getElementById('statesBrowserModal');
+    if (modal) {
+      modal.style.display = 'none';
+      modal.classList.add('hidden');
+    }
+  }
+
+  /**
+   * Populate presets grid
+   */
+  populatePresetsGrid() {
+    const presetsGrid = document.getElementById('presetsGrid');
+    if (!presetsGrid) return;
+
+    presetsGrid.innerHTML = '';
+
+    presets.forEach(preset => {
+      const card = this.createStateCard(preset, false);
+      presetsGrid.appendChild(card);
+    });
+  }
+
+  /**
+   * Populate saved states grid
+   */
+  populateSavedGrid() {
+    const savedGrid = document.getElementById('savedGrid');
+    const noSavesMessage = document.getElementById('noSavesMessage');
+    if (!savedGrid) return;
+
+    savedGrid.innerHTML = '';
+
+    const savedStates = this.localStorageManager.getSavedStates();
+    console.log('Saved states retrieved:', savedStates.length, savedStates);
+
+    if (savedStates.length === 0) {
+      if (noSavesMessage) {
+        noSavesMessage.classList.remove('hidden');
+      }
+      return;
+    }
+
+    if (noSavesMessage) {
+      noSavesMessage.classList.add('hidden');
+    }
+
+    savedStates.forEach(saveData => {
+      console.log('Creating card for saved state:', saveData.id);
+      const card = this.createStateCard(saveData, true);
+      savedGrid.appendChild(card);
+    });
+  }
+
+  /**
+   * Create a state card element
+   * @param {Object} data - State data with {id, thumbnail, state}
+   * @param {boolean} showDelete - Whether to show delete button
+   */
+  createStateCard(data, showDelete) {
+    const card = document.createElement('div');
+    card.className = 'state-card';
+    console.log('Creating card, has thumbnail?', !!data.thumbnail, 'thumbnail length:', data.thumbnail ? data.thumbnail.length : 0);
+
+    // Create thumbnail image or placeholder
+    if (data.thumbnail) {
+      const img = document.createElement('img');
+      img.src = data.thumbnail;
+      img.alt = data.name || 'Linkage state';
+      img.onload = () => console.log('Image loaded successfully for', data.id);
+      img.onerror = (e) => console.error('Image failed to load for', data.id, e);
+      card.appendChild(img);
+    } else {
+      // Placeholder with preset name
+      const placeholder = document.createElement('div');
+      placeholder.className = 'state-card-placeholder';
+      placeholder.textContent = data.name || data.description || 'Preset';
+      card.appendChild(placeholder);
+    }
+
+    // Add delete button for saved states
+    if (showDelete) {
+      const deleteBtn = document.createElement('button');
+      deleteBtn.className = 'state-card-delete';
+      deleteBtn.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      `;
+      deleteBtn.onclick = (e) => {
+        e.stopPropagation();
+        this.deleteState(data.id);
+      };
+      card.appendChild(deleteBtn);
+    }
+
+    // Click card to load state
+    card.onclick = () => {
+      this.loadState(data.state);
+    };
+
+    return card;
+  }
+
+  /**
+   * Load a state
+   * @param {Object} state - State object to load
+   */
+  loadState(state) {
+    try {
+      // Clear existing traces
+      this.traceSystem.clearAllTraces();
+
+      // Import the state
+      this.stateSerializer.importState(state);
+
+      // Update UI
+      this.syncButtonStates();
+      this.colorPicker.setDesign({
+        color: state.traceColor,
+        traceWidth: state.traceWidth,
+        rodsWidth: state.rodsWidth,
+        fadingEnabled: state.fadingEnabled
+      });
+
+      // Update URL
+      this.urlStateManager.updateURLNow();
+
+      // Close modal
+      this.closeStatesBrowser();
+    } catch (error) {
+      console.error('Error loading state:', error);
+      alert('Failed to load state. The data may be corrupted.');
+    }
+  }
+
+  /**
+   * Delete a saved state
+   * @param {string} id - State ID to delete
+   */
+  deleteState(id) {
+    if (confirm('Delete this saved state?')) {
+      const success = this.localStorageManager.deleteState(id);
+      if (success) {
+        // Refresh the saved grid
+        this.populateSavedGrid();
+      }
     }
   }
 }

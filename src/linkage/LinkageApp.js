@@ -8,6 +8,7 @@ import { UIController } from '../ui/UIController.js';
 import { VideoExporter } from '../utils/VideoExporter.js';
 import { StateSerializer } from '../utils/StateSerializer.js';
 import { URLStateManager } from '../utils/URLStateManager.js';
+import { LocalStorageManager } from '../utils/LocalStorageManager.js';
 
 /**
  * Main application class that orchestrates all components
@@ -34,6 +35,7 @@ class LinkageApp {
     // Initialize state serialization and URL state management
     this.stateSerializer = new StateSerializer(this.mechanism, this.camera, this.traceSystem, this.renderer);
     this.urlStateManager = new URLStateManager(this.stateSerializer);
+    this.localStorageManager = new LocalStorageManager();
 
     // Try to load state from URL, if not present, use default configuration
     const loadedFromURL = this.urlStateManager.decodeStateFromURL();
@@ -52,7 +54,9 @@ class LinkageApp {
       this.videoExporter,
       this.camera,
       this.urlStateManager,
-      this.renderer
+      this.renderer,
+      this.stateSerializer,
+      this.localStorageManager
     );
 
     // Store p5 instance for GIF export
