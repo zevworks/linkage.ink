@@ -11,8 +11,11 @@
     </style>
 </head>
 <body class="m-0 p-0 overflow-hidden">
+    <!-- Sidebar Backdrop -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300 opacity-0 pointer-events-none"></div>
+
     <!-- Menu Toggle Button -->
-    <button id="menuToggle" class="fixed z-50 bg-transparent border-0 p-0 cursor-pointer" style="top: 18px; right: 16px;">
+    <button id="menuToggle" class="fixed z-50 bg-transparent border-0 p-0 cursor-pointer transition-all duration-300" style="top: 18px; right: 16px;">
         <svg id="menuIconSvg" width="36" height="36" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s ease;">
             <!-- GP Icon: center circle with two sleeves (rectangles) -->
             <g id="menuIcon">
@@ -23,20 +26,20 @@
         </svg>
     </button>
 
-    <!-- Collapsible Menu Panel with Design Controls -->
-    <div id="menuPanel" class="fixed z-40 backdrop-blur-md rounded-2xl shadow-2xl transition-all duration-300 transform -translate-y-[500px] opacity-0 pointer-events-none" style="top: 62px; right: 15px; width: 320px; background: rgba(0, 0, 0, 0.7); padding: 6px;">
-        <div class="flex flex-col">
+    <!-- Sidebar Panel -->
+    <div id="menuPanel" class="fixed top-0 right-0 h-screen w-80 bg-black bg-opacity-80 backdrop-blur-md shadow-2xl z-40 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+        <div class="flex flex-col p-4 gap-4">
             <!-- Action Buttons Section -->
             <div>
-                <div class="grid grid-cols-2" style="gap: 3px;">
-                    <button id="playPauseBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Pause</button>
-                    <button id="fitViewBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Fit</button>
-                    <button id="addRodBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Add Rod</button>
-                    <button id="removeRodBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Remove Rod</button>
-                    <button id="saveStateBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Save State</button>
-                    <button id="openStatesBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Open States</button>
-                    <button id="copyLinkBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Copy Link</button>
-                    <button id="saveVideoBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Save Video</button>
+                <div class="grid grid-cols-2 gap-2">
+                    <button id="playPauseBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 py-2 px-3 text-white border border-white bg-transparent">Pause</button>
+                    <button id="fitViewBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 py-2 px-3 text-white border border-white bg-transparent">Fit</button>
+                    <button id="addRodBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 py-2 px-3 text-white border border-white bg-transparent">Add Rod</button>
+                    <button id="removeRodBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 py-2 px-3 text-white border border-white bg-transparent">Remove Rod</button>
+                    <button id="saveStateBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 py-2 px-3 text-white border border-white bg-transparent">Save State</button>
+                    <button id="openStatesBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 py-2 px-3 text-white border border-white bg-transparent">Open States</button>
+                    <button id="copyLinkBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 py-2 px-3 text-white border border-white bg-transparent">Copy Link</button>
+                    <button id="saveVideoBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95 py-2 px-3 text-white border border-white bg-transparent">Save Video</button>
                 </div>
             </div>
 
