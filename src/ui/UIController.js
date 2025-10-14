@@ -365,13 +365,23 @@ export class UIController {
     }
 
     // Filter out items that were "deleted" (not in savedStatesOrder) and sort
+    console.log('Before filtering - savedStates.length:', savedStates.length);
+    console.log('Before filtering - savedStatesOrder:', [...this.savedStatesOrder]);
+
     const orderedStates = savedStates
-      .filter(s => this.savedStatesOrder.includes(s.id))
+      .filter(s => {
+        const isIncluded = this.savedStatesOrder.includes(s.id);
+        console.log(`Checking ${s.id}: ${isIncluded}`);
+        return isIncluded;
+      })
       .sort((a, b) => {
         const indexA = this.savedStatesOrder.indexOf(a.id);
         const indexB = this.savedStatesOrder.indexOf(b.id);
         return indexA - indexB;
       });
+
+    console.log('After filtering - orderedStates.length:', orderedStates.length);
+    console.log('After filtering - orderedStates IDs:', orderedStates.map(s => s.id));
 
     // Check if all items were deleted
     if (orderedStates.length === 0) {
