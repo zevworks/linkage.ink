@@ -32,19 +32,27 @@ export class HistoryManager {
 
       try {
         // Use our index from browser state to look up in our history stack
-        let targetIndex = this.historyIndex;
+        let targetIndex = null;
 
         if (event.state && event.state.ourIndex !== undefined) {
           targetIndex = event.state.ourIndex;
         } else if (window.history.state && window.history.state.ourIndex !== undefined) {
           targetIndex = window.history.state.ourIndex;
         } else {
-          console.warn('No history index found in popstate, cannot restore state reliably');
+          // No index found - this is an old history entry from before our code ran
+          console.warn('No history index found in popstate - old history entry, ignoring');
           this.isRestoringFromHistory = false;
           return;
         }
 
         console.log('Restoring to index:', targetIndex);
+
+        // Validate that we have state for this index
+        if (targetIndex < 0 || targetIndex >= this.stateHistory.length) {
+          console.warn('Index', targetIndex, 'out of range (0-' + (this.stateHistory.length - 1) + ') - old history from previous page load, ignoring');
+          this.isRestoringFromHistory = false;
+          return;
+        }
 
         // Get state from our history stack
         const targetState = this.stateHistory[targetIndex];
@@ -65,7 +73,7 @@ export class HistoryManager {
             'rod1:', targetState.rods[0]?.length.toFixed(1),
             'rod2:', targetState.rods[1]?.length.toFixed(1));
         } else {
-          console.error('No state found at index', targetIndex);
+          console.error('No state found at index', targetIndex, '- this should not happen');
         }
 
         if (onStateRestore) {
