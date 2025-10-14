@@ -1,23 +1,9 @@
 [
   {
-    "id": "simple-circle",
-    "name": "Simple Circle",
+    "id": "hart",
+    "name": "hart",
     "description": "Basic single-rod circular motion",
-    "thumbnail": "simple-circle.png",
-    "stateUrl": "#ax=0&ay=0&cl=150&ct=1&cfr=0&ox=400&oy=300&z=1.0&tc=%237B007B&tw=4&rw=4&f=0&s=0&inv=0"
-  },
-  {
-    "id": "double-rod",
-    "name": "Double Rod",
-    "description": "Two-rod linkage creating complex patterns",
-    "thumbnail": "double-rod.png",
-    "stateUrl": "#ax=0&ay=0&cl=120&ct=0&cfr=0&r1l=180&r1t=1&r1fr=0&r1gx=200&r1gy=0&ox=400&oy=300&z=0.8&tc=%230096FF&tw=4&rw=4&f=0&s=0&inv=0"
-  },
-  {
-    "id": "figure-eight",
-    "name": "Figure Eight",
-    "description": "Three-rod configuration creating figure-eight pattern",
-    "thumbnail": "figure-eight.png",
-    "stateUrl": "#ax=0&ay=0&cl=100&ct=0&cfr=0&r1l=150&r1t=0&r1fr=0&r1gx=180&r1gy=0&r2l=120&r2t=1&r2fr=0&r2gx=90&r2gy=-150&ox=400&oy=300&z=0.7&tc=%23FF6400&tw=4&rw=4&f=1&s=0&inv=0"
+    "thumbnail": "hart.png",
+    "stateUrl": "#anchor=-95.6%2C14.9&crank=254.1%2C0%2C0&rod1=494.8%2C-101.9%2C-195.0%2C0%2C1&rod2=1028.7%2C-106.8%2C-743.3%2C1%2C0&camera=1251.0%2C970.1%2C0.548&color=255%2C0%2C0&traceWidth=4&rodsWidth=4&stretch=1&inverse=1&fade=1"
   }
 ]
