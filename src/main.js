@@ -14,12 +14,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const menuIconSvg = document.getElementById('menuIconSvg');
   let isMenuOpen = false;
 
+  // Expose menu state for cross-component access
+  window.linkageMenuState = { isMenuOpen: false };
+
   let firstMenuOpen = true;
 
   const toggleMenu = () => {
     isMenuOpen = !isMenuOpen;
+    window.linkageMenuState.isMenuOpen = isMenuOpen;
 
     if (isMenuOpen) {
+      // On narrow screens, close sidebar if open
+      const isNarrowScreen = window.innerWidth < 768;
+      if (isNarrowScreen && app.uiController && app.uiController.isSidebarOpen()) {
+        app.uiController.closeSidebar();
+      }
+
       menuPanel.classList.remove('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
       menuPanel.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
       menuIconSvg.style.transform = 'rotate(-90deg)';

@@ -285,6 +285,31 @@ export class UIController {
   }
 
   /**
+   * Check if sidebar is open
+   */
+  isSidebarOpen() {
+    const sidebar = document.getElementById('statesSidebar');
+    return sidebar && sidebar.classList.contains('open');
+  }
+
+  /**
+   * Close the sidebar
+   */
+  closeSidebar() {
+    const sidebar = document.getElementById('statesSidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    const icon = document.getElementById('sidebarToggleIcon');
+
+    if (!sidebar || !toggleBtn || !icon) return;
+
+    if (sidebar.classList.contains('open')) {
+      sidebar.classList.remove('open');
+      toggleBtn.classList.remove('open');
+      icon.style.transform = 'rotate(0deg)';
+    }
+  }
+
+  /**
    * Toggle the states sidebar
    */
   toggleStatesSidebar() {
@@ -302,6 +327,25 @@ export class UIController {
       toggleBtn.classList.remove('open');
       icon.style.transform = 'rotate(0deg)';
     } else {
+      // On narrow screens, close menu if open
+      const isNarrowScreen = window.innerWidth < 768;
+      if (isNarrowScreen) {
+        const menuPanel = document.getElementById('menuPanel');
+        const menuIconSvg = document.getElementById('menuIconSvg');
+        if (menuPanel && menuPanel.classList.contains('opacity-100')) {
+          // Close menu
+          menuPanel.classList.add('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
+          menuPanel.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+          if (menuIconSvg) {
+            menuIconSvg.style.transform = 'rotate(0deg)';
+          }
+          // Update menu state if accessible
+          if (window.linkageMenuState) {
+            window.linkageMenuState.isMenuOpen = false;
+          }
+        }
+      }
+
       // Open sidebar
       sidebar.classList.add('open');
       toggleBtn.classList.add('open');
@@ -365,23 +409,13 @@ export class UIController {
     }
 
     // Filter out items that were "deleted" (not in savedStatesOrder) and sort
-    console.log('Before filtering - savedStates.length:', savedStates.length);
-    console.log('Before filtering - savedStatesOrder:', [...this.savedStatesOrder]);
-
     const orderedStates = savedStates
-      .filter(s => {
-        const isIncluded = this.savedStatesOrder.includes(s.id);
-        console.log(`Checking ${s.id}: ${isIncluded}`);
-        return isIncluded;
-      })
+      .filter(s => this.savedStatesOrder.includes(s.id))
       .sort((a, b) => {
         const indexA = this.savedStatesOrder.indexOf(a.id);
         const indexB = this.savedStatesOrder.indexOf(b.id);
         return indexA - indexB;
       });
-
-    console.log('After filtering - orderedStates.length:', orderedStates.length);
-    console.log('After filtering - orderedStates IDs:', orderedStates.map(s => s.id));
 
     // Check if all items were deleted
     if (orderedStates.length === 0) {
