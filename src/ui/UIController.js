@@ -57,7 +57,7 @@ export class UIController {
     // Sync play/pause button
     const playPauseBtn = document.getElementById('playPauseBtn');
     if (playPauseBtn) {
-      playPauseBtn.textContent = this.mechanism.isPlaying ? 'Pause' : 'Play';
+      playPauseBtn.textContent = this.mechanism.isPlaying ? 'PAUSE' : 'PLAY';
     }
   }
 
@@ -67,7 +67,7 @@ export class UIController {
     if (playPauseBtn) {
       playPauseBtn.onclick = () => {
         const isPlaying = this.mechanism.togglePlayPause();
-        playPauseBtn.textContent = isPlaying ? 'Pause' : 'Play';
+        playPauseBtn.textContent = isPlaying ? 'PAUSE' : 'PLAY';
       };
     }
 
@@ -150,7 +150,7 @@ export class UIController {
         if (success) {
           // Visual feedback
           const originalText = sidebarLinkBtn.textContent;
-          sidebarLinkBtn.textContent = 'Copied!';
+          sidebarLinkBtn.textContent = 'COPIED!';
           setTimeout(() => {
             sidebarLinkBtn.textContent = originalText;
           }, 2000);
@@ -167,16 +167,16 @@ export class UIController {
         if (this.videoExporter.isCurrentlyRecording()) {
           // Cancel recording
           this.videoExporter.cancel();
-          sidebarVideoBtn.textContent = 'Video';
+          sidebarVideoBtn.textContent = 'VIDEO';
         } else {
           // Start recording
           const canvas = this.p5Instance.canvas;
           const framesPerRound = this.mechanism.FRAMES_PER_ROUND;
 
-          sidebarVideoBtn.textContent = 'Recording...';
+          sidebarVideoBtn.textContent = 'RECORDING...';
 
           this.videoExporter.startRecording(canvas, framesPerRound, () => {
-            sidebarVideoBtn.textContent = 'Video';
+            sidebarVideoBtn.textContent = 'VIDEO';
           });
         }
       };
@@ -268,7 +268,7 @@ export class UIController {
         const sidebarSaveBtn = document.getElementById('sidebarSaveBtn');
         if (sidebarSaveBtn) {
           const originalText = sidebarSaveBtn.textContent;
-          sidebarSaveBtn.textContent = 'Saved!';
+          sidebarSaveBtn.textContent = 'SAVED!';
           setTimeout(() => {
             sidebarSaveBtn.textContent = originalText;
           }, 1500);

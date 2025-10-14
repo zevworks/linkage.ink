@@ -8,6 +8,9 @@
         .flex-col {
             gap: 0.5rem;
         }
+        button:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+        }
     </style>
 </head>
 <body class="m-0 p-0 overflow-hidden">
@@ -29,10 +32,10 @@
             <!-- Action Buttons Section -->
             <div>
                 <div class="grid grid-cols-2" style="gap: 3px;">
-                    <button id="playPauseBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Pause</button>
-                    <button id="fitViewBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Fit</button>
-                    <button id="addRodBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Add Rod</button>
-                    <button id="removeRodBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Remove Rod</button>
+                    <button id="playPauseBtn" class="text-sm font-medium transition-all duration-200 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent; text-transform: uppercase;">Pause</button>
+                    <button id="fitViewBtn" class="text-sm font-medium transition-all duration-200 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent; text-transform: uppercase;">Fit</button>
+                    <button id="addRodBtn" class="text-sm font-medium transition-all duration-200 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent; text-transform: uppercase;">Add Rod</button>
+                    <button id="removeRodBtn" class="text-sm font-medium transition-all duration-200 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent; text-transform: uppercase;">Remove Rod</button>
                 </div>
             </div>
 
@@ -69,10 +72,10 @@
         <!-- Sidebar Header with Action Buttons -->
         <div style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
             <div style="display: flex; flex-direction: column; gap: 6px;">
-                <button id="sidebarSaveBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Save</button>
+                <button id="sidebarSaveBtn" class="text-xs font-medium transition-all duration-200 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent; text-transform: uppercase;">Save</button>
                 <div class="grid grid-cols-2" style="gap: 6px;">
-                    <button id="sidebarLinkBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Link</button>
-                    <button id="sidebarVideoBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Video</button>
+                    <button id="sidebarLinkBtn" class="text-xs font-medium transition-all duration-200 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent; text-transform: uppercase;">Link</button>
+                    <button id="sidebarVideoBtn" class="text-xs font-medium transition-all duration-200 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent; text-transform: uppercase;">Video</button>
                 </div>
             </div>
         </div>
