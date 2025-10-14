@@ -15,33 +15,22 @@ export class HistoryManager {
    * @param {Function} onStateRestore - Callback when state is restored from history
    */
   setupPopStateListener(onStateRestore) {
-    window.addEventListener('popstate', (event) => {
+    window.addEventListener('popstate', async (event) => {
       if (this.isRestoringFromHistory) {
         return;
       }
 
-      console.log('Popstate event - restoring from history, length:', window.history.length,
-        'event.state:', event.state,
-        'has linkageState:', !!(event.state?.linkageState),
-        'has hash:', !!(event.state?.hash));
+      console.log('Popstate event, current hash:', window.location.hash.substring(0, 80));
       this.isRestoringFromHistory = true;
 
       try {
-        // Restore state from history entry (always available since we store it)
+        // Restore state from history entry if available
         if (event.state && event.state.linkageState) {
           console.log('Restoring from event.state.linkageState');
           this.urlStateManager.stateSerializer.importState(event.state.linkageState);
-        } else if (event.state && event.state.hash) {
-          // Fallback: parse the hash we stored in the state
-          console.log('Restoring from event.state.hash');
-          const params = new URLSearchParams(event.state.hash.split('#')[1]);
-          // Manually build state from params and import
-          // (This is a simplified version - we should use the stored linkageState above)
-          console.warn('Hash-only restore not fully implemented, using current URL');
-          this.urlStateManager.decodeStateFromURL();
         } else {
-          // Last resort: decode from current URL (probably wrong)
-          console.log('No state in history entry, using current URL (may be incorrect)');
+          // URL hash should already be updated by the browser, decode it
+          console.log('Restoring from URL hash');
           this.urlStateManager.decodeStateFromURL();
         }
 
