@@ -473,6 +473,7 @@ export class UIController {
       let touchHandled = false;
 
       deleteBtn.addEventListener('touchend', (e) => {
+        console.log('Delete button touchend fired for id:', data.id);
         e.preventDefault();
         e.stopPropagation();
         touchHandled = true;
@@ -481,6 +482,7 @@ export class UIController {
       });
 
       deleteBtn.onclick = (e) => {
+        console.log('Delete button click fired for id:', data.id, 'touchHandled:', touchHandled);
         e.preventDefault();
         e.stopPropagation();
         if (!touchHandled) {
@@ -538,9 +540,16 @@ export class UIController {
    * @param {string} id - State ID to delete
    */
   deleteState(id) {
+    console.log('deleteState called with id:', id);
+    console.log('isEditMode:', this.isEditMode);
+    console.log('savedStatesOrder before:', [...this.savedStatesOrder]);
+
     if (this.isEditMode) {
       // In edit mode, just remove from order array (deletion happens on save)
+      const beforeLength = this.savedStatesOrder.length;
       this.savedStatesOrder = this.savedStatesOrder.filter(stateId => stateId !== id);
+      console.log('savedStatesOrder after filter:', [...this.savedStatesOrder]);
+      console.log('Removed items:', beforeLength - this.savedStatesOrder.length);
       this.populateSavedGrid();
     } else {
       // Not in edit mode, delete immediately
