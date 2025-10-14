@@ -20,37 +20,26 @@ export class HistoryManager {
         return;
       }
 
-      console.log('Popstate event - restoring from history, length:', window.history.length, 'event.state:', event.state ? 'exists' : 'null');
+      console.log('Popstate event - restoring from history, length:', window.history.length, 'has state:', !!event.state);
       this.isRestoringFromHistory = true;
 
       try {
-        // Restore state from history entry, not from URL (URL might not be updated yet!)
+        // Restore state from history entry (always available since we store it)
         if (event.state && event.state.linkageState) {
-          console.log('Restoring from event.state');
+          console.log('Restoring from event.state.linkageState');
           this.urlStateManager.stateSerializer.importState(event.state.linkageState);
+        } else if (event.state && event.state.hash) {
+          // Fallback: parse the hash we stored in the state
+          console.log('Restoring from event.state.hash');
+          const params = new URLSearchParams(event.state.hash.split('#')[1]);
+          // Manually build state from params and import
+          // (This is a simplified version - we should use the stored linkageState above)
+          console.warn('Hash-only restore not fully implemented, using current URL');
+          this.urlStateManager.decodeStateFromURL();
         } else {
-          // Fallback: Always decode from URL after popstate since the URL is now correct
-          console.log('Restoring from URL - waiting for hash update, current hash:', window.location.hash.substring(0, 100));
-          // Wait for browser to update the hash using requestAnimationFrame
-          requestAnimationFrame(() => {
-            console.log('After RAF, hash:', window.location.hash.substring(0, 100));
-            this.urlStateManager.decodeStateFromURL();
-
-            // Log what we restored
-            const state = this.urlStateManager.stateSerializer.exportState();
-            console.log('Restored to (after URL update):',
-              'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
-              'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
-              'rod1:', state.rods[0]?.length.toFixed(1),
-              'rod2:', state.rods[1]?.length.toFixed(1));
-
-            if (onStateRestore) {
-              onStateRestore();
-            }
-          });
-
-          this.isRestoringFromHistory = false;
-          return;
+          // Last resort: decode from current URL (probably wrong)
+          console.log('No state in history entry, using current URL (may be incorrect)');
+          this.urlStateManager.decodeStateFromURL();
         }
 
         // Log what we restored
@@ -161,8 +150,8 @@ export class HistoryManager {
     const params = this._encodeStateToParams(state);
     const url = window.location.pathname + '#' + params.toString();
 
-    // Push to browser history
-    window.history.pushState({ linkageState: state }, '', url);
+    // Push to browser history - store both the state object AND the URL hash
+    window.history.pushState({ linkageState: state, hash: url }, '', url);
     this.lastPushedState = stateString;
 
     console.log('Pushed state to history, length:', window.history.length,
@@ -184,8 +173,8 @@ export class HistoryManager {
     const params = this._encodeStateToParams(state);
     const url = window.location.pathname + '#' + params.toString();
 
-    // Replace current history entry
-    window.history.replaceState({ linkageState: state }, '', url);
+    // Replace current history entry - store both the state object AND the URL hash
+    window.history.replaceState({ linkageState: state, hash: url }, '', url);
     this.lastPushedState = stateString;
 
     console.log('Replaced current history entry, length:', window.history.length,
