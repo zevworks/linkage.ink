@@ -27,6 +27,10 @@ export class HistoryManager {
         if (event.state && event.state.linkageState) {
           // Restore state from history (undo/redo)
           this.urlStateManager.stateSerializer.importState(event.state.linkageState);
+
+          // Update URL to reflect restored state
+          this.urlStateManager.updateURLNow();
+
           this.hasShownNavigateAwayWarning = false; // Reset warning flag
 
           if (onStateRestore) {
