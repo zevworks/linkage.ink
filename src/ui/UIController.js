@@ -355,12 +355,22 @@ export class UIController {
       noSavesMessage.classList.add('hidden');
     }
 
-    // Sort savedStates according to savedStatesOrder
-    const orderedStates = [...savedStates].sort((a, b) => {
-      const indexA = this.savedStatesOrder.indexOf(a.id);
-      const indexB = this.savedStatesOrder.indexOf(b.id);
-      return indexA - indexB;
-    });
+    // Filter out items that were "deleted" (not in savedStatesOrder) and sort
+    const orderedStates = savedStates
+      .filter(s => this.savedStatesOrder.includes(s.id))
+      .sort((a, b) => {
+        const indexA = this.savedStatesOrder.indexOf(a.id);
+        const indexB = this.savedStatesOrder.indexOf(b.id);
+        return indexA - indexB;
+      });
+
+    // Check if all items were deleted
+    if (orderedStates.length === 0) {
+      if (noSavesMessage) {
+        noSavesMessage.classList.remove('hidden');
+      }
+      return;
+    }
 
     orderedStates.forEach((saveData, index) => {
       const isFirst = index === 0;
