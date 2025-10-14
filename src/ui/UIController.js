@@ -468,15 +468,26 @@ export class UIController {
           <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       `;
-      deleteBtn.onclick = (e) => {
-        e.stopPropagation();
-        this.deleteState(data.id);
-      };
+
+      // Flag to prevent double-firing on touch devices
+      let touchHandled = false;
+
       deleteBtn.addEventListener('touchend', (e) => {
         e.preventDefault();
         e.stopPropagation();
+        touchHandled = true;
         this.deleteState(data.id);
+        setTimeout(() => { touchHandled = false; }, 500);
       });
+
+      deleteBtn.onclick = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (!touchHandled) {
+          this.deleteState(data.id);
+        }
+      };
+
       card.appendChild(deleteBtn);
     }
 
