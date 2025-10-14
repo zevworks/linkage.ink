@@ -44,8 +44,6 @@ class LinkageApp {
 
     // Setup popstate listener for browser back/forward buttons
     this.historyManager.setupPopStateListener(() => {
-      // Clear traces when restoring state to avoid accumulation
-      this.traceSystem.clearAllTraces();
       // Sync UI after state restoration
       this.uiController?.syncButtonStates();
     });
