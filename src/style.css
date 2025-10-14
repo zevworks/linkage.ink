@@ -1,6 +1,7 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@source "../index.html";
+@source "./**/*.js";
 
 @layer base {
   html, body {
@@ -37,6 +38,10 @@
   }
 
   /* States Sidebar */
+  #statesSidebar {
+    transform: translateX(-180px);
+  }
+
   #statesSidebar.open {
     transform: translateX(0);
   }
@@ -50,7 +55,7 @@
   }
 
   #sidebarToggle:hover {
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.8);
   }
 
   .state-card {

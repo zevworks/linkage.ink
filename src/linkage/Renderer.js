@@ -73,9 +73,58 @@ export class Renderer {
     const menuPanel = document.getElementById('menuPanel');
     if (menuPanel) {
       if (this.isInverse) {
-        menuPanel.style.background = 'rgba(255, 255, 255, 0.7)';
+        menuPanel.style.background = 'rgba(255, 255, 255, 0.6)';
       } else {
-        menuPanel.style.background = 'rgba(0, 0, 0, 0.7)';
+        menuPanel.style.background = 'rgba(0, 0, 0, 0.6)';
+      }
+    }
+
+    // Update sidebar background - normal: black, dark: white
+    const statesSidebar = document.getElementById('statesSidebar');
+    if (statesSidebar) {
+      if (this.isInverse) {
+        statesSidebar.style.background = 'rgba(255, 255, 255, 0.6)';
+      } else {
+        statesSidebar.style.background = 'rgba(0, 0, 0, 0.6)';
+      }
+    }
+
+    // Update sidebar toggle button background - normal: black, dark: white
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    if (sidebarToggle) {
+      if (this.isInverse) {
+        sidebarToggle.style.background = 'rgba(255, 255, 255, 0.6)';
+      } else {
+        sidebarToggle.style.background = 'rgba(0, 0, 0, 0.6)';
+      }
+    }
+
+    // Update sidebar toggle icon color
+    const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
+    if (sidebarToggleIcon) {
+      const path = sidebarToggleIcon.querySelector('path');
+      if (path) {
+        path.setAttribute('stroke', this.isInverse ? '#000000' : '#ffffff');
+      }
+    }
+
+    // Update sidebar section headers
+    const sidebarHeaders = document.querySelectorAll('#statesSidebar h3');
+    sidebarHeaders.forEach(header => {
+      if (this.isInverse) {
+        header.style.color = 'black';
+      } else {
+        header.style.color = 'white';
+      }
+    });
+
+    // Update "No saved states" message
+    const noSavesMessage = document.getElementById('noSavesMessage');
+    if (noSavesMessage) {
+      if (this.isInverse) {
+        noSavesMessage.style.color = '#666666'; // darker gray for light background
+      } else {
+        noSavesMessage.style.color = '#9ca3af'; // lighter gray for dark background
       }
     }
 

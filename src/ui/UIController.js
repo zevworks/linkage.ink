@@ -217,6 +217,9 @@ export class UIController {
       const id = this.localStorageManager.saveState(stateData, thumbnail);
 
       if (id) {
+        // Refresh the saved grid immediately
+        this.populateSavedGrid();
+
         // Visual feedback
         const saveStateBtn = document.getElementById('saveStateBtn');
         if (saveStateBtn) {
@@ -287,7 +290,6 @@ export class UIController {
     savedGrid.innerHTML = '';
 
     const savedStates = this.localStorageManager.getSavedStates();
-    console.log('Saved states retrieved:', savedStates.length, savedStates);
 
     if (savedStates.length === 0) {
       if (noSavesMessage) {
@@ -301,7 +303,6 @@ export class UIController {
     }
 
     savedStates.forEach(saveData => {
-      console.log('Creating card for saved state:', saveData.id);
       const card = this.createStateCard(saveData, true);
       savedGrid.appendChild(card);
     });
@@ -315,15 +316,12 @@ export class UIController {
   createStateCard(data, showDelete) {
     const card = document.createElement('div');
     card.className = 'state-card';
-    console.log('Creating card, has thumbnail?', !!data.thumbnail, 'thumbnail length:', data.thumbnail ? data.thumbnail.length : 0);
 
     // Create thumbnail image or placeholder
     if (data.thumbnail) {
       const img = document.createElement('img');
       img.src = data.thumbnail;
       img.alt = data.name || 'Linkage state';
-      img.onload = () => console.log('Image loaded successfully for', data.id);
-      img.onerror = (e) => console.error('Image failed to load for', data.id, e);
       card.appendChild(img);
     } else {
       // Placeholder with preset name
