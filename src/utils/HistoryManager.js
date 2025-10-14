@@ -30,9 +30,10 @@ export class HistoryManager {
           this.urlStateManager.stateSerializer.importState(event.state.linkageState);
         } else {
           // Fallback: Always decode from URL after popstate since the URL is now correct
-          console.log('Restoring from URL - waiting for hash update');
-          // Wait a tick for the URL to update
-          setTimeout(() => {
+          console.log('Restoring from URL - waiting for hash update, current hash:', window.location.hash.substring(0, 100));
+          // Wait for browser to update the hash using requestAnimationFrame
+          requestAnimationFrame(() => {
+            console.log('After RAF, hash:', window.location.hash.substring(0, 100));
             this.urlStateManager.decodeStateFromURL();
 
             // Log what we restored
@@ -46,7 +47,7 @@ export class HistoryManager {
             if (onStateRestore) {
               onStateRestore();
             }
-          }, 0);
+          });
 
           this.isRestoringFromHistory = false;
           return;
