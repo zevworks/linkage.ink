@@ -2,6 +2,7 @@ import presetsConfig from '../../presets.config.json';
 
 /**
  * Parse state from URL hash string
+ * Uses the same format as URLStateManager: anchor=x,y&crank=len,trace,fulltrace&rod1=len,gpx,gpy,trace,fulltrace
  */
 function parseStateFromHash(hash) {
   // Remove '#' if present
@@ -20,65 +21,89 @@ function parseStateFromHash(hash) {
       anchor: {},
       rods: [],
       camera: {},
-      traceColor: { r: 128, g: 0, b: 128 },
-      traceWidth: 4,
-      rodsWidth: 4,
-      fadingEnabled: false,
-      isStretchingMode: false,
-      isInverse: false
+      traceColor: {}
     };
 
-    // Parse anchor position
-    state.anchor.x = parseFloat(params.get('ax')) || 0;
-    state.anchor.y = parseFloat(params.get('ay')) || 0;
+    // Decode anchor
+    const anchorStr = params.get('anchor');
+    if (anchorStr) {
+      const [x, y] = anchorStr.split(',').map(Number);
+      state.anchor.x = x;
+      state.anchor.y = y;
+    }
 
-    // Parse crank
-    state.anchor.crank = {
-      length: parseFloat(params.get('cl')) || 150,
-      isTracing: params.get('ct') === '1',
-      isFullRodTracing: params.get('cfr') === '1'
-    };
-
-    // Parse camera
-    state.camera.offsetX = parseFloat(params.get('ox')) || 400;
-    state.camera.offsetY = parseFloat(params.get('oy')) || 300;
-    state.camera.zoom = parseFloat(params.get('z')) || 1.0;
-
-    // Parse trace color
-    const tcHex = params.get('tc');
-    if (tcHex) {
-      const hex = tcHex.replace('#', '').replace('%23', '');
-      state.traceColor = {
-        r: parseInt(hex.substring(0, 2), 16),
-        g: parseInt(hex.substring(2, 4), 16),
-        b: parseInt(hex.substring(4, 6), 16)
+    // Decode crank
+    const crankStr = params.get('crank');
+    if (crankStr) {
+      const [length, isTracing, isFullRodTracing] = crankStr.split(',');
+      state.anchor.crank = {
+        length: Number(length),
+        isTracing: isTracing === '1',
+        isFullRodTracing: isFullRodTracing === '1'
       };
     }
 
-    // Parse trace and rod widths
-    state.traceWidth = parseFloat(params.get('tw')) || 4;
-    state.rodsWidth = parseFloat(params.get('rw')) || 4;
-
-    // Parse settings
-    state.fadingEnabled = params.get('f') === '1';
-    state.isStretchingMode = params.get('s') === '1';
-    state.isInverse = params.get('inv') === '1';
-
-    // Parse rods (r1, r2, r3, etc.)
+    // Decode rods
     let rodId = 1;
-    while (params.has(`r${rodId}l`)) {
-      const rod = {
+    while (params.has(`rod${rodId}`)) {
+      const rodStr = params.get(`rod${rodId}`);
+      const [length, gpx, gpy, isTracing, isFullRodTracing] = rodStr.split(',');
+      state.rods.push({
         id: rodId,
-        length: parseFloat(params.get(`r${rodId}l`)),
-        isTracing: params.get(`r${rodId}t`) === '1',
-        isFullRodTracing: params.get(`r${rodId}fr`) === '1',
+        length: Number(length),
+        isTracing: isTracing === '1',
+        isFullRodTracing: isFullRodTracing === '1',
         guidePoint: {
-          x: parseFloat(params.get(`r${rodId}gx`)) || 0,
-          y: parseFloat(params.get(`r${rodId}gy`)) || 0
+          x: Number(gpx),
+          y: Number(gpy)
         }
-      };
-      state.rods.push(rod);
+      });
       rodId++;
+    }
+
+    // Decode camera
+    const cameraStr = params.get('camera');
+    if (cameraStr) {
+      const [offsetX, offsetY, zoom] = cameraStr.split(',').map(Number);
+      state.camera.offsetX = offsetX;
+      state.camera.offsetY = offsetY;
+      state.camera.zoom = zoom;
+    }
+
+    // Decode color
+    const colorStr = params.get('color');
+    if (colorStr) {
+      const [r, g, b] = colorStr.split(',').map(Number);
+      state.traceColor = { r, g, b };
+    }
+
+    // Decode widths
+    const traceWidthStr = params.get('traceWidth');
+    if (traceWidthStr !== null) {
+      state.traceWidth = parseInt(traceWidthStr);
+    }
+
+    const rodsWidthStr = params.get('rodsWidth');
+    if (rodsWidthStr !== null) {
+      state.rodsWidth = parseInt(rodsWidthStr);
+    }
+
+    // Decode stretching mode
+    const stretchStr = params.get('stretch');
+    if (stretchStr !== null) {
+      state.isStretchingMode = stretchStr === '1';
+    }
+
+    // Decode inverse mode
+    const inverseStr = params.get('inverse');
+    if (inverseStr !== null) {
+      state.isInverse = inverseStr === '1';
+    }
+
+    // Decode fading enabled
+    const fadeStr = params.get('fade');
+    if (fadeStr !== null) {
+      state.fadingEnabled = fadeStr === '1';
     }
 
     return state;
