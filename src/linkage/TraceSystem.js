@@ -11,7 +11,7 @@ export class TraceSystem {
     this.traceColor = [0, 100, 0]; // Dark green
     this.fullRodTraceColor = [0, 150, 0]; // Lighter green for full rod traces
     this.fadeLifespan = 360; // 1 full rotation (360 frames)
-    this.fullRodTraceSegments = 8; // Number of points to trace along rod length
+    this.fullRodTraceSegments = 5; // Number of points to trace along rod length (reduced for performance)
     this.traceWidth = 4; // Trace stroke width
     this.rodsWidth = 4; // Rods stroke width
     this.jointSizeMultiplier = 5; // Multiplier for joint size relative to trace/rod width
@@ -128,58 +128,89 @@ export class TraceSystem {
   }
 
   update() {
+    // Enforce safety limits even with fading to prevent memory issues
+    const maxTracePoints = this.fadingEnabled ? 7200 : this.maxTracePointsNoFade; // 20 rotations max
+    const maxRodTraces = this.fadingEnabled ? 800 : this.maxRodTracesNoFade; // More frames for fading
+
     if (!this.fadingEnabled) {
       // When fading is disabled, enforce max trace limits to prevent infinite growth
       for (const rodId in this.tracePaths) {
         let path = this.tracePaths[rodId];
-        if (path.length > this.maxTracePointsNoFade) {
+        if (path.length > maxTracePoints) {
           // Remove oldest points to stay under limit
-          path.splice(0, path.length - this.maxTracePointsNoFade);
+          path.splice(0, path.length - maxTracePoints);
         }
       }
 
       for (const rodId in this.fullRodTracePaths) {
         let path = this.fullRodTracePaths[rodId];
-        if (path.length > this.maxRodTracesNoFade) {
+        if (path.length > maxRodTraces) {
           // Remove oldest frames to stay under limit
-          path.splice(0, path.length - this.maxRodTracesNoFade);
+          path.splice(0, path.length - maxRodTraces);
         }
       }
       return;
     }
 
-    // Age trace points using original "flowing" logic
+    // OPTIMIZED: Only age and check points from the front (oldest) until we find one that's young enough
+    // This avoids aging ALL points every frame, which was O(n)
     for (const rodId in this.tracePaths) {
       let path = this.tracePaths[rodId];
 
-      // Original logic: iterate backwards, age each point, and remove chunks when finding old point
-      for (let i = path.length - 1; i >= 0; i--) {
+      // Age and remove old points from the front only
+      let removeCount = 0;
+      for (let i = 0; i < path.length; i++) {
         path[i].age++;
         if (path[i].age > this.fadeLifespan) {
-          path.splice(0, i + 1); // Remove from start to current position
+          removeCount = i + 1;
+        } else {
+          // Found a young enough point, stop aging the rest
           break;
         }
       }
+
+      if (removeCount > 0) {
+        path.splice(0, removeCount);
+      }
+
+      // Safety limit: enforce max points even with fading
+      if (path.length > maxTracePoints) {
+        path.splice(0, path.length - maxTracePoints);
+      }
     }
 
-    // Age all full-rod trace points and remove completely faded ones
+    // OPTIMIZED: Only age oldest full-rod traces until we find one young enough
     for (const rodId in this.fullRodTracePaths) {
       let path = this.fullRodTracePaths[rodId];
 
-      // Age all rod traces
+      // Age and remove old rod traces from the front only
+      let removeCount = 0;
       for (let i = 0; i < path.length; i++) {
         path[i].age++;
+        if (path[i].age >= this.fadeLifespan) {
+          removeCount = i + 1;
+        } else {
+          // Found a young enough trace, stop aging the rest
+          break;
+        }
       }
 
-      // Remove completely faded rod traces (age >= fadeLifespan)
-      while (path.length > 0 && path[0].age >= this.fadeLifespan) {
-        path.shift();
+      if (removeCount > 0) {
+        path.splice(0, removeCount);
+      }
+
+      // Safety limit: enforce max frames even with fading
+      if (path.length > maxRodTraces) {
+        path.splice(0, path.length - maxRodTraces);
       }
     }
   }
 
   draw(p, cameraZoom) {
     p.noFill();
+
+    // Skip barely visible traces (alpha < 3) for performance
+    const minVisibleAlpha = 3;
 
     // Draw full-rod traces first (bottom layer)
     p.strokeWeight(this.rodsWidth);
@@ -192,7 +223,7 @@ export class TraceSystem {
       for (let frameIdx = 0; frameIdx < path.length; frameIdx++) {
         let frame = path[frameIdx];
         let alpha = this.fadingEnabled ? MathUtils.map(frame.age, 0, this.fadeLifespan, 255, 0) : 255;
-        if (alpha <= 0) continue;
+        if (alpha < minVisibleAlpha) continue; // Skip barely visible
 
         p.stroke(this.fullRodTraceColor[0], this.fullRodTraceColor[1], this.fullRodTraceColor[2], alpha);
         p.beginShape();
@@ -215,7 +246,7 @@ export class TraceSystem {
       while (i < path.length - 1) {
         // Calculate alpha for current point
         let currentAlpha = this.fadingEnabled ? MathUtils.map(path[i].age, 0, this.fadeLifespan, 255, 0) : 255;
-        if (currentAlpha <= 0) {
+        if (currentAlpha < minVisibleAlpha) {
           i++;
           continue;
         }
@@ -234,13 +265,14 @@ export class TraceSystem {
         // Add current point
         p.curveVertex(path[i].pos.x, path[i].pos.y);
 
-        // Continue adding points while alpha is similar (within 10 units)
+        // Continue adding points while alpha is similar (within 15 units) - increased for better batching
         let j = i + 1;
-        while (j < path.length) {
+        const maxBatchSize = 50; // Limit batch size for consistent frame times
+        while (j < path.length && (j - i) < maxBatchSize) {
           let nextAlpha = this.fadingEnabled ? MathUtils.map(path[j].age, 0, this.fadeLifespan, 255, 0) : 255;
 
           // If alpha difference is too large, stop this segment (skip check when fading is disabled)
-          if (this.fadingEnabled && Math.abs(nextAlpha - currentAlpha) > 10) {
+          if (this.fadingEnabled && Math.abs(nextAlpha - currentAlpha) > 15) {
             break;
           }
 
