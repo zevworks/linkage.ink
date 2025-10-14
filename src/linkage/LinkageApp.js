@@ -48,8 +48,8 @@ class LinkageApp {
       console.log('Loaded configuration from URL');
     }
 
-    // Replace initial state in history immediately (don't wait or state might change)
-    this.historyManager.replaceHistoryNow();
+    // Push initial state as a NEW history entry (don't replace old entry that lacks state)
+    this.historyManager.pushToHistoryNow();
 
     // Initialize interaction
     this.inputHandler = new InputHandler(this.mechanism, this.camera, this.renderer, this.urlStateManager);
