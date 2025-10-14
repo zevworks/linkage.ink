@@ -126,6 +126,22 @@ export class LocalStorageManager {
   }
 
   /**
+   * Save the order of saved states
+   * @param {Array} orderArray - Array of save IDs in desired order
+   * @returns {boolean} - Success status
+   */
+  saveSaveOrder(orderArray) {
+    try {
+      localStorage.setItem(this.STORAGE_KEY_SAVES, JSON.stringify(orderArray));
+      console.log('Saved order:', orderArray);
+      return true;
+    } catch (error) {
+      console.error('Error saving order:', error);
+      return false;
+    }
+  }
+
+  /**
    * Get preset states (imported from presets data)
    * @returns {Array} - Array of preset objects
    */

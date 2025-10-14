@@ -340,10 +340,12 @@ export class UIController {
     const savedStates = this.localStorageManager.getSavedStates();
 
     // Initialize order if empty, or add new states that aren't in the order yet
+    // BUT: Don't add items back if we're in edit mode (they might have been deleted)
     if (this.savedStatesOrder.length === 0) {
       this.savedStatesOrder = savedStates.map(s => s.id);
-    } else {
-      // Add any new states that aren't in the order yet (e.g., newly saved states)
+    } else if (!this.isEditMode) {
+      // Only add new states when NOT in edit mode
+      // In edit mode, respect the current savedStatesOrder (which may have deletions)
       savedStates.forEach(s => {
         if (!this.savedStatesOrder.includes(s.id)) {
           this.savedStatesOrder.push(s.id);
@@ -608,6 +610,9 @@ export class UIController {
         this.localStorageManager.deleteState(id);
       });
     }
+
+    // Save the new order to localStorage
+    this.localStorageManager.saveSaveOrder(this.savedStatesOrder);
 
     // Exit edit mode
     this.isEditMode = false;
