@@ -87,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Close menu when clicking or tapping outside
   const closeMenuIfOutside = (e) => {
+    const isMenuOpen = menuPanel.classList.contains('opacity-100');
     if (isMenuOpen && !menuPanel.contains(e.target) && !menuToggle.contains(e.target)) {
       menuToggle.click();
     }
@@ -94,4 +95,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('click', closeMenuIfOutside);
   document.addEventListener('touchstart', closeMenuIfOutside);
+
+  // On small screens, tapping canvas should close sidebar or menu if open
+  const canvasContainer = document.getElementById('canvas-container');
+  if (canvasContainer) {
+    const closeOverlaysOnCanvasTap = (e) => {
+      const isNarrowScreen = window.innerWidth < 768;
+      if (!isNarrowScreen) return;
+
+      // Check if target is the canvas or canvas container
+      const isCanvasClick = e.target === canvasContainer ||
+                           e.target.tagName === 'CANVAS' ||
+                           canvasContainer.contains(e.target);
+
+      if (isCanvasClick) {
+        // Close sidebar if open
+        if (app.uiController && app.uiController.isSidebarOpen()) {
+          app.uiController.closeSidebar();
+        }
+
+        // Close menu if open
+        const isMenuOpen = menuPanel.classList.contains('opacity-100');
+        if (isMenuOpen) {
+          menuPanel.classList.add('-translate-y-[500px]', 'opacity-0', 'pointer-events-none');
+          menuPanel.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+          menuIconSvg.style.transform = 'rotate(0deg)';
+        }
+      }
+    };
+
+    canvasContainer.addEventListener('click', closeOverlaysOnCanvasTap);
+    canvasContainer.addEventListener('touchend', closeOverlaysOnCanvasTap);
+  }
 });
