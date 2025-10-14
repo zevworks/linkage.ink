@@ -20,12 +20,18 @@ export class HistoryManager {
         return;
       }
 
-      console.log('Popstate event - restoring from history, length:', window.history.length);
+      console.log('Popstate event - restoring from history, length:', window.history.length, 'hash:', window.location.hash.substring(0, 100));
       this.isRestoringFromHistory = true;
 
       try {
         // Decode and restore state from URL
         const restored = this.urlStateManager.decodeStateFromURL();
+
+        // Log what we restored
+        const state = this.urlStateManager.stateSerializer.exportState();
+        console.log('Restored to:',
+          'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
+          'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1));
 
         if (restored && onStateRestore) {
           onStateRestore();
@@ -131,7 +137,9 @@ export class HistoryManager {
     window.history.pushState({ linkageState: state }, '', url);
     this.lastPushedState = stateString;
 
-    console.log('Pushed state to history, length:', window.history.length);
+    console.log('Pushed state to history, length:', window.history.length,
+      'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
+      'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1));
   }
 
   /**
