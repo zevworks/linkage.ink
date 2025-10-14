@@ -118,6 +118,15 @@ export class Renderer {
       }
     });
 
+    // Update edit icon color
+    const editSavedBtn = document.getElementById('editSavedBtn');
+    if (editSavedBtn) {
+      const paths = editSavedBtn.querySelectorAll('path');
+      paths.forEach(path => {
+        path.setAttribute('stroke', this.isInverse ? '#000000' : '#ffffff');
+      });
+    }
+
     // Update "No saved states" message
     const noSavesMessage = document.getElementById('noSavesMessage');
     if (noSavesMessage) {

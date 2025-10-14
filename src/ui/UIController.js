@@ -16,6 +16,8 @@ export class UIController {
     this.localStorageManager = localStorageManager;
     this.p5Instance = null;
     this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer, traceSystem, mechanism);
+    this.isEditMode = false;
+    this.savedStatesOrder = []; // Track order of saved states
 
     // Defer event listener setup until DOM is ready
     if (document.readyState === 'loading') {
@@ -197,6 +199,45 @@ export class UIController {
       });
     }
 
+    // Edit saved states button
+    const editSavedBtn = document.getElementById('editSavedBtn');
+    if (editSavedBtn) {
+      editSavedBtn.onclick = () => {
+        this.toggleEditMode();
+      };
+      editSavedBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleEditMode();
+      });
+    }
+
+    // Save edit button
+    const saveEditBtn = document.getElementById('saveEditBtn');
+    if (saveEditBtn) {
+      saveEditBtn.onclick = () => {
+        this.saveEditOrder();
+      };
+      saveEditBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.saveEditOrder();
+      });
+    }
+
+    // Cancel edit button
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    if (cancelEditBtn) {
+      cancelEditBtn.onclick = () => {
+        this.cancelEditMode();
+      };
+      cancelEditBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.cancelEditMode();
+      });
+    }
+
     // Populate sidebar on init
     this.populatePresetsGrid();
     this.populateSavedGrid();
@@ -297,6 +338,11 @@ export class UIController {
 
     const savedStates = this.localStorageManager.getSavedStates();
 
+    // Initialize order if not already set or if it's different
+    if (this.savedStatesOrder.length !== savedStates.length) {
+      this.savedStatesOrder = savedStates.map(s => s.id);
+    }
+
     if (savedStates.length === 0) {
       if (noSavesMessage) {
         noSavesMessage.classList.remove('hidden');
@@ -308,8 +354,27 @@ export class UIController {
       noSavesMessage.classList.add('hidden');
     }
 
-    savedStates.forEach(saveData => {
-      const card = this.createStateCard(saveData, true);
+    // Sort savedStates according to savedStatesOrder
+    const orderedStates = [...savedStates].sort((a, b) => {
+      const indexA = this.savedStatesOrder.indexOf(a.id);
+      const indexB = this.savedStatesOrder.indexOf(b.id);
+      return indexA - indexB;
+    });
+
+    orderedStates.forEach((saveData, index) => {
+      const card = this.createStateCard(saveData, this.isEditMode);
+      card.dataset.stateId = saveData.id;
+      card.dataset.index = index;
+
+      // Add drag-and-drop attributes in edit mode
+      if (this.isEditMode) {
+        card.draggable = true;
+        card.addEventListener('dragstart', (e) => this.handleDragStart(e));
+        card.addEventListener('dragover', (e) => this.handleDragOver(e));
+        card.addEventListener('drop', (e) => this.handleDrop(e));
+        card.addEventListener('dragend', (e) => this.handleDragEnd(e));
+      }
+
       savedGrid.appendChild(card);
     });
   }
@@ -317,7 +382,7 @@ export class UIController {
   /**
    * Create a state card element
    * @param {Object} data - State data with {id, thumbnail, state}
-   * @param {boolean} showDelete - Whether to show delete button
+   * @param {boolean} showDelete - Whether to show delete button (only in edit mode)
    */
   createStateCard(data, showDelete) {
     const card = document.createElement('div');
@@ -337,10 +402,10 @@ export class UIController {
       card.appendChild(placeholder);
     }
 
-    // Add delete button for saved states
+    // Add delete button for saved states in edit mode
     if (showDelete) {
       const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'state-card-delete';
+      deleteBtn.className = 'state-card-delete-edit';
       deleteBtn.innerHTML = `
         <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -350,13 +415,20 @@ export class UIController {
         e.stopPropagation();
         this.deleteState(data.id);
       };
+      deleteBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.deleteState(data.id);
+      });
       card.appendChild(deleteBtn);
     }
 
-    // Click card to load state
-    card.onclick = () => {
-      this.loadState(data.state);
-    };
+    // Click card to load state (only when not in edit mode)
+    if (!showDelete) {
+      card.onclick = () => {
+        this.loadState(data.state);
+      };
+    }
 
     return card;
   }
@@ -398,12 +470,124 @@ export class UIController {
    * @param {string} id - State ID to delete
    */
   deleteState(id) {
-    if (confirm('Delete this saved state?')) {
-      const success = this.localStorageManager.deleteState(id);
-      if (success) {
-        // Refresh the saved grid
-        this.populateSavedGrid();
+    const success = this.localStorageManager.deleteState(id);
+    if (success) {
+      // Remove from order array
+      this.savedStatesOrder = this.savedStatesOrder.filter(stateId => stateId !== id);
+      // Refresh the saved grid
+      this.populateSavedGrid();
+    }
+  }
+
+  /**
+   * Toggle edit mode for saved states
+   */
+  toggleEditMode() {
+    this.isEditMode = !this.isEditMode;
+    const editModeButtons = document.getElementById('editModeButtons');
+
+    if (this.isEditMode) {
+      // Show Save/Cancel buttons
+      if (editModeButtons) {
+        editModeButtons.classList.remove('hidden');
+      }
+    } else {
+      // Hide Save/Cancel buttons
+      if (editModeButtons) {
+        editModeButtons.classList.add('hidden');
       }
     }
+
+    // Refresh grid to show/hide delete buttons and enable/disable dragging
+    this.populateSavedGrid();
+  }
+
+  /**
+   * Save the current order of saved states
+   */
+  saveEditOrder() {
+    // Order is already being tracked in this.savedStatesOrder
+    // Exit edit mode
+    this.isEditMode = false;
+    const editModeButtons = document.getElementById('editModeButtons');
+    if (editModeButtons) {
+      editModeButtons.classList.add('hidden');
+    }
+    this.populateSavedGrid();
+  }
+
+  /**
+   * Cancel edit mode and revert order
+   */
+  cancelEditMode() {
+    this.isEditMode = false;
+    const editModeButtons = document.getElementById('editModeButtons');
+    if (editModeButtons) {
+      editModeButtons.classList.add('hidden');
+    }
+    // Reset order to match localStorage order
+    const savedStates = this.localStorageManager.getSavedStates();
+    this.savedStatesOrder = savedStates.map(s => s.id);
+    this.populateSavedGrid();
+  }
+
+  /**
+   * Drag and drop handlers for reordering
+   */
+  handleDragStart(e) {
+    e.target.classList.add('dragging');
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', e.target.innerHTML);
+  }
+
+  handleDragOver(e) {
+    if (e.preventDefault) {
+      e.preventDefault();
+    }
+    e.dataTransfer.dropEffect = 'move';
+
+    const dragging = document.querySelector('.dragging');
+    const savedGrid = document.getElementById('savedGrid');
+    const afterElement = this.getDragAfterElement(savedGrid, e.clientY);
+
+    if (afterElement == null) {
+      savedGrid.appendChild(dragging);
+    } else {
+      savedGrid.insertBefore(dragging, afterElement);
+    }
+
+    return false;
+  }
+
+  handleDrop(e) {
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+
+    // Update the order array based on current DOM order
+    const savedGrid = document.getElementById('savedGrid');
+    const cards = Array.from(savedGrid.querySelectorAll('.state-card'));
+    this.savedStatesOrder = cards.map(card => card.dataset.stateId);
+
+    return false;
+  }
+
+  handleDragEnd(e) {
+    e.target.classList.remove('dragging');
+  }
+
+  getDragAfterElement(container, y) {
+    const draggableElements = [...container.querySelectorAll('.state-card:not(.dragging)')];
+
+    return draggableElements.reduce((closest, child) => {
+      const box = child.getBoundingClientRect();
+      const offset = y - box.top - box.height / 2;
+
+      if (offset < 0 && offset > closest.offset) {
+        return { offset: offset, element: child };
+      } else {
+        return closest;
+      }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
   }
 }

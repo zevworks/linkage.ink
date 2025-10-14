@@ -81,7 +81,8 @@
     object-fit: cover;
   }
 
-  .state-card-delete {
+  /* Edit mode delete button - always visible */
+  .state-card-delete-edit {
     position: absolute;
     top: 0.25rem;
     right: 0.25rem;
@@ -95,22 +96,24 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transition: opacity 0.2s ease, transform 0.15s ease;
+    opacity: 1;
+    transition: background 0.15s ease, transform 0.15s ease;
     z-index: 10;
   }
 
-  .state-card:hover .state-card-delete {
-    opacity: 1;
-  }
-
-  .state-card-delete:hover {
+  .state-card-delete-edit:hover {
     background: rgba(220, 38, 38, 1);
     transform: scale(1.1);
   }
 
-  .state-card-delete:active {
+  .state-card-delete-edit:active {
     transform: scale(0.95);
+  }
+
+  /* Dragging state */
+  .state-card.dragging {
+    opacity: 0.5;
+    cursor: move;
   }
 
   .state-card-placeholder {
