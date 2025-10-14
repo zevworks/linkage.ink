@@ -17,6 +17,8 @@ export class TraceSystem {
     this.jointSizeMultiplier = 5; // Multiplier for joint size relative to trace/rod width
     this.isInverse = false; // Track inverse mode
     this.fadingEnabled = true; // Control whether traces fade over time
+    this.maxTracePointsNoFade = 3600; // Max points when fading is off (10 rotations worth)
+    this.maxRodTracesNoFade = 400; // Max rod trace frames when fading is off
   }
 
   setTraceColor(color) {
@@ -126,8 +128,23 @@ export class TraceSystem {
   }
 
   update() {
-    // Skip aging if fading is disabled
     if (!this.fadingEnabled) {
+      // When fading is disabled, enforce max trace limits to prevent infinite growth
+      for (const rodId in this.tracePaths) {
+        let path = this.tracePaths[rodId];
+        if (path.length > this.maxTracePointsNoFade) {
+          // Remove oldest points to stay under limit
+          path.splice(0, path.length - this.maxTracePointsNoFade);
+        }
+      }
+
+      for (const rodId in this.fullRodTracePaths) {
+        let path = this.fullRodTracePaths[rodId];
+        if (path.length > this.maxRodTracesNoFade) {
+          // Remove oldest frames to stay under limit
+          path.splice(0, path.length - this.maxRodTracesNoFade);
+        }
+      }
       return;
     }
 
