@@ -18,6 +18,7 @@ export class UIController {
     this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer, traceSystem, mechanism);
     this.isEditMode = false;
     this.savedStatesOrder = []; // Track order of saved states
+    this.editModeSnapshot = null; // Snapshot of states before editing
 
     // Defer event listener setup until DOM is ready
     if (document.readyState === 'loading') {
@@ -505,16 +506,21 @@ export class UIController {
   }
 
   /**
-   * Delete a saved state
+   * Delete a saved state (or mark for deletion in edit mode)
    * @param {string} id - State ID to delete
    */
   deleteState(id) {
-    const success = this.localStorageManager.deleteState(id);
-    if (success) {
-      // Remove from order array
+    if (this.isEditMode) {
+      // In edit mode, just remove from order array (deletion happens on save)
       this.savedStatesOrder = this.savedStatesOrder.filter(stateId => stateId !== id);
-      // Refresh the saved grid
       this.populateSavedGrid();
+    } else {
+      // Not in edit mode, delete immediately
+      const success = this.localStorageManager.deleteState(id);
+      if (success) {
+        this.savedStatesOrder = this.savedStatesOrder.filter(stateId => stateId !== id);
+        this.populateSavedGrid();
+      }
     }
   }
 
@@ -528,6 +534,9 @@ export class UIController {
     const cancelEditLink = document.getElementById('cancelEditLink');
 
     if (this.isEditMode) {
+      // Take a snapshot of current order when entering edit mode
+      this.editModeSnapshot = [...this.savedStatesOrder];
+
       // Show Save/Cancel links, hide Edit button
       if (editSavedBtn) editSavedBtn.classList.add('hidden');
       if (saveEditLink) saveEditLink.classList.remove('hidden');
@@ -547,9 +556,20 @@ export class UIController {
    * Save the current order of saved states
    */
   saveEditOrder() {
-    // Order is already being tracked in this.savedStatesOrder
+    // Find states that were deleted (in snapshot but not in current order)
+    if (this.editModeSnapshot) {
+      const deletedStates = this.editModeSnapshot.filter(id => !this.savedStatesOrder.includes(id));
+
+      // Actually delete them from localStorage
+      deletedStates.forEach(id => {
+        this.localStorageManager.deleteState(id);
+      });
+    }
+
     // Exit edit mode
     this.isEditMode = false;
+    this.editModeSnapshot = null;
+
     const editSavedBtn = document.getElementById('editSavedBtn');
     const saveEditLink = document.getElementById('saveEditLink');
     const cancelEditLink = document.getElementById('cancelEditLink');
@@ -566,6 +586,13 @@ export class UIController {
    */
   cancelEditMode() {
     this.isEditMode = false;
+
+    // Restore from snapshot (reverts both deletions and reordering)
+    if (this.editModeSnapshot) {
+      this.savedStatesOrder = [...this.editModeSnapshot];
+      this.editModeSnapshot = null;
+    }
+
     const editSavedBtn = document.getElementById('editSavedBtn');
     const saveEditLink = document.getElementById('saveEditLink');
     const cancelEditLink = document.getElementById('cancelEditLink');
@@ -574,9 +601,6 @@ export class UIController {
     if (saveEditLink) saveEditLink.classList.add('hidden');
     if (cancelEditLink) cancelEditLink.classList.add('hidden');
 
-    // Reset order to match localStorage order
-    const savedStates = this.localStorageManager.getSavedStates();
-    this.savedStatesOrder = savedStates.map(s => s.id);
     this.populateSavedGrid();
   }
 
