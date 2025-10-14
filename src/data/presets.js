@@ -104,7 +104,7 @@ function loadPresetsFromConfig() {
       id: `preset-${preset.id}`,
       name: preset.name,
       description: preset.description,
-      thumbnail: preset.thumbnail ? `/presets/${preset.thumbnail}` : null,
+      thumbnail: preset.thumbnail ? `./presets/${preset.thumbnail}` : null,
       state: state
     };
   }).filter(Boolean); // Remove null entries
