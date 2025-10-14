@@ -189,6 +189,12 @@ export class UIController {
       sidebarToggle.onclick = () => {
         this.toggleStatesSidebar();
       };
+      // Add touch event handling for mobile
+      sidebarToggle.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleStatesSidebar();
+      });
     }
 
     // Populate sidebar on init

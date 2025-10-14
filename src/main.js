@@ -62,6 +62,22 @@ document.addEventListener('DOMContentLoaded', () => {
     menuPanel.addEventListener(eventType, preventCanvasInteraction);
   });
 
+  // Prevent sidebar and sidebar toggle from affecting canvas
+  const statesSidebar = document.getElementById('statesSidebar');
+  const sidebarToggle = document.getElementById('sidebarToggle');
+
+  if (statesSidebar) {
+    ['mousedown', 'mouseup', 'mousemove', 'click', 'touchstart', 'touchmove', 'touchend', 'wheel'].forEach(eventType => {
+      statesSidebar.addEventListener(eventType, preventCanvasInteraction);
+    });
+  }
+
+  if (sidebarToggle) {
+    ['mousedown', 'mouseup', 'mousemove', 'click', 'touchstart', 'touchmove', 'touchend', 'wheel'].forEach(eventType => {
+      sidebarToggle.addEventListener(eventType, preventCanvasInteraction);
+    });
+  }
+
   // Close menu when clicking or tapping outside
   const closeMenuIfOutside = (e) => {
     if (isMenuOpen && !menuPanel.contains(e.target) && !menuToggle.contains(e.target)) {
