@@ -20,7 +20,7 @@ export class HistoryManager {
         return;
       }
 
-      console.log('Popstate event - restoring from history, length:', window.history.length);
+      console.log('Popstate event - restoring from history, length:', window.history.length, 'event.state:', event.state ? 'exists' : 'null');
       this.isRestoringFromHistory = true;
 
       try {
@@ -29,9 +29,27 @@ export class HistoryManager {
           console.log('Restoring from event.state');
           this.urlStateManager.stateSerializer.importState(event.state.linkageState);
         } else {
-          // Fallback: decode from URL if no state in history entry
-          console.log('Restoring from URL (fallback)');
-          this.urlStateManager.decodeStateFromURL();
+          // Fallback: Always decode from URL after popstate since the URL is now correct
+          console.log('Restoring from URL - waiting for hash update');
+          // Wait a tick for the URL to update
+          setTimeout(() => {
+            this.urlStateManager.decodeStateFromURL();
+
+            // Log what we restored
+            const state = this.urlStateManager.stateSerializer.exportState();
+            console.log('Restored to (after URL update):',
+              'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
+              'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
+              'rod1:', state.rods[0]?.length.toFixed(1),
+              'rod2:', state.rods[1]?.length.toFixed(1));
+
+            if (onStateRestore) {
+              onStateRestore();
+            }
+          }, 0);
+
+          this.isRestoringFromHistory = false;
+          return;
         }
 
         // Log what we restored
