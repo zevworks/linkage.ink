@@ -70,7 +70,8 @@ export class URLStateManager {
     }
 
     // Update URL hash without triggering page reload
-    window.history.replaceState(null, '', '#' + params.toString());
+    // Preserve existing state (don't overwrite linkageState that HistoryManager stored)
+    window.history.replaceState(window.history.state, '', '#' + params.toString());
   }
 
   /**
