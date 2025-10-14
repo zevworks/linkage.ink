@@ -33,10 +33,6 @@
                     <button id="fitViewBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Fit</button>
                     <button id="addRodBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Add Rod</button>
                     <button id="removeRodBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Remove Rod</button>
-                    <button id="saveStateBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Save State</button>
-                    <button id="openStatesBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Open States</button>
-                    <button id="copyLinkBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Copy Link</button>
-                    <button id="saveVideoBtn" class="rounded-lg text-sm font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 3px; margin: 3px; color: white; border: 1px solid white; background: transparent;">Save Video</button>
                 </div>
             </div>
 
@@ -69,6 +65,15 @@
 
     <!-- Left Sidebar for Saved States -->
     <div id="statesSidebar" class="fixed left-0 top-0 h-full shadow-2xl transition-transform duration-300 z-20" style="width: 180px; background: rgba(0, 0, 0, 0.6);">
+
+        <!-- Sidebar Header with Action Buttons -->
+        <div style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
+            <div class="grid grid-cols-3" style="gap: 6px;">
+                <button id="sidebarSaveBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Save</button>
+                <button id="sidebarLinkBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Link</button>
+                <button id="sidebarVideoBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Video</button>
+            </div>
+        </div>
 
         <!-- Sidebar Content -->
         <div class="h-full overflow-y-auto p-3">

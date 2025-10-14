@@ -131,20 +131,28 @@ export class UIController {
       };
     }
 
-    // Copy Link button
-    const copyLinkBtn = document.getElementById('copyLinkBtn');
-    if (copyLinkBtn) {
-      copyLinkBtn.onclick = async () => {
+    // Sidebar Save button
+    const sidebarSaveBtn = document.getElementById('sidebarSaveBtn');
+    if (sidebarSaveBtn) {
+      sidebarSaveBtn.onclick = () => {
+        this.saveCurrentState();
+      };
+    }
+
+    // Sidebar Link button
+    const sidebarLinkBtn = document.getElementById('sidebarLinkBtn');
+    if (sidebarLinkBtn) {
+      sidebarLinkBtn.onclick = async () => {
         // First update URL to ensure it's current
         this.urlStateManager.updateURLNow();
 
         const success = await this.urlStateManager.copyURLToClipboard();
         if (success) {
           // Visual feedback
-          const originalText = copyLinkBtn.textContent;
-          copyLinkBtn.textContent = 'Copied!';
+          const originalText = sidebarLinkBtn.textContent;
+          sidebarLinkBtn.textContent = 'Copied!';
           setTimeout(() => {
-            copyLinkBtn.textContent = originalText;
+            sidebarLinkBtn.textContent = originalText;
           }, 2000);
         } else {
           alert('Failed to copy link to clipboard');
@@ -152,41 +160,25 @@ export class UIController {
       };
     }
 
-    // Save Video button
-    const saveVideoBtn = document.getElementById('saveVideoBtn');
-    if (saveVideoBtn) {
-      saveVideoBtn.onclick = () => {
+    // Sidebar Video button
+    const sidebarVideoBtn = document.getElementById('sidebarVideoBtn');
+    if (sidebarVideoBtn) {
+      sidebarVideoBtn.onclick = () => {
         if (this.videoExporter.isCurrentlyRecording()) {
           // Cancel recording
           this.videoExporter.cancel();
-          saveVideoBtn.textContent = 'Save Video';
+          sidebarVideoBtn.textContent = 'Video';
         } else {
           // Start recording
           const canvas = this.p5Instance.canvas;
           const framesPerRound = this.mechanism.FRAMES_PER_ROUND;
 
-          saveVideoBtn.textContent = 'Recording...';
+          sidebarVideoBtn.textContent = 'Recording...';
 
           this.videoExporter.startRecording(canvas, framesPerRound, () => {
-            saveVideoBtn.textContent = 'Save Video';
+            sidebarVideoBtn.textContent = 'Video';
           });
         }
-      };
-    }
-
-    // Save State button
-    const saveStateBtn = document.getElementById('saveStateBtn');
-    if (saveStateBtn) {
-      saveStateBtn.onclick = () => {
-        this.saveCurrentState();
-      };
-    }
-
-    // Open States button - toggles sidebar
-    const openStatesBtn = document.getElementById('openStatesBtn');
-    if (openStatesBtn) {
-      openStatesBtn.onclick = () => {
-        this.toggleStatesSidebar();
       };
     }
 
@@ -273,12 +265,12 @@ export class UIController {
         this.populateSavedGrid();
 
         // Visual feedback
-        const saveStateBtn = document.getElementById('saveStateBtn');
-        if (saveStateBtn) {
-          const originalText = saveStateBtn.textContent;
-          saveStateBtn.textContent = 'Saved!';
+        const sidebarSaveBtn = document.getElementById('sidebarSaveBtn');
+        if (sidebarSaveBtn) {
+          const originalText = sidebarSaveBtn.textContent;
+          sidebarSaveBtn.textContent = 'Saved!';
           setTimeout(() => {
-            saveStateBtn.textContent = originalText;
+            sidebarSaveBtn.textContent = originalText;
           }, 1500);
         }
       }

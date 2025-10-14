@@ -53,8 +53,25 @@ export class Renderer {
     }
 
     // Update menu button styles - normal: white on black, dark: black on white
-    const menuButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn', 'saveStateBtn', 'openStatesBtn', 'copyLinkBtn', 'saveVideoBtn'];
+    const menuButtons = ['playPauseBtn', 'addRodBtn', 'removeRodBtn', 'fitViewBtn'];
     menuButtons.forEach(btnId => {
+      const btn = document.getElementById(btnId);
+      if (btn) {
+        if (this.isInverse) {
+          btn.style.color = 'black';
+          btn.style.border = '1px solid black';
+          btn.style.background = 'transparent';
+        } else {
+          btn.style.color = 'white';
+          btn.style.border = '1px solid white';
+          btn.style.background = 'transparent';
+        }
+      }
+    });
+
+    // Update sidebar button styles - normal: white on black, dark: black on white
+    const sidebarButtons = ['sidebarSaveBtn', 'sidebarLinkBtn', 'sidebarVideoBtn'];
+    sidebarButtons.forEach(btnId => {
       const btn = document.getElementById(btnId);
       if (btn) {
         if (this.isInverse) {
@@ -105,6 +122,16 @@ export class Renderer {
       const path = sidebarToggleIcon.querySelector('path');
       if (path) {
         path.setAttribute('stroke', this.isInverse ? '#000000' : '#ffffff');
+      }
+    }
+
+    // Update sidebar header border
+    const sidebarHeader = document.querySelector('#statesSidebar > div:first-child');
+    if (sidebarHeader) {
+      if (this.isInverse) {
+        sidebarHeader.style.borderBottom = '1px solid rgba(0, 0, 0, 0.2)';
+      } else {
+        sidebarHeader.style.borderBottom = '1px solid rgba(255, 255, 255, 0.2)';
       }
     }
 
