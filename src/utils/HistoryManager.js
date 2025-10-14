@@ -40,12 +40,24 @@ export class HistoryManager {
         // Fallback: URL (will be wrong until browser updates it)
         else {
           console.log('No state available, waiting for URL update');
-          // Wait for next tick when URL should be updated
-          await new Promise(resolve => setTimeout(resolve, 0));
-          const hashParams = new URLSearchParams(window.location.hash.substring(1));
-          const rod2FromHash = hashParams.get('rod2')?.split(',')[0];
-          console.log('After timeout, hash rod2:', rod2FromHash);
-          this.urlStateManager.decodeStateFromURL();
+          // Wait longer for URL to update (try multiple times)
+          let attempts = 0;
+          const maxAttempts = 5;
+          let decoded = false;
+
+          while (attempts < maxAttempts && !decoded) {
+            await new Promise(resolve => setTimeout(resolve, attempts * 10));
+            const hashParams = new URLSearchParams(window.location.hash.substring(1));
+            const rod2FromHash = hashParams.get('rod2')?.split(',')[0];
+            console.log(`Attempt ${attempts + 1}, hash rod2:`, rod2FromHash);
+
+            // Just decode it - we have no way to know if it's correct
+            if (attempts === maxAttempts - 1) {
+              this.urlStateManager.decodeStateFromURL();
+              decoded = true;
+            }
+            attempts++;
+          }
         }
 
         // Log what we restored
