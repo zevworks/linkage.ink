@@ -339,9 +339,16 @@ export class UIController {
 
     const savedStates = this.localStorageManager.getSavedStates();
 
-    // Initialize order if not already set or if it's different
-    if (this.savedStatesOrder.length !== savedStates.length) {
+    // Initialize order if empty, or add new states that aren't in the order yet
+    if (this.savedStatesOrder.length === 0) {
       this.savedStatesOrder = savedStates.map(s => s.id);
+    } else {
+      // Add any new states that aren't in the order yet (e.g., newly saved states)
+      savedStates.forEach(s => {
+        if (!this.savedStatesOrder.includes(s.id)) {
+          this.savedStatesOrder.push(s.id);
+        }
+      });
     }
 
     if (savedStates.length === 0) {
