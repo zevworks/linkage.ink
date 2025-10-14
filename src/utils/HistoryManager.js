@@ -31,7 +31,9 @@ export class HistoryManager {
         const state = this.urlStateManager.stateSerializer.exportState();
         console.log('Restored to:',
           'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
-          'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1));
+          'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
+          'rod1:', state.rods[0]?.length.toFixed(1),
+          'rod2:', state.rods[1]?.length.toFixed(1));
 
         if (restored && onStateRestore) {
           onStateRestore();
@@ -139,7 +141,9 @@ export class HistoryManager {
 
     console.log('Pushed state to history, length:', window.history.length,
       'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
-      'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1));
+      'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
+      'rod1:', state.rods[0]?.length.toFixed(1),
+      'rod2:', state.rods[1]?.length.toFixed(1));
   }
 
   /**
@@ -158,7 +162,11 @@ export class HistoryManager {
     window.history.replaceState({ linkageState: state }, '', url);
     this.lastPushedState = stateString;
 
-    console.log('Replaced current history entry, length:', window.history.length);
+    console.log('Replaced current history entry, length:', window.history.length,
+      'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
+      'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
+      'rod1:', state.rods[0]?.length.toFixed(1),
+      'rod2:', state.rods[1]?.length.toFixed(1));
   }
 
   /**
