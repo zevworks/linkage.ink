@@ -8,6 +8,9 @@ export class HistoryManager {
     this.isRestoringFromHistory = false;
     this.pendingPush = null;
     this.lastPushedState = null;
+    // Maintain our own history stack since browser history state is unreliable
+    this.stateHistory = [];
+    this.historyIndex = -1;
   }
 
   /**
@@ -15,7 +18,7 @@ export class HistoryManager {
    * @param {Function} onStateRestore - Callback when state is restored from history
    */
   setupPopStateListener(onStateRestore) {
-    window.addEventListener('popstate', async (event) => {
+    window.addEventListener('popstate', (event) => {
       if (this.isRestoringFromHistory) {
         return;
       }
@@ -23,50 +26,47 @@ export class HistoryManager {
       console.log('Popstate event',
         'event.state:', event.state,
         'history.state:', window.history.state,
-        'has history.state.linkageState:', !!(window.history.state?.linkageState));
+        'our historyIndex before:', this.historyIndex);
+
       this.isRestoringFromHistory = true;
 
       try {
-        // Try event.state first (new entries)
-        if (event.state && event.state.linkageState) {
-          console.log('Restoring from event.state.linkageState');
-          this.urlStateManager.stateSerializer.importState(event.state.linkageState);
-        }
-        // Try window.history.state (might have the target state)
-        else if (window.history.state && window.history.state.linkageState) {
-          console.log('Restoring from window.history.state.linkageState');
-          this.urlStateManager.stateSerializer.importState(window.history.state.linkageState);
-        }
-        // Fallback: URL (will be wrong until browser updates it)
-        else {
-          console.log('No state available, waiting for URL update');
-          // Wait longer for URL to update (try multiple times)
-          let attempts = 0;
-          const maxAttempts = 5;
-          let decoded = false;
+        // Use our index from browser state to look up in our history stack
+        let targetIndex = this.historyIndex;
 
-          while (attempts < maxAttempts && !decoded) {
-            await new Promise(resolve => setTimeout(resolve, attempts * 10));
-            const hashParams = new URLSearchParams(window.location.hash.substring(1));
-            const rod2FromHash = hashParams.get('rod2')?.split(',')[0];
-            console.log(`Attempt ${attempts + 1}, hash rod2:`, rod2FromHash);
-
-            // Just decode it - we have no way to know if it's correct
-            if (attempts === maxAttempts - 1) {
-              this.urlStateManager.decodeStateFromURL();
-              decoded = true;
-            }
-            attempts++;
-          }
+        if (event.state && event.state.ourIndex !== undefined) {
+          targetIndex = event.state.ourIndex;
+        } else if (window.history.state && window.history.state.ourIndex !== undefined) {
+          targetIndex = window.history.state.ourIndex;
+        } else {
+          console.warn('No history index found in popstate, cannot restore state reliably');
+          this.isRestoringFromHistory = false;
+          return;
         }
 
-        // Log what we restored
-        const state = this.urlStateManager.stateSerializer.exportState();
-        console.log('Restored to:',
-          'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
-          'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
-          'rod1:', state.rods[0]?.length.toFixed(1),
-          'rod2:', state.rods[1]?.length.toFixed(1));
+        console.log('Restoring to index:', targetIndex);
+
+        // Get state from our history stack
+        const targetState = this.stateHistory[targetIndex];
+        if (targetState) {
+          console.log('Restoring state from our history stack');
+          this.urlStateManager.stateSerializer.importState(targetState);
+          this.historyIndex = targetIndex;
+
+          // Update URL to match
+          const params = this._encodeStateToParams(targetState);
+          const url = window.location.pathname + '#' + params.toString();
+          window.history.replaceState({ ourIndex: this.historyIndex }, '', url);
+
+          // Log what we restored
+          console.log('Restored to:',
+            'anchor:', targetState.anchor.x.toFixed(1), targetState.anchor.y.toFixed(1),
+            'camera:', targetState.camera.offsetX.toFixed(1), targetState.camera.offsetY.toFixed(1),
+            'rod1:', targetState.rods[0]?.length.toFixed(1),
+            'rod2:', targetState.rods[1]?.length.toFixed(1));
+        } else {
+          console.error('No state found at index', targetIndex);
+        }
 
         if (onStateRestore) {
           onStateRestore();
@@ -164,15 +164,22 @@ export class HistoryManager {
       return;
     }
 
+    // Store in our own history stack
+    this.historyIndex++;
+    this.stateHistory[this.historyIndex] = state;
+    // Truncate any forward history
+    this.stateHistory.length = this.historyIndex + 1;
+
     // Encode state to URL format
     const params = this._encodeStateToParams(state);
     const url = window.location.pathname + '#' + params.toString();
 
-    // Push to browser history - store both the state object AND the URL hash
-    window.history.pushState({ linkageState: state, hash: url }, '', url);
+    // Push to browser history - store only our index, not the full state
+    window.history.pushState({ ourIndex: this.historyIndex }, '', url);
     this.lastPushedState = stateString;
 
     console.log('Pushed state to history, length:', window.history.length,
+      'ourIndex:', this.historyIndex,
       'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
       'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
       'rod1:', state.rods[0]?.length.toFixed(1),
@@ -187,15 +194,23 @@ export class HistoryManager {
     const state = this.urlStateManager.stateSerializer.exportState();
     const stateString = JSON.stringify(state);
 
+    // Store in our history stack at current index (don't increment)
+    if (this.historyIndex === -1) {
+      // First replace initializes the stack
+      this.historyIndex = 0;
+    }
+    this.stateHistory[this.historyIndex] = state;
+
     // Encode state to URL format
     const params = this._encodeStateToParams(state);
     const url = window.location.pathname + '#' + params.toString();
 
-    // Replace current history entry - store both the state object AND the URL hash
-    window.history.replaceState({ linkageState: state, hash: url }, '', url);
+    // Replace current history entry - store only our index
+    window.history.replaceState({ ourIndex: this.historyIndex }, '', url);
     this.lastPushedState = stateString;
 
     console.log('Replaced current history entry, length:', window.history.length,
+      'ourIndex:', this.historyIndex,
       'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
       'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
       'rod1:', state.rods[0]?.length.toFixed(1),
