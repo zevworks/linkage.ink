@@ -111,6 +111,11 @@ class LinkageApp {
         // Update mechanism
         this.mechanism.update();
 
+        // Check if we should auto-fit after state load
+        if (this.uiController) {
+          this.uiController.checkAutoFit();
+        }
+
         // Only add trace points when mechanism is playing
         if (this.mechanism.isPlaying) {
           for (let i = 0; i < this.mechanism.rods.length; i++) {

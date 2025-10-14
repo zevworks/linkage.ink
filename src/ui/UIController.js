@@ -20,6 +20,10 @@ export class UIController {
     this.savedStatesOrder = []; // Track order of saved states
     this.editModeSnapshot = null; // Snapshot of states before editing
 
+    // Auto-fit after state load
+    this.waitingForAutoFit = false;
+    this.autoFitStartAngle = 0;
+
     // Defer event listener setup until DOM is ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => {
@@ -577,9 +581,65 @@ export class UIController {
 
       // Close sidebar
       this.toggleStatesSidebar();
+
+      // Initiate auto-fit: record start angle and set flag
+      this.autoFitStartAngle = this.mechanism.crankAngle;
+      this.waitingForAutoFit = true;
     } catch (error) {
       console.error('Error loading state:', error);
       alert('Failed to load state. The data may be corrupted.');
+    }
+  }
+
+  /**
+   * Check if rotation is complete and trigger auto-fit
+   * Call this from the draw loop
+   */
+  checkAutoFit() {
+    if (!this.waitingForAutoFit || !this.p5Instance) {
+      return;
+    }
+
+    // Calculate angle difference (handle wraparound)
+    const currentAngle = this.mechanism.crankAngle;
+    let angleDiff = currentAngle - this.autoFitStartAngle;
+
+    // Normalize to 0 to 2*PI range
+    while (angleDiff < 0) angleDiff += Math.PI * 2;
+    while (angleDiff >= Math.PI * 2) angleDiff -= Math.PI * 2;
+
+    // Check if we've completed at least one full rotation
+    if (angleDiff >= Math.PI * 2 - 0.1) { // Small tolerance for rounding
+      this.waitingForAutoFit = false;
+
+      // Get both trace and mechanism bounds and merge them
+      const traceBounds = this.traceSystem.calculateBounds();
+      const mechanismBounds = this.mechanism.calculateBounds();
+
+      // Merge bounds to get the larger extent
+      let bounds = null;
+      if (traceBounds && mechanismBounds) {
+        bounds = {
+          minX: Math.min(traceBounds.minX, mechanismBounds.minX),
+          maxX: Math.max(traceBounds.maxX, mechanismBounds.maxX),
+          minY: Math.min(traceBounds.minY, mechanismBounds.minY),
+          maxY: Math.max(traceBounds.maxY, mechanismBounds.maxY)
+        };
+        bounds.width = bounds.maxX - bounds.minX;
+        bounds.height = bounds.maxY - bounds.minY;
+        bounds.centerX = (bounds.minX + bounds.maxX) / 2;
+        bounds.centerY = (bounds.minY + bounds.maxY) / 2;
+      } else {
+        bounds = traceBounds || mechanismBounds;
+      }
+
+      if (bounds) {
+        this.camera.fitToView(bounds, this.p5Instance.width, this.p5Instance.height, true);
+        // Push to history after fit view completes (wait for animation)
+        setTimeout(() => {
+          this.urlStateManager.pushToHistoryNow();
+        }, 600);
+      }
     }
   }
 
