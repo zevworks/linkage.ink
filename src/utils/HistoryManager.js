@@ -20,19 +20,31 @@ export class HistoryManager {
         return;
       }
 
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const rod2FromHash = hashParams.get('rod2')?.split(',')[0];
-      console.log('Popstate event, hash rod2:', rod2FromHash, 'full hash length:', window.location.hash.length);
+      console.log('Popstate event',
+        'event.state:', event.state,
+        'history.state:', window.history.state,
+        'has history.state.linkageState:', !!(window.history.state?.linkageState));
       this.isRestoringFromHistory = true;
 
       try {
-        // Restore state from history entry if available
+        // Try event.state first (new entries)
         if (event.state && event.state.linkageState) {
           console.log('Restoring from event.state.linkageState');
           this.urlStateManager.stateSerializer.importState(event.state.linkageState);
-        } else {
-          // URL hash should already be updated by the browser, decode it
-          console.log('Restoring from URL hash, rod2 in URL:', rod2FromHash);
+        }
+        // Try window.history.state (might have the target state)
+        else if (window.history.state && window.history.state.linkageState) {
+          console.log('Restoring from window.history.state.linkageState');
+          this.urlStateManager.stateSerializer.importState(window.history.state.linkageState);
+        }
+        // Fallback: URL (will be wrong until browser updates it)
+        else {
+          console.log('No state available, waiting for URL update');
+          // Wait for next tick when URL should be updated
+          await new Promise(resolve => setTimeout(resolve, 0));
+          const hashParams = new URLSearchParams(window.location.hash.substring(1));
+          const rod2FromHash = hashParams.get('rod2')?.split(',')[0];
+          console.log('After timeout, hash rod2:', rod2FromHash);
           this.urlStateManager.decodeStateFromURL();
         }
 
