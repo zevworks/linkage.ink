@@ -20,7 +20,10 @@ export class HistoryManager {
         return;
       }
 
-      console.log('Popstate event - restoring from history, length:', window.history.length, 'has state:', !!event.state);
+      console.log('Popstate event - restoring from history, length:', window.history.length,
+        'event.state:', event.state,
+        'has linkageState:', !!(event.state?.linkageState),
+        'has hash:', !!(event.state?.hash));
       this.isRestoringFromHistory = true;
 
       try {

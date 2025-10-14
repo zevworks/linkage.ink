@@ -21,6 +21,7 @@ export class InputHandler {
    * Clear all input state (used when restoring from history)
    */
   clearState() {
+    console.log('InputHandler.clearState() called');
     this.selectedObject = null;
     this.dragOffset = null;
     this.isPanning = false;
