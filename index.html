@@ -68,10 +68,12 @@
 
         <!-- Sidebar Header with Action Buttons -->
         <div style="padding: 12px; border-bottom: 1px solid rgba(255, 255, 255, 0.2);">
-            <div class="grid grid-cols-3" style="gap: 6px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
                 <button id="sidebarSaveBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Save</button>
-                <button id="sidebarLinkBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Link</button>
-                <button id="sidebarVideoBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Video</button>
+                <div class="grid grid-cols-2" style="gap: 6px;">
+                    <button id="sidebarLinkBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Link</button>
+                    <button id="sidebarVideoBtn" class="rounded text-xs font-medium transition-all duration-200 hover:brightness-90 active:scale-95" style="padding: 6px; color: white; border: 1px solid white; background: transparent;">Video</button>
+                </div>
             </div>
         </div>
 
