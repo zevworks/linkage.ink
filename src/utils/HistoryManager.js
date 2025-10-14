@@ -143,14 +143,15 @@ export class HistoryManager {
     const url = window.location.pathname + '#' + params.toString();
 
     // Push to browser history - store FULL state directly
-    window.history.pushState({ linkageState: state }, '', url);
+    const stateToStore = { linkageState: state };
+    window.history.pushState(stateToStore, '', url);
     this.lastPushedState = stateString;
 
+    // Verify it was stored
     console.log('Pushed state to history, length:', window.history.length,
       'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
-      'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
-      'rod1:', state.rods[0]?.length.toFixed(1),
       'rod2:', state.rods[1]?.length.toFixed(1));
+    console.log('Verify: history.state has linkageState?', !!(window.history.state?.linkageState));
   }
 
   /**
@@ -166,14 +167,15 @@ export class HistoryManager {
     const url = window.location.pathname + '#' + params.toString();
 
     // Replace current history entry - store FULL state directly
-    window.history.replaceState({ linkageState: state }, '', url);
+    const stateToStore = { linkageState: state };
+    window.history.replaceState(stateToStore, '', url);
     this.lastPushedState = stateString;
 
+    // Verify it was stored
     console.log('Replaced current history entry, length:', window.history.length,
       'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
-      'camera:', state.camera.offsetX.toFixed(1), state.camera.offsetY.toFixed(1),
-      'rod1:', state.rods[0]?.length.toFixed(1),
       'rod2:', state.rods[1]?.length.toFixed(1));
+    console.log('Verify: history.state has linkageState?', !!(window.history.state?.linkageState));
   }
 
   /**
