@@ -212,26 +212,26 @@ export class UIController {
       });
     }
 
-    // Save edit button
-    const saveEditBtn = document.getElementById('saveEditBtn');
-    if (saveEditBtn) {
-      saveEditBtn.onclick = () => {
+    // Save edit link
+    const saveEditLink = document.getElementById('saveEditLink');
+    if (saveEditLink) {
+      saveEditLink.onclick = () => {
         this.saveEditOrder();
       };
-      saveEditBtn.addEventListener('touchend', (e) => {
+      saveEditLink.addEventListener('touchend', (e) => {
         e.preventDefault();
         e.stopPropagation();
         this.saveEditOrder();
       });
     }
 
-    // Cancel edit button
-    const cancelEditBtn = document.getElementById('cancelEditBtn');
-    if (cancelEditBtn) {
-      cancelEditBtn.onclick = () => {
+    // Cancel edit link
+    const cancelEditLink = document.getElementById('cancelEditLink');
+    if (cancelEditLink) {
+      cancelEditLink.onclick = () => {
         this.cancelEditMode();
       };
-      cancelEditBtn.addEventListener('touchend', (e) => {
+      cancelEditLink.addEventListener('touchend', (e) => {
         e.preventDefault();
         e.stopPropagation();
         this.cancelEditMode();
@@ -362,18 +362,11 @@ export class UIController {
     });
 
     orderedStates.forEach((saveData, index) => {
-      const card = this.createStateCard(saveData, this.isEditMode);
+      const isFirst = index === 0;
+      const isLast = index === orderedStates.length - 1;
+      const card = this.createStateCard(saveData, this.isEditMode, isFirst, isLast, index);
       card.dataset.stateId = saveData.id;
       card.dataset.index = index;
-
-      // Add drag-and-drop attributes in edit mode
-      if (this.isEditMode) {
-        card.draggable = true;
-        card.addEventListener('dragstart', (e) => this.handleDragStart(e));
-        card.addEventListener('dragover', (e) => this.handleDragOver(e));
-        card.addEventListener('drop', (e) => this.handleDrop(e));
-        card.addEventListener('dragend', (e) => this.handleDragEnd(e));
-      }
 
       savedGrid.appendChild(card);
     });
@@ -382,9 +375,12 @@ export class UIController {
   /**
    * Create a state card element
    * @param {Object} data - State data with {id, thumbnail, state}
-   * @param {boolean} showDelete - Whether to show delete button (only in edit mode)
+   * @param {boolean} showEditControls - Whether to show edit controls (only in edit mode)
+   * @param {boolean} isFirst - Whether this is the first item
+   * @param {boolean} isLast - Whether this is the last item
+   * @param {number} index - Index in the array
    */
-  createStateCard(data, showDelete) {
+  createStateCard(data, showEditControls, isFirst, isLast, index) {
     const card = document.createElement('div');
     card.className = 'state-card';
 
@@ -402,8 +398,51 @@ export class UIController {
       card.appendChild(placeholder);
     }
 
-    // Add delete button for saved states in edit mode
-    if (showDelete) {
+    // Add edit controls for saved states in edit mode
+    if (showEditControls) {
+      // Up arrow (if not first)
+      if (!isFirst) {
+        const upBtn = document.createElement('button');
+        upBtn.className = 'state-card-arrow state-card-arrow-up';
+        upBtn.innerHTML = `
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 10V2M6 2L2 6M6 2L10 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+        upBtn.onclick = (e) => {
+          e.stopPropagation();
+          this.moveStateUp(index);
+        };
+        upBtn.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.moveStateUp(index);
+        });
+        card.appendChild(upBtn);
+      }
+
+      // Down arrow (if not last)
+      if (!isLast) {
+        const downBtn = document.createElement('button');
+        downBtn.className = 'state-card-arrow state-card-arrow-down';
+        downBtn.innerHTML = `
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 2V10M6 10L2 6M6 10L10 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        `;
+        downBtn.onclick = (e) => {
+          e.stopPropagation();
+          this.moveStateDown(index);
+        };
+        downBtn.addEventListener('touchend', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          this.moveStateDown(index);
+        });
+        card.appendChild(downBtn);
+      }
+
+      // Delete button
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'state-card-delete-edit';
       deleteBtn.innerHTML = `
@@ -424,7 +463,7 @@ export class UIController {
     }
 
     // Click card to load state (only when not in edit mode)
-    if (!showDelete) {
+    if (!showEditControls) {
       card.onclick = () => {
         this.loadState(data.state);
       };
@@ -484,21 +523,23 @@ export class UIController {
    */
   toggleEditMode() {
     this.isEditMode = !this.isEditMode;
-    const editModeButtons = document.getElementById('editModeButtons');
+    const editSavedBtn = document.getElementById('editSavedBtn');
+    const saveEditLink = document.getElementById('saveEditLink');
+    const cancelEditLink = document.getElementById('cancelEditLink');
 
     if (this.isEditMode) {
-      // Show Save/Cancel buttons
-      if (editModeButtons) {
-        editModeButtons.classList.remove('hidden');
-      }
+      // Show Save/Cancel links, hide Edit button
+      if (editSavedBtn) editSavedBtn.classList.add('hidden');
+      if (saveEditLink) saveEditLink.classList.remove('hidden');
+      if (cancelEditLink) cancelEditLink.classList.remove('hidden');
     } else {
-      // Hide Save/Cancel buttons
-      if (editModeButtons) {
-        editModeButtons.classList.add('hidden');
-      }
+      // Show Edit button, hide Save/Cancel links
+      if (editSavedBtn) editSavedBtn.classList.remove('hidden');
+      if (saveEditLink) saveEditLink.classList.add('hidden');
+      if (cancelEditLink) cancelEditLink.classList.add('hidden');
     }
 
-    // Refresh grid to show/hide delete buttons and enable/disable dragging
+    // Refresh grid to show/hide edit controls
     this.populateSavedGrid();
   }
 
@@ -509,10 +550,14 @@ export class UIController {
     // Order is already being tracked in this.savedStatesOrder
     // Exit edit mode
     this.isEditMode = false;
-    const editModeButtons = document.getElementById('editModeButtons');
-    if (editModeButtons) {
-      editModeButtons.classList.add('hidden');
-    }
+    const editSavedBtn = document.getElementById('editSavedBtn');
+    const saveEditLink = document.getElementById('saveEditLink');
+    const cancelEditLink = document.getElementById('cancelEditLink');
+
+    if (editSavedBtn) editSavedBtn.classList.remove('hidden');
+    if (saveEditLink) saveEditLink.classList.add('hidden');
+    if (cancelEditLink) cancelEditLink.classList.add('hidden');
+
     this.populateSavedGrid();
   }
 
@@ -521,10 +566,14 @@ export class UIController {
    */
   cancelEditMode() {
     this.isEditMode = false;
-    const editModeButtons = document.getElementById('editModeButtons');
-    if (editModeButtons) {
-      editModeButtons.classList.add('hidden');
-    }
+    const editSavedBtn = document.getElementById('editSavedBtn');
+    const saveEditLink = document.getElementById('saveEditLink');
+    const cancelEditLink = document.getElementById('cancelEditLink');
+
+    if (editSavedBtn) editSavedBtn.classList.remove('hidden');
+    if (saveEditLink) saveEditLink.classList.add('hidden');
+    if (cancelEditLink) cancelEditLink.classList.add('hidden');
+
     // Reset order to match localStorage order
     const savedStates = this.localStorageManager.getSavedStates();
     this.savedStatesOrder = savedStates.map(s => s.id);
@@ -532,62 +581,28 @@ export class UIController {
   }
 
   /**
-   * Drag and drop handlers for reordering
+   * Move a state up in the order
    */
-  handleDragStart(e) {
-    e.target.classList.add('dragging');
-    e.dataTransfer.effectAllowed = 'move';
-    e.dataTransfer.setData('text/html', e.target.innerHTML);
-  }
-
-  handleDragOver(e) {
-    if (e.preventDefault) {
-      e.preventDefault();
+  moveStateUp(index) {
+    if (index > 0) {
+      // Swap with previous item
+      const temp = this.savedStatesOrder[index];
+      this.savedStatesOrder[index] = this.savedStatesOrder[index - 1];
+      this.savedStatesOrder[index - 1] = temp;
+      this.populateSavedGrid();
     }
-    e.dataTransfer.dropEffect = 'move';
+  }
 
-    const dragging = document.querySelector('.dragging');
-    const savedGrid = document.getElementById('savedGrid');
-    const afterElement = this.getDragAfterElement(savedGrid, e.clientY);
-
-    if (afterElement == null) {
-      savedGrid.appendChild(dragging);
-    } else {
-      savedGrid.insertBefore(dragging, afterElement);
+  /**
+   * Move a state down in the order
+   */
+  moveStateDown(index) {
+    if (index < this.savedStatesOrder.length - 1) {
+      // Swap with next item
+      const temp = this.savedStatesOrder[index];
+      this.savedStatesOrder[index] = this.savedStatesOrder[index + 1];
+      this.savedStatesOrder[index + 1] = temp;
+      this.populateSavedGrid();
     }
-
-    return false;
-  }
-
-  handleDrop(e) {
-    if (e.stopPropagation) {
-      e.stopPropagation();
-    }
-
-    // Update the order array based on current DOM order
-    const savedGrid = document.getElementById('savedGrid');
-    const cards = Array.from(savedGrid.querySelectorAll('.state-card'));
-    this.savedStatesOrder = cards.map(card => card.dataset.stateId);
-
-    return false;
-  }
-
-  handleDragEnd(e) {
-    e.target.classList.remove('dragging');
-  }
-
-  getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.state-card:not(.dragging)')];
-
-    return draggableElements.reduce((closest, child) => {
-      const box = child.getBoundingClientRect();
-      const offset = y - box.top - box.height / 2;
-
-      if (offset < 0 && offset > closest.offset) {
-        return { offset: offset, element: child };
-      } else {
-        return closest;
-      }
-    }, { offset: Number.NEGATIVE_INFINITY }).element;
   }
 }

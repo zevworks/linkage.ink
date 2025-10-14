@@ -118,13 +118,20 @@ export class Renderer {
       }
     });
 
-    // Update edit icon color
+    // Update edit mode controls colors
     const editSavedBtn = document.getElementById('editSavedBtn');
     if (editSavedBtn) {
-      const paths = editSavedBtn.querySelectorAll('path');
-      paths.forEach(path => {
-        path.setAttribute('stroke', this.isInverse ? '#000000' : '#ffffff');
-      });
+      editSavedBtn.style.color = this.isInverse ? 'black' : 'white';
+    }
+
+    const saveEditLink = document.getElementById('saveEditLink');
+    if (saveEditLink) {
+      saveEditLink.style.color = this.isInverse ? 'black' : 'white';
+    }
+
+    const cancelEditLink = document.getElementById('cancelEditLink');
+    if (cancelEditLink) {
+      cancelEditLink.style.color = this.isInverse ? 'black' : 'white';
     }
 
     // Update "No saved states" message

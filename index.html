@@ -82,16 +82,11 @@
             <div id="savedSection">
                 <div class="flex items-center justify-between mb-2">
                     <h3 class="text-xs font-semibold text-white uppercase tracking-wider">Saved</h3>
-                    <button id="editSavedBtn" class="p-1 cursor-pointer bg-transparent border-0" style="line-height: 0;">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </button>
-                </div>
-                <div id="editModeButtons" class="mb-2 gap-1 hidden" style="display: flex; flex-direction: column;">
-                    <button id="saveEditBtn" class="text-xs py-1 px-2 rounded cursor-pointer" style="background: rgba(34, 197, 94, 0.8); color: white; border: none;">Save</button>
-                    <button id="cancelEditBtn" class="text-xs py-1 px-2 rounded cursor-pointer" style="background: rgba(239, 68, 68, 0.8); color: white; border: none;">Cancel</button>
+                    <div id="editModeControls">
+                        <button id="editSavedBtn" class="cursor-pointer bg-transparent border-0 text-white text-xs" style="padding: 0;">Edit</button>
+                        <span id="saveEditLink" class="cursor-pointer text-white text-xs hidden" style="margin-right: 8px;">Save</span>
+                        <span id="cancelEditLink" class="cursor-pointer text-white text-xs hidden">Cancel</span>
+                    </div>
                 </div>
                 <div id="savedGrid" class="grid grid-cols-2 gap-2"></div>
                 <div id="noSavesMessage" class="text-gray-400 text-xs text-center py-4 hidden">No saved states</div>
