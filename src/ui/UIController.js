@@ -175,23 +175,25 @@ export class UIController {
       };
     }
 
-    // Open States button
+    // Open States button - toggles sidebar
     const openStatesBtn = document.getElementById('openStatesBtn');
     if (openStatesBtn) {
       openStatesBtn.onclick = () => {
-        this.openStatesBrowser();
+        this.toggleStatesSidebar();
       };
     }
 
-    // Close modal button
-    const closeModalBtn = document.getElementById('closeModalBtn');
-    const modalBackdrop = document.getElementById('modalBackdrop');
-    if (closeModalBtn) {
-      closeModalBtn.onclick = () => this.closeStatesBrowser();
+    // Sidebar toggle button
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    if (sidebarToggle) {
+      sidebarToggle.onclick = () => {
+        this.toggleStatesSidebar();
+      };
     }
-    if (modalBackdrop) {
-      modalBackdrop.onclick = () => this.closeStatesBrowser();
-    }
+
+    // Populate sidebar on init
+    this.populatePresetsGrid();
+    this.populateSavedGrid();
   }
 
   /**
@@ -232,29 +234,27 @@ export class UIController {
   }
 
   /**
-   * Open the states browser modal
+   * Toggle the states sidebar
    */
-  openStatesBrowser() {
-    const modal = document.getElementById('statesBrowserModal');
-    if (!modal) return;
+  toggleStatesSidebar() {
+    const sidebar = document.getElementById('statesSidebar');
+    const icon = document.getElementById('sidebarToggleIcon');
 
-    // Show modal
-    modal.style.display = 'block';
-    modal.classList.remove('hidden');
+    if (!sidebar || !icon) return;
 
-    // Populate grids
-    this.populatePresetsGrid();
-    this.populateSavedGrid();
-  }
+    const isOpen = sidebar.classList.contains('open');
 
-  /**
-   * Close the states browser modal
-   */
-  closeStatesBrowser() {
-    const modal = document.getElementById('statesBrowserModal');
-    if (modal) {
-      modal.style.display = 'none';
-      modal.classList.add('hidden');
+    if (isOpen) {
+      // Close sidebar
+      sidebar.classList.remove('open');
+      icon.style.transform = 'rotate(0deg)';
+    } else {
+      // Open sidebar
+      sidebar.classList.add('open');
+      icon.style.transform = 'rotate(180deg)';
+      // Refresh grids when opening
+      this.populatePresetsGrid();
+      this.populateSavedGrid();
     }
   }
 
@@ -335,7 +335,7 @@ export class UIController {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'state-card-delete';
       deleteBtn.innerHTML = `
-        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       `;
@@ -378,8 +378,8 @@ export class UIController {
       // Push to history when loading a state
       this.urlStateManager.pushToHistoryNow();
 
-      // Close modal
-      this.closeStatesBrowser();
+      // Close sidebar
+      this.toggleStatesSidebar();
     } catch (error) {
       console.error('Error loading state:', error);
       alert('Failed to load state. The data may be corrupted.');
