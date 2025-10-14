@@ -20,12 +20,19 @@ export class HistoryManager {
         return;
       }
 
-      console.log('Popstate event - restoring from history, length:', window.history.length, 'hash:', window.location.hash.substring(0, 100));
+      console.log('Popstate event - restoring from history, length:', window.history.length);
       this.isRestoringFromHistory = true;
 
       try {
-        // Decode and restore state from URL
-        const restored = this.urlStateManager.decodeStateFromURL();
+        // Restore state from history entry, not from URL (URL might not be updated yet!)
+        if (event.state && event.state.linkageState) {
+          console.log('Restoring from event.state');
+          this.urlStateManager.stateSerializer.importState(event.state.linkageState);
+        } else {
+          // Fallback: decode from URL if no state in history entry
+          console.log('Restoring from URL (fallback)');
+          this.urlStateManager.decodeStateFromURL();
+        }
 
         // Log what we restored
         const state = this.urlStateManager.stateSerializer.exportState();
@@ -35,7 +42,7 @@ export class HistoryManager {
           'rod1:', state.rods[0]?.length.toFixed(1),
           'rod2:', state.rods[1]?.length.toFixed(1));
 
-        if (restored && onStateRestore) {
+        if (onStateRestore) {
           onStateRestore();
         }
       } catch (error) {
