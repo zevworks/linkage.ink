@@ -54,9 +54,9 @@ class LinkageApp {
       console.log('Loaded configuration from URL');
     }
 
-    // Push initial state to history
+    // Replace initial state in history (don't create new entry to avoid duplicate)
     setTimeout(() => {
-      this.historyManager.pushToHistoryNow();
+      this.historyManager.replaceHistoryNow();
     }, 100);
 
     // Initialize interaction

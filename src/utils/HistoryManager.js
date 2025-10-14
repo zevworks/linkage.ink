@@ -57,6 +57,24 @@ export class HistoryManager {
   }
 
   /**
+   * Replace current history entry without creating a new one
+   * Used for initial state on page load
+   */
+  replaceHistoryNow() {
+    if (this.isRestoringFromHistory) {
+      return;
+    }
+
+    // Cancel any pending debounced push
+    if (this.pendingPush) {
+      clearTimeout(this.pendingPush);
+      this.pendingPush = null;
+    }
+
+    this._replaceState();
+  }
+
+  /**
    * Schedule a push to history with debouncing
    * Used for continuous actions (dragging, zooming)
    * @param {number} delayMs - Delay before pushing (default 500ms)
@@ -113,6 +131,25 @@ export class HistoryManager {
     this.lastPushedState = stateString;
 
     console.log('Pushed state to history');
+  }
+
+  /**
+   * Internal method to replace current history entry
+   */
+  _replaceState() {
+    // Get current state
+    const state = this.urlStateManager.stateSerializer.exportState();
+    const stateString = JSON.stringify(state);
+
+    // Encode state to URL format
+    const params = this._encodeStateToParams(state);
+    const url = window.location.pathname + '#' + params.toString();
+
+    // Replace current history entry
+    window.history.replaceState({ linkageState: state }, '', url);
+    this.lastPushedState = stateString;
+
+    console.log('Replaced current history entry');
   }
 
   /**
