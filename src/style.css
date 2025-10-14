@@ -85,9 +85,9 @@
   /* Edit mode arrow buttons */
   .state-card-arrow {
     position: absolute;
-    top: 0.25rem;
-    width: 1.25rem;
-    height: 1.25rem;
+    top: 0.5rem;
+    width: 1.75rem;
+    height: 1.75rem;
     border-radius: 50%;
     background: rgba(59, 130, 246, 0.9);
     color: white;
@@ -102,11 +102,11 @@
   }
 
   .state-card-arrow-up {
-    left: 0.25rem;
+    left: 0.5rem;
   }
 
   .state-card-arrow-down {
-    left: 1.75rem; /* 0.25rem + 1.25rem + 0.25rem gap */
+    left: 2.5rem; /* 0.5rem + 1.75rem + 0.25rem gap */
   }
 
   .state-card-arrow:hover {
@@ -118,13 +118,13 @@
     transform: scale(0.95);
   }
 
-  /* Edit mode delete button */
+  /* Edit mode delete button - centered on top-right corner */
   .state-card-delete-edit {
     position: absolute;
-    top: 0.25rem;
-    right: 0.25rem;
-    width: 1.25rem;
-    height: 1.25rem;
+    top: -0.875rem; /* Half of 1.75rem to center on corner */
+    right: -0.875rem;
+    width: 1.75rem;
+    height: 1.75rem;
     border-radius: 50%;
     background: rgba(239, 68, 68, 0.9);
     color: white;
