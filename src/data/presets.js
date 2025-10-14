@@ -1,230 +1,116 @@
-/**
- * Built-in preset linkage configurations
- */
+import presetsConfig from '../../presets.config.json';
 
-export const presets = [
-  {
-    id: 'preset-simple-circle',
-    name: 'Simple Circle',
-    description: 'Basic single-rod circular motion',
-    thumbnail: null, // Will be generated on first load
-    state: {
+/**
+ * Parse state from URL hash string
+ */
+function parseStateFromHash(hash) {
+  // Remove '#' if present
+  const hashStr = hash.startsWith('#') ? hash.slice(1) : hash;
+
+  if (!hashStr) {
+    return null;
+  }
+
+  try {
+    const params = new URLSearchParams(hashStr);
+
+    // Build state object
+    const state = {
       version: '1.0',
-      anchor: {
-        x: 0,
-        y: 0,
-        crank: {
-          length: 150,
-          isTracing: true,
-          isFullRodTracing: false
-        }
-      },
+      anchor: {},
       rods: [],
-      camera: {
-        offsetX: 400,
-        offsetY: 300,
-        zoom: 1.0
-      },
+      camera: {},
       traceColor: { r: 128, g: 0, b: 128 },
       traceWidth: 4,
       rodsWidth: 4,
       fadingEnabled: false,
       isStretchingMode: false,
       isInverse: false
+    };
+
+    // Parse anchor position
+    state.anchor.x = parseFloat(params.get('ax')) || 0;
+    state.anchor.y = parseFloat(params.get('ay')) || 0;
+
+    // Parse crank
+    state.anchor.crank = {
+      length: parseFloat(params.get('cl')) || 150,
+      isTracing: params.get('ct') === '1',
+      isFullRodTracing: params.get('cfr') === '1'
+    };
+
+    // Parse camera
+    state.camera.offsetX = parseFloat(params.get('ox')) || 400;
+    state.camera.offsetY = parseFloat(params.get('oy')) || 300;
+    state.camera.zoom = parseFloat(params.get('z')) || 1.0;
+
+    // Parse trace color
+    const tcHex = params.get('tc');
+    if (tcHex) {
+      const hex = tcHex.replace('#', '').replace('%23', '');
+      state.traceColor = {
+        r: parseInt(hex.substring(0, 2), 16),
+        g: parseInt(hex.substring(2, 4), 16),
+        b: parseInt(hex.substring(4, 6), 16)
+      };
     }
-  },
-  {
-    id: 'preset-double-rod',
-    name: 'Double Rod',
-    description: 'Two-rod linkage creating complex patterns',
-    thumbnail: null,
-    state: {
-      version: '1.0',
-      anchor: {
-        x: 0,
-        y: 0,
-        crank: {
-          length: 120,
-          isTracing: false,
-          isFullRodTracing: false
+
+    // Parse trace and rod widths
+    state.traceWidth = parseFloat(params.get('tw')) || 4;
+    state.rodsWidth = parseFloat(params.get('rw')) || 4;
+
+    // Parse settings
+    state.fadingEnabled = params.get('f') === '1';
+    state.isStretchingMode = params.get('s') === '1';
+    state.isInverse = params.get('inv') === '1';
+
+    // Parse rods (r1, r2, r3, etc.)
+    let rodId = 1;
+    while (params.has(`r${rodId}l`)) {
+      const rod = {
+        id: rodId,
+        length: parseFloat(params.get(`r${rodId}l`)),
+        isTracing: params.get(`r${rodId}t`) === '1',
+        isFullRodTracing: params.get(`r${rodId}fr`) === '1',
+        guidePoint: {
+          x: parseFloat(params.get(`r${rodId}gx`)) || 0,
+          y: parseFloat(params.get(`r${rodId}gy`)) || 0
         }
-      },
-      rods: [
-        {
-          id: 1,
-          length: 180,
-          isTracing: true,
-          isFullRodTracing: false,
-          guidePoint: {
-            x: 200,
-            y: 0
-          }
-        }
-      ],
-      camera: {
-        offsetX: 400,
-        offsetY: 300,
-        zoom: 0.8
-      },
-      traceColor: { r: 0, g: 150, b: 255 },
-      traceWidth: 4,
-      rodsWidth: 4,
-      fadingEnabled: false,
-      isStretchingMode: false,
-      isInverse: false
+      };
+      state.rods.push(rod);
+      rodId++;
     }
-  },
-  {
-    id: 'preset-figure-eight',
-    name: 'Figure Eight',
-    description: 'Three-rod configuration creating figure-eight pattern',
-    thumbnail: null,
-    state: {
-      version: '1.0',
-      anchor: {
-        x: 0,
-        y: 0,
-        crank: {
-          length: 100,
-          isTracing: false,
-          isFullRodTracing: false
-        }
-      },
-      rods: [
-        {
-          id: 1,
-          length: 150,
-          isTracing: false,
-          isFullRodTracing: false,
-          guidePoint: {
-            x: 180,
-            y: 0
-          }
-        },
-        {
-          id: 2,
-          length: 120,
-          isTracing: true,
-          isFullRodTracing: false,
-          guidePoint: {
-            x: 90,
-            y: -150
-          }
-        }
-      ],
-      camera: {
-        offsetX: 400,
-        offsetY: 300,
-        zoom: 0.7
-      },
-      traceColor: { r: 255, g: 100, b: 0 },
-      traceWidth: 4,
-      rodsWidth: 4,
-      fadingEnabled: true,
-      isStretchingMode: false,
-      isInverse: false
-    }
-  },
-  {
-    id: 'preset-complex-pattern',
-    name: 'Complex Pattern',
-    description: 'Multi-rod linkage with intricate motion',
-    thumbnail: null,
-    state: {
-      version: '1.0',
-      anchor: {
-        x: 0,
-        y: 0,
-        crank: {
-          length: 80,
-          isTracing: false,
-          isFullRodTracing: false
-        }
-      },
-      rods: [
-        {
-          id: 1,
-          length: 140,
-          isTracing: false,
-          isFullRodTracing: false,
-          guidePoint: {
-            x: 150,
-            y: 0
-          }
-        },
-        {
-          id: 2,
-          length: 100,
-          isTracing: false,
-          isFullRodTracing: false,
-          guidePoint: {
-            x: 80,
-            y: -120
-          }
-        },
-        {
-          id: 3,
-          length: 110,
-          isTracing: true,
-          isFullRodTracing: false,
-          guidePoint: {
-            x: -50,
-            y: -80
-          }
-        }
-      ],
-      camera: {
-        offsetX: 400,
-        offsetY: 300,
-        zoom: 0.6
-      },
-      traceColor: { r: 0, g: 255, b: 150 },
-      traceWidth: 4,
-      rodsWidth: 4,
-      fadingEnabled: true,
-      isStretchingMode: false,
-      isInverse: false
-    }
-  },
-  {
-    id: 'preset-full-rod-trace',
-    name: 'Full Rod Trace',
-    description: 'Rod with full-length tracing enabled',
-    thumbnail: null,
-    state: {
-      version: '1.0',
-      anchor: {
-        x: 0,
-        y: 0,
-        crank: {
-          length: 100,
-          isTracing: false,
-          isFullRodTracing: true
-        }
-      },
-      rods: [
-        {
-          id: 1,
-          length: 180,
-          isTracing: true,
-          isFullRodTracing: false,
-          guidePoint: {
-            x: 160,
-            y: -40
-          }
-        }
-      ],
-      camera: {
-        offsetX: 400,
-        offsetY: 300,
-        zoom: 0.8
-      },
-      traceColor: { r: 255, g: 50, b: 150 },
-      traceWidth: 3,
-      rodsWidth: 4,
-      fadingEnabled: false,
-      isStretchingMode: false,
-      isInverse: false
-    }
+
+    return state;
+  } catch (error) {
+    console.error('Error parsing state from hash:', error);
+    return null;
   }
-];
+}
+
+/**
+ * Load presets from config file
+ */
+function loadPresetsFromConfig() {
+  return presetsConfig.map(preset => {
+    const state = parseStateFromHash(preset.stateUrl);
+
+    if (!state) {
+      console.error(`Failed to parse state for preset: ${preset.id}`);
+      return null;
+    }
+
+    return {
+      id: `preset-${preset.id}`,
+      name: preset.name,
+      description: preset.description,
+      thumbnail: preset.thumbnail ? `/presets/${preset.thumbnail}` : null,
+      state: state
+    };
+  }).filter(Boolean); // Remove null entries
+}
+
+/**
+ * Built-in preset linkage configurations
+ */
+export const presets = loadPresetsFromConfig();
