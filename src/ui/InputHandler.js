@@ -168,6 +168,10 @@ export class InputHandler {
     if (!wasClick && this.urlStateManager) {
       // For drag actions (panning, moving objects), create a history entry
       if (this.isPanning || this.selectedObject) {
+        console.log('Scheduling history push after drag/pan', {
+          isPanning: this.isPanning,
+          selectedType: this.selectedObject?.type
+        });
         this.urlStateManager.schedulePushToHistory(300);
       }
     }
