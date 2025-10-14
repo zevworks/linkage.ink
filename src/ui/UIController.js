@@ -428,10 +428,13 @@ export class UIController {
           </svg>
         `;
         upBtn.onclick = (e) => {
+          console.log('Up button clicked for index:', index);
+          e.preventDefault();
           e.stopPropagation();
           this.moveStateUp(index);
         };
         upBtn.addEventListener('touchend', (e) => {
+          console.log('Up button touchend for index:', index);
           e.preventDefault();
           e.stopPropagation();
           this.moveStateUp(index);
@@ -449,10 +452,13 @@ export class UIController {
           </svg>
         `;
         downBtn.onclick = (e) => {
+          console.log('Down button clicked for index:', index);
+          e.preventDefault();
           e.stopPropagation();
           this.moveStateDown(index);
         };
         downBtn.addEventListener('touchend', (e) => {
+          console.log('Down button touchend for index:', index);
           e.preventDefault();
           e.stopPropagation();
           this.moveStateDown(index);

@@ -66,8 +66,9 @@
     background: rgba(255, 255, 255, 0.1);
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-    aspect-ratio: 4/3;
+    aspect-ratio: 5/3;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    max-height: 100px;
   }
 
   .state-card img,
@@ -141,7 +142,8 @@
     justify-content: center;
     opacity: 1;
     transition: background 0.15s ease, transform 0.15s ease;
-    z-index: 10;
+    z-index: 20;
+    pointer-events: auto;
   }
 
   .state-card-delete-edit:hover {
