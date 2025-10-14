@@ -238,19 +238,22 @@ export class UIController {
    */
   toggleStatesSidebar() {
     const sidebar = document.getElementById('statesSidebar');
+    const toggleBtn = document.getElementById('sidebarToggle');
     const icon = document.getElementById('sidebarToggleIcon');
 
-    if (!sidebar || !icon) return;
+    if (!sidebar || !toggleBtn || !icon) return;
 
     const isOpen = sidebar.classList.contains('open');
 
     if (isOpen) {
       // Close sidebar
       sidebar.classList.remove('open');
+      toggleBtn.classList.remove('open');
       icon.style.transform = 'rotate(0deg)';
     } else {
       // Open sidebar
       sidebar.classList.add('open');
+      toggleBtn.classList.add('open');
       icon.style.transform = 'rotate(180deg)';
       // Refresh grids when opening
       this.populatePresetsGrid();

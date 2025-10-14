@@ -34,6 +34,14 @@
     transform: translateX(0);
   }
 
+  #sidebarToggle {
+    transition: left 0.3s ease, background 0.2s ease;
+  }
+
+  #sidebarToggle.open {
+    left: 180px;
+  }
+
   #sidebarToggle:hover {
     background: rgba(0, 0, 0, 0.9);
   }
