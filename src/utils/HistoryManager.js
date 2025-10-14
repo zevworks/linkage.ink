@@ -1,6 +1,6 @@
 /**
  * Manages browser history for undo/redo functionality
- * Coordinates with URLStateManager to push states to browser history
+ * Stores full linkage state in browser history for back/forward navigation
  */
 export class HistoryManager {
   constructor(urlStateManager) {
@@ -8,6 +8,7 @@ export class HistoryManager {
     this.isRestoringFromHistory = false;
     this.pendingPush = null;
     this.lastPushedState = null;
+    this.hasShownNavigateAwayWarning = false;
   }
 
   /**
@@ -20,30 +21,24 @@ export class HistoryManager {
         return;
       }
 
-      console.log('Popstate event', 'has linkageState:', !!(event.state?.linkageState));
-
       this.isRestoringFromHistory = true;
 
       try {
-        // Get state from browser history
         if (event.state && event.state.linkageState) {
-          const targetState = event.state.linkageState;
-          console.log('Restoring state from history');
-          this.urlStateManager.stateSerializer.importState(targetState);
-
-          // Log what we restored
-          console.log('Restored to:',
-            'anchor:', targetState.anchor.x.toFixed(1), targetState.anchor.y.toFixed(1),
-            'camera:', targetState.camera.offsetX.toFixed(1), targetState.camera.offsetY.toFixed(1),
-            'rod1:', targetState.rods[0]?.length.toFixed(1),
-            'rod2:', targetState.rods[1]?.length.toFixed(1));
+          // Restore state from history (undo/redo)
+          this.urlStateManager.stateSerializer.importState(event.state.linkageState);
+          this.hasShownNavigateAwayWarning = false; // Reset warning flag
 
           if (onStateRestore) {
             onStateRestore();
           }
         } else {
-          // No state - old history entry from before our code ran, ignore it
-          console.warn('No linkageState in history entry - old entry, ignoring');
+          // No linkageState - this is browser history from before page loaded
+          // Warn user they're about to navigate away
+          if (!this.hasShownNavigateAwayWarning) {
+            console.warn('⚠️ No more undo history. Pressing back again will navigate away from this page.');
+            this.hasShownNavigateAwayWarning = true;
+          }
         }
       } catch (error) {
         console.error('Error restoring state from history:', error);
@@ -128,54 +123,35 @@ export class HistoryManager {
    * Internal method to push state to history
    */
   _pushState() {
-    // Get current state
     const state = this.urlStateManager.stateSerializer.exportState();
     const stateString = JSON.stringify(state);
 
     // Don't push if state hasn't changed
     if (stateString === this.lastPushedState) {
-      console.log('Skipped push - state unchanged');
       return;
     }
 
-    // Encode state to URL format
+    // Encode state to URL format and push to history
     const params = this._encodeStateToParams(state);
     const url = window.location.pathname + '#' + params.toString();
+    window.history.pushState({ linkageState: state }, '', url);
 
-    // Push to browser history - store FULL state directly
-    const stateToStore = { linkageState: state };
-    window.history.pushState(stateToStore, '', url);
     this.lastPushedState = stateString;
-
-    // Verify it was stored
-    console.log('Pushed state to history, length:', window.history.length,
-      'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
-      'rod2:', state.rods[1]?.length.toFixed(1));
-    console.log('Verify: history.state has linkageState?', !!(window.history.state?.linkageState));
   }
 
   /**
    * Internal method to replace current history entry
    */
   _replaceState() {
-    // Get current state
     const state = this.urlStateManager.stateSerializer.exportState();
     const stateString = JSON.stringify(state);
 
-    // Encode state to URL format
+    // Encode state to URL format and replace current entry
     const params = this._encodeStateToParams(state);
     const url = window.location.pathname + '#' + params.toString();
+    window.history.replaceState({ linkageState: state }, '', url);
 
-    // Replace current history entry - store FULL state directly
-    const stateToStore = { linkageState: state };
-    window.history.replaceState(stateToStore, '', url);
     this.lastPushedState = stateString;
-
-    // Verify it was stored
-    console.log('Replaced current history entry, length:', window.history.length,
-      'anchor:', state.anchor.x.toFixed(1), state.anchor.y.toFixed(1),
-      'rod2:', state.rods[1]?.length.toFixed(1));
-    console.log('Verify: history.state has linkageState?', !!(window.history.state?.linkageState));
   }
 
   /**

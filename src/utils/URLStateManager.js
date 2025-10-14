@@ -69,8 +69,7 @@ export class URLStateManager {
       params.set('fade', state.fadingEnabled ? '1' : '0');
     }
 
-    // Update URL hash without triggering page reload
-    // Preserve existing state (don't overwrite linkageState that HistoryManager stored)
+    // Update URL hash, preserving history state for undo/redo
     window.history.replaceState(window.history.state, '', '#' + params.toString());
   }
 

@@ -26,9 +26,6 @@ class LinkageApp {
     this.camera = new Camera();
     this.videoExporter = new VideoExporter();
 
-    // Auto-fit flag
-    this.hasAutoFitted = false;
-    this.frameCount = 0;
 
     // Initialize rendering first (needed for state serialization)
     this.renderer = new Renderer(this.mechanism, this.camera, this.traceSystem);
@@ -42,15 +39,11 @@ class LinkageApp {
     this.historyManager = new HistoryManager(this.urlStateManager);
     this.urlStateManager.setHistoryManager(this.historyManager);
 
-    // Try to load state from URL, if not present, use default configuration
-    const loadedFromURL = this.urlStateManager.decodeStateFromURL();
-    if (loadedFromURL) {
-      console.log('Loaded configuration from URL');
-    }
+    // Load state from URL if present
+    this.urlStateManager.decodeStateFromURL();
 
-    // Replace current history entry to establish our baseline
-    // This overwrites whatever was at this position (including forward history)
-    // Then all subsequent actions will push new entries
+    // Replace current history entry with initial state
+    // Subsequent user actions will push new entries
     this.historyManager.replaceHistoryNow();
 
     // Initialize interaction
@@ -141,39 +134,6 @@ class LinkageApp {
         
         // Update trace aging
         this.traceSystem.update();
-
-        // Auto-fit disabled for now to debug undo/redo
-        // if (!this.hasAutoFitted && this.mechanism.isPlaying) {
-        //   this.frameCount++;
-        //   if (this.frameCount >= 90) { // Wait 1.5 seconds for traces to build up
-        //     this.hasAutoFitted = true;
-        //
-        //     // Get both trace and mechanism bounds
-        //     const traceBounds = this.traceSystem.calculateBounds();
-        //     const mechanismBounds = this.mechanism.calculateBounds();
-        //
-        //     // Merge bounds to get the larger extent
-        //     let bounds = null;
-        //     if (traceBounds && mechanismBounds) {
-        //       bounds = {
-        //         minX: Math.min(traceBounds.minX, mechanismBounds.minX),
-        //         maxX: Math.max(traceBounds.maxX, mechanismBounds.maxX),
-        //         minY: Math.min(traceBounds.minY, mechanismBounds.minY),
-        //         maxY: Math.max(traceBounds.maxY, mechanismBounds.maxY)
-        //       };
-        //       bounds.width = bounds.maxX - bounds.minX;
-        //       bounds.height = bounds.maxY - bounds.minY;
-        //       bounds.centerX = (bounds.minX + bounds.maxX) / 2;
-        //       bounds.centerY = (bounds.minY + bounds.maxY) / 2;
-        //     } else {
-        //       bounds = traceBounds || mechanismBounds;
-        //     }
-        //
-        //     if (bounds) {
-        //       this.camera.fitToView(bounds, p.width, p.height, true);
-        //     }
-        //   }
-        // }
 
         // Render everything
         this.renderer.draw(p);

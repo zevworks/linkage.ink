@@ -21,7 +21,6 @@ export class InputHandler {
    * Clear all input state (used when restoring from history)
    */
   clearState() {
-    console.log('InputHandler.clearState() called');
     this.selectedObject = null;
     this.dragOffset = null;
     this.isPanning = false;
@@ -178,12 +177,7 @@ export class InputHandler {
 
     // If it was a drag (not a click), push state to history after completion
     if (!wasClick && this.urlStateManager) {
-      // For drag actions (panning, moving objects), create a history entry
       if (this.isPanning || this.selectedObject) {
-        console.log('Scheduling history push after drag/pan', {
-          isPanning: this.isPanning,
-          selectedType: this.selectedObject?.type
-        });
         this.urlStateManager.schedulePushToHistory(300);
       }
     }
