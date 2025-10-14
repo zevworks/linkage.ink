@@ -48,9 +48,10 @@ class LinkageApp {
       console.log('Loaded configuration from URL');
     }
 
-    // Push initial state as NEW entry at end of history (ensures we're at the tip)
-    // This way, going back will only navigate through entries we created
-    this.historyManager.pushToHistoryNow();
+    // Replace current history entry to establish our baseline
+    // This overwrites whatever was at this position (including forward history)
+    // Then all subsequent actions will push new entries
+    this.historyManager.replaceHistoryNow();
 
     // Initialize interaction
     this.inputHandler = new InputHandler(this.mechanism, this.camera, this.renderer, this.urlStateManager);
