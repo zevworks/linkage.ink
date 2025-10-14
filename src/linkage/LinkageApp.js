@@ -8,6 +8,7 @@ import { UIController } from '../ui/UIController.js';
 import { VideoExporter } from '../utils/VideoExporter.js';
 import { StateSerializer } from '../utils/StateSerializer.js';
 import { URLStateManager } from '../utils/URLStateManager.js';
+import { HistoryManager } from '../utils/HistoryManager.js';
 import { LocalStorageManager } from '../utils/LocalStorageManager.js';
 
 /**
@@ -37,14 +38,28 @@ class LinkageApp {
     this.urlStateManager = new URLStateManager(this.stateSerializer);
     this.localStorageManager = new LocalStorageManager();
 
+    // Initialize history manager for undo/redo with browser back/forward
+    this.historyManager = new HistoryManager(this.urlStateManager);
+    this.urlStateManager.setHistoryManager(this.historyManager);
+
+    // Setup popstate listener for browser back/forward buttons
+    this.historyManager.setupPopStateListener(() => {
+      // Clear traces when restoring state to avoid accumulation
+      this.traceSystem.clearAllTraces();
+      // Sync UI after state restoration
+      this.uiController?.syncButtonStates();
+    });
+
     // Try to load state from URL, if not present, use default configuration
     const loadedFromURL = this.urlStateManager.decodeStateFromURL();
     if (loadedFromURL) {
       console.log('Loaded configuration from URL');
     }
 
-    // Always update URL to ensure all parameters (including stretch) are present
-    this.urlStateManager.updateURLNow();
+    // Push initial state to history
+    setTimeout(() => {
+      this.historyManager.pushToHistoryNow();
+    }, 100);
 
     // Initialize interaction
     this.inputHandler = new InputHandler(this.mechanism, this.camera, this.renderer, this.urlStateManager);
@@ -210,7 +225,10 @@ class LinkageApp {
             // Double tap detected - zoom in with animation
             const worldPos = this.camera.screenToWorld(tapPos.x, tapPos.y);
             this.camera.animatedZoomAt(worldPos, 1.3);
-            this.urlStateManager.scheduleURLUpdate();
+            // Push to history after animation completes
+            setTimeout(() => {
+              this.urlStateManager.pushToHistoryNow();
+            }, 600);
             lastTapTime = 0; // Reset to prevent triple tap
             lastTapPos = null;
           } else {
@@ -266,6 +284,8 @@ class LinkageApp {
             const dx = currentMidpoint.x - prevTouchMidpoint.x;
             const dy = currentMidpoint.y - prevTouchMidpoint.y;
             this.camera.pan(dx, dy);
+            // Update URL during pan for visual feedback
+            this.urlStateManager.updateURLWithoutHistory(50);
           }
 
           prevTouchMidpoint = currentMidpoint;
@@ -282,9 +302,13 @@ class LinkageApp {
         if (p.touches.length === 0) {
           this.inputHandler.handleRelease(p.mouseX, p.mouseY);
           prevTouchMidpoint = null;
+          // Push to history after two-finger gesture completes
+          this.urlStateManager.schedulePushToHistory(300);
         } else if (p.touches.length === 1) {
           // One finger lifted, reset for potential new gesture
           prevTouchMidpoint = null;
+          // Push to history if was doing two-finger gesture
+          this.urlStateManager.schedulePushToHistory(300);
         }
         return false;
       };

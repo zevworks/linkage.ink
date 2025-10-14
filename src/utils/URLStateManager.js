@@ -6,6 +6,14 @@ export class URLStateManager {
   constructor(stateSerializer) {
     this.stateSerializer = stateSerializer;
     this.updateTimeout = null;
+    this.historyManager = null;
+  }
+
+  /**
+   * Set the history manager for undo/redo support
+   */
+  setHistoryManager(historyManager) {
+    this.historyManager = historyManager;
   }
 
   /**
@@ -180,8 +188,13 @@ export class URLStateManager {
 
   /**
    * Update URL with debouncing to avoid constant updates during drag
+   * This updates the URL without creating history entries
    */
   scheduleURLUpdate(delayMs = 500) {
+    if (this.historyManager && this.historyManager.isRestoring()) {
+      return;
+    }
+
     if (this.updateTimeout) {
       clearTimeout(this.updateTimeout);
     }
@@ -193,12 +206,54 @@ export class URLStateManager {
 
   /**
    * Immediately update URL (for discrete actions like color change)
+   * This updates the URL without creating history entries
    */
   updateURLNow() {
+    if (this.historyManager && this.historyManager.isRestoring()) {
+      return;
+    }
+
     if (this.updateTimeout) {
       clearTimeout(this.updateTimeout);
     }
     this.encodeStateToURL();
+  }
+
+  /**
+   * Push current state to browser history immediately
+   * Used for discrete actions (button clicks, toggles)
+   */
+  pushToHistoryNow() {
+    if (this.historyManager) {
+      this.historyManager.pushToHistoryNow();
+    } else {
+      // Fallback to simple URL update if no history manager
+      this.updateURLNow();
+    }
+  }
+
+  /**
+   * Schedule a push to browser history with debouncing
+   * Used for continuous actions that should create a history entry when complete
+   */
+  schedulePushToHistory(delayMs = 500) {
+    if (this.historyManager) {
+      this.historyManager.schedulePushToHistory(delayMs);
+    } else {
+      // Fallback to simple URL update if no history manager
+      this.scheduleURLUpdate(delayMs);
+    }
+  }
+
+  /**
+   * Update URL without creating history entry (for continuous visual feedback)
+   */
+  updateURLWithoutHistory(delayMs = 100) {
+    if (this.historyManager) {
+      this.historyManager.updateURLWithoutHistory(delayMs);
+    } else {
+      this.scheduleURLUpdate(delayMs);
+    }
   }
 
   /**

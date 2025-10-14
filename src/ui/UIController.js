@@ -36,8 +36,9 @@ export class UIController {
     if (design.fadingEnabled !== undefined) {
       this.traceSystem.setFading(design.fadingEnabled);
     }
-    // Use debounced update to avoid rate limiting when dragging sliders
-    this.urlStateManager.scheduleURLUpdate();
+    // Use debounced push to history for slider changes
+    this.urlStateManager.updateURLWithoutHistory(50);
+    this.urlStateManager.schedulePushToHistory(400);
   }
 
   setP5Instance(p5Instance, mechanism) {
@@ -91,7 +92,10 @@ export class UIController {
         if (bounds && this.p5Instance) {
           // Use p5 instance width/height which accounts for display size
           this.camera.fitToView(bounds, this.p5Instance.width, this.p5Instance.height, true);
-          this.urlStateManager.scheduleURLUpdate();
+          // Push to history after fit view completes (wait for animation)
+          setTimeout(() => {
+            this.urlStateManager.pushToHistoryNow();
+          }, 600);
         }
       };
     }
@@ -102,7 +106,7 @@ export class UIController {
       addRodBtn.onclick = () => {
         this.mechanism.addRod();
         this.traceSystem.updateFadeLifespan(this.mechanism.FRAMES_PER_ROUND);
-        this.urlStateManager.updateURLNow();
+        this.urlStateManager.pushToHistoryNow();
       };
     }
 
@@ -116,7 +120,7 @@ export class UIController {
 
         this.mechanism.removeRod();
         this.traceSystem.updateFadeLifespan(this.mechanism.FRAMES_PER_ROUND);
-        this.urlStateManager.updateURLNow();
+        this.urlStateManager.pushToHistoryNow();
       };
     }
 
@@ -371,8 +375,8 @@ export class UIController {
         fadingEnabled: state.fadingEnabled
       });
 
-      // Update URL
-      this.urlStateManager.updateURLNow();
+      // Push to history when loading a state
+      this.urlStateManager.pushToHistoryNow();
 
       // Close modal
       this.closeStatesBrowser();

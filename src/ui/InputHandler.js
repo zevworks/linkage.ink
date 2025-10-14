@@ -82,6 +82,10 @@ export class InputHandler {
 
     if (this.isPanning) {
       this.camera.pan(x - px, y - py);
+      // Update URL during drag for visual feedback (without creating history)
+      if (this.urlStateManager) {
+        this.urlStateManager.updateURLWithoutHistory(50);
+      }
     } else if (this.selectedObject) {
       if (this.selectedObject.type === 'anchor' && this.dragOffset) {
         this.selectedObject.obj.pos.set(
@@ -110,6 +114,11 @@ export class InputHandler {
           rod.length = newLength;
         }
       }
+
+      // Update URL during drag for visual feedback (without creating history)
+      if (this.urlStateManager) {
+        this.urlStateManager.updateURLWithoutHistory(50);
+      }
     }
   }
 
@@ -123,26 +132,43 @@ export class InputHandler {
     }
 
     const dragDist = Vector.dist(new Vector(x, y), this.pressPos);
+    let wasClick = dragDist < 5 * (window.devicePixelRatio || 1);
 
     // Handle joint click - toggle point tracing
     if (this.selectedObject && this.selectedObject.type === 'joint') {
-      if (dragDist < 5 * (window.devicePixelRatio || 1)) { // Click/Tap threshold
+      if (wasClick) {
         const rodIndex = this.selectedObject.rodIndex;
         const rod = this.mechanism.rods[rodIndex];
         if (rod) {
           rod.isTracing = !rod.isTracing;
+          // Push to history immediately for toggle action
+          if (this.urlStateManager) {
+            this.urlStateManager.pushToHistoryNow();
+          }
         }
       }
     }
 
     // Handle guide point click - toggle full rod tracing
     if (this.selectedObject && this.selectedObject.type === 'guidePoint') {
-      if (dragDist < 5 * (window.devicePixelRatio || 1)) { // Click/Tap threshold
+      if (wasClick) {
         const rodIndex = this.selectedObject.rodIndex;
         const rod = this.mechanism.rods[rodIndex];
         if (rod) {
           rod.isFullRodTracing = !rod.isFullRodTracing;
+          // Push to history immediately for toggle action
+          if (this.urlStateManager) {
+            this.urlStateManager.pushToHistoryNow();
+          }
         }
+      }
+    }
+
+    // If it was a drag (not a click), push state to history after completion
+    if (!wasClick && this.urlStateManager) {
+      // For drag actions (panning, moving objects), create a history entry
+      if (this.isPanning || this.selectedObject) {
+        this.urlStateManager.schedulePushToHistory(300);
       }
     }
 
@@ -150,11 +176,6 @@ export class InputHandler {
     this.dragOffset = null;
     this.isPanning = false;
     this.renderer.setSelectedObject(null);
-
-    // Update URL after any interaction completes
-    if (this.urlStateManager) {
-      this.urlStateManager.scheduleURLUpdate();
-    }
   }
 
   handleZoom(x, y, delta) {
@@ -162,9 +183,10 @@ export class InputHandler {
     let zoomFactor = 1 - delta * 0.001;
     this.camera.zoomAt(worldMouse, zoomFactor);
 
-    // Update URL after zoom
+    // Update URL and push to history after zoom (debounced)
     if (this.urlStateManager) {
-      this.urlStateManager.scheduleURLUpdate();
+      this.urlStateManager.updateURLWithoutHistory(50);
+      this.urlStateManager.schedulePushToHistory(500);
     }
   }
 
