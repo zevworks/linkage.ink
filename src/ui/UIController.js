@@ -582,7 +582,15 @@ export class UIController {
       // Close sidebar
       this.toggleStatesSidebar();
 
-      // Initiate auto-fit: record start angle and set flag
+      // Immediately fit to mechanism bounds (shows crank/rods right away)
+      if (this.p5Instance) {
+        const mechanismBounds = this.mechanism.calculateBounds();
+        if (mechanismBounds) {
+          this.camera.fitToView(mechanismBounds, this.p5Instance.width, this.p5Instance.height, true);
+        }
+      }
+
+      // Initiate auto-fit: record start angle and set flag for re-fit after one round
       this.autoFitStartAngle = this.mechanism.crankAngle;
       this.waitingForAutoFit = true;
     } catch (error) {
