@@ -339,10 +339,6 @@ export class UIController {
           if (menuIconSvg) {
             menuIconSvg.style.transform = 'rotate(0deg)';
           }
-          // Update menu state if accessible
-          if (window.linkageMenuState) {
-            window.linkageMenuState.isMenuOpen = false;
-          }
         }
       }
 

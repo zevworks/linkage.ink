@@ -12,16 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const menuToggle = document.getElementById('menuToggle');
   const menuPanel = document.getElementById('menuPanel');
   const menuIconSvg = document.getElementById('menuIconSvg');
-  let isMenuOpen = false;
-
-  // Expose menu state for cross-component access
-  window.linkageMenuState = { isMenuOpen: false };
 
   let firstMenuOpen = true;
 
   const toggleMenu = () => {
-    isMenuOpen = !isMenuOpen;
-    window.linkageMenuState.isMenuOpen = isMenuOpen;
+    // Check actual DOM state as source of truth (handles auto-close from sidebar)
+    const isCurrentlyOpen = menuPanel.classList.contains('opacity-100');
+    const isMenuOpen = !isCurrentlyOpen;
 
     if (isMenuOpen) {
       // On narrow screens, close sidebar if open
