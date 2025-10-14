@@ -20,7 +20,9 @@ export class HistoryManager {
         return;
       }
 
-      console.log('Popstate event, current hash:', window.location.hash.substring(0, 80));
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const rod2FromHash = hashParams.get('rod2')?.split(',')[0];
+      console.log('Popstate event, hash rod2:', rod2FromHash, 'full hash length:', window.location.hash.length);
       this.isRestoringFromHistory = true;
 
       try {
@@ -30,7 +32,7 @@ export class HistoryManager {
           this.urlStateManager.stateSerializer.importState(event.state.linkageState);
         } else {
           // URL hash should already be updated by the browser, decode it
-          console.log('Restoring from URL hash');
+          console.log('Restoring from URL hash, rod2 in URL:', rod2FromHash);
           this.urlStateManager.decodeStateFromURL();
         }
 
