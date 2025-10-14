@@ -42,12 +42,6 @@ class LinkageApp {
     this.historyManager = new HistoryManager(this.urlStateManager);
     this.urlStateManager.setHistoryManager(this.historyManager);
 
-    // Setup popstate listener for browser back/forward buttons
-    this.historyManager.setupPopStateListener(() => {
-      // Sync UI after state restoration
-      this.uiController?.syncButtonStates();
-    });
-
     // Try to load state from URL, if not present, use default configuration
     const loadedFromURL = this.urlStateManager.decodeStateFromURL();
     if (loadedFromURL) {
@@ -61,6 +55,15 @@ class LinkageApp {
 
     // Initialize interaction
     this.inputHandler = new InputHandler(this.mechanism, this.camera, this.renderer, this.urlStateManager);
+
+    // Setup popstate listener for browser back/forward buttons (after inputHandler exists)
+    this.historyManager.setupPopStateListener(() => {
+      // Clear input handler state to prevent spurious history pushes
+      this.inputHandler.clearState();
+      // Sync UI after state restoration
+      this.uiController?.syncButtonStates();
+    });
+
     this.uiController = new UIController(
       this.mechanism,
       this.traceSystem,

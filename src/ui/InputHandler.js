@@ -17,6 +17,17 @@ export class InputHandler {
     this.prevPinchDist = 0;
   }
 
+  /**
+   * Clear all input state (used when restoring from history)
+   */
+  clearState() {
+    this.selectedObject = null;
+    this.dragOffset = null;
+    this.isPanning = false;
+    this.pressPos = null;
+    this.renderer.setSelectedObject(null);
+  }
+
   handlePress(x, y, isTouchDevice = false) {
     this.pressPos = new Vector(x, y);
     let worldMouse = this.camera.screenToWorld(x, y);
