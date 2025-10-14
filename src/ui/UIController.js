@@ -382,9 +382,10 @@ export class UIController {
     } else if (!this.isEditMode) {
       // Only add new states when NOT in edit mode
       // In edit mode, respect the current savedStatesOrder (which may have deletions)
+      // Add new states to the TOP of the list
       savedStates.forEach(s => {
         if (!this.savedStatesOrder.includes(s.id)) {
-          this.savedStatesOrder.push(s.id);
+          this.savedStatesOrder.unshift(s.id);
         }
       });
     }
