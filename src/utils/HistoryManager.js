@@ -20,7 +20,7 @@ export class HistoryManager {
         return;
       }
 
-      console.log('Popstate event - restoring from history');
+      console.log('Popstate event - restoring from history, length:', window.history.length);
       this.isRestoringFromHistory = true;
 
       try {
@@ -119,6 +119,7 @@ export class HistoryManager {
 
     // Don't push if state hasn't changed
     if (stateString === this.lastPushedState) {
+      console.log('Skipped push - state unchanged');
       return;
     }
 
@@ -130,7 +131,7 @@ export class HistoryManager {
     window.history.pushState({ linkageState: state }, '', url);
     this.lastPushedState = stateString;
 
-    console.log('Pushed state to history');
+    console.log('Pushed state to history, length:', window.history.length);
   }
 
   /**
@@ -149,7 +150,7 @@ export class HistoryManager {
     window.history.replaceState({ linkageState: state }, '', url);
     this.lastPushedState = stateString;
 
-    console.log('Replaced current history entry');
+    console.log('Replaced current history entry, length:', window.history.length);
   }
 
   /**
