@@ -574,16 +574,8 @@ export class UIController {
     while (angleDiff < 0) angleDiff += Math.PI * 2;
     while (angleDiff >= Math.PI * 2) angleDiff -= Math.PI * 2;
 
-    console.log('Auto-fit check:', {
-      startAngle: this.autoFitStartAngle,
-      currentAngle: currentAngle,
-      angleDiff: angleDiff,
-      threshold: Math.PI * 2 - 0.1
-    });
-
     // Check if we've completed at least one full rotation
     if (angleDiff >= Math.PI * 2 - 0.1) { // Small tolerance for rounding
-      console.log('Auto-fit triggered!');
       this.waitingForAutoFit = false;
 
       // Get both trace and mechanism bounds and merge them
