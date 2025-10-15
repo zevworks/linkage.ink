@@ -241,6 +241,78 @@ export class UIController {
   }
 
   /**
+   * Generate a 480x480 thumbnail with fitted trace
+   */
+  generateThumbnail() {
+    // Create offscreen canvas
+    const thumbnailCanvas = document.createElement('canvas');
+    const size = 480;
+    thumbnailCanvas.width = size;
+    thumbnailCanvas.height = size;
+    const ctx = thumbnailCanvas.getContext('2d');
+
+    // Set background color (matching renderer)
+    const bgColor = this.renderer.getInverse() ? '#000000' : '#f5f5f5';
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, size, size);
+
+    // Get trace bounds
+    const bounds = this.traceSystem.calculateBounds();
+    if (!bounds || bounds.width === 0 || bounds.height === 0) {
+      // No trace yet, return blank thumbnail
+      return thumbnailCanvas.toDataURL('image/png', 0.9);
+    }
+
+    // Calculate zoom to fit trace in the thumbnail with padding
+    const padding = 40; // pixels of padding around the trace
+    const availableWidth = size - 2 * padding;
+    const availableHeight = size - 2 * padding;
+
+    const scaleX = availableWidth / bounds.width;
+    const scaleY = availableHeight / bounds.height;
+    const zoom = Math.min(scaleX, scaleY);
+
+    // Calculate offset to center the trace
+    const offsetX = size / 2 - (bounds.centerX * zoom);
+    const offsetY = size / 2 - (bounds.centerY * zoom);
+
+    // Create a simple p5-like object for drawing
+    const p5Like = {
+      stroke: (...args) => {
+        if (args.length === 1) {
+          ctx.strokeStyle = `rgb(${args[0]}, ${args[0]}, ${args[0]})`;
+        } else if (args.length === 3) {
+          ctx.strokeStyle = `rgb(${args[0]}, ${args[1]}, ${args[2]})`;
+        } else if (args.length === 4) {
+          ctx.strokeStyle = `rgba(${args[0]}, ${args[1]}, ${args[2]}, ${args[3] / 255})`;
+        }
+      },
+      strokeWeight: (w) => {
+        ctx.lineWidth = w * zoom;
+      },
+      noFill: () => {
+        ctx.fillStyle = 'transparent';
+      },
+      beginShape: () => {
+        ctx.beginPath();
+      },
+      vertex: (x, y) => {
+        const screenX = x * zoom + offsetX;
+        const screenY = y * zoom + offsetY;
+        ctx.lineTo(screenX, screenY);
+      },
+      endShape: () => {
+        ctx.stroke();
+      }
+    };
+
+    // Draw the traces using the trace system
+    this.traceSystem.draw(p5Like, zoom);
+
+    return thumbnailCanvas.toDataURL('image/png', 0.9);
+  }
+
+  /**
    * Capture current canvas as thumbnail and save state
    */
   saveCurrentState() {
@@ -250,9 +322,8 @@ export class UIController {
     }
 
     try {
-      // Capture canvas as data URL
-      const canvas = this.p5Instance.canvas;
-      const thumbnail = canvas.toDataURL('image/png', 0.8);
+      // Generate fitted thumbnail
+      const thumbnail = this.generateThumbnail();
 
       // Get current state
       const stateData = this.stateSerializer.exportState();
