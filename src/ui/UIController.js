@@ -270,9 +270,20 @@ export class UIController {
       zoom: this.camera.zoom
     };
 
-    // Temporarily fit camera to trace bounds (use square canvas size)
-    const canvasSize = Math.min(this.p5Instance.width, this.p5Instance.height);
-    this.camera.fitToView(bounds, canvasSize, canvasSize, false);
+    // Calculate zoom to fit trace bounds in thumbnail with padding
+    const thumbnailSize = 100;
+    const padding = 10; // pixels of padding
+    const availableSize = thumbnailSize - 2 * padding;
+
+    // Calculate zoom that fits the bounds
+    const zoomX = availableSize / bounds.width;
+    const zoomY = availableSize / bounds.height;
+    const zoom = Math.min(zoomX, zoomY);
+
+    // Set camera to center on trace bounds with calculated zoom
+    this.camera.x = bounds.centerX;
+    this.camera.y = bounds.centerY;
+    this.camera.zoom = zoom;
 
     // Force a synchronous redraw with the new camera position
     this.p5Instance.push();
@@ -283,12 +294,11 @@ export class UIController {
     // Capture the canvas
     const canvas = this.p5Instance.canvas;
     const thumbnailCanvas = document.createElement('canvas');
-    const size = 100;
-    thumbnailCanvas.width = size;
-    thumbnailCanvas.height = size;
+    thumbnailCanvas.width = thumbnailSize;
+    thumbnailCanvas.height = thumbnailSize;
     const ctx = thumbnailCanvas.getContext('2d');
 
-    // Crop to square from center and scale
+    // Crop to square from center and scale to 100x100
     const sourceSize = Math.min(canvas.width, canvas.height);
     const sourceX = (canvas.width - sourceSize) / 2;
     const sourceY = (canvas.height - sourceSize) / 2;
@@ -296,7 +306,7 @@ export class UIController {
     ctx.drawImage(
       canvas,
       sourceX, sourceY, sourceSize, sourceSize,
-      0, 0, size, size
+      0, 0, thumbnailSize, thumbnailSize
     );
 
     // Restore camera state
