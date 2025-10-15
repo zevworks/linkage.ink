@@ -8,7 +8,7 @@ import { GuidePoint } from './GuidePoint.js';
  * Core linkage mechanism with physics simulation
  */
 export class LinkageMechanism {
-  constructor(width, height, traceSystem = null) {
+  constructor(width, height, traceSystem = null, skipDefault = false) {
     this.FRAMES_PER_ROUND = 360;
     this.crankSpeed = Math.PI * 2 / this.FRAMES_PER_ROUND;
     this.crankAngle = 0;
@@ -23,7 +23,9 @@ export class LinkageMechanism {
     this.joints = [];
 
     // Initialize with heart shape configuration like reference
-    this.setupDefaultConfiguration(width, height);
+    if (!skipDefault) {
+      this.setupDefaultConfiguration(width, height);
+    }
   }
 
   setupDefaultConfiguration(width, height) {

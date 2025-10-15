@@ -21,9 +21,13 @@ class LinkageApp {
     this.width = window.innerWidth;
     this.height = window.innerHeight;
 
+    // Check if there's a URL state before initializing
+    const hasUrlState = window.location.hash.length > 1;
+    this.shouldLoadPreset = !hasUrlState && presets.length > 0;
+
     // Initialize core systems
     this.traceSystem = new TraceSystem();
-    this.mechanism = new LinkageMechanism(this.width, this.height, this.traceSystem);
+    this.mechanism = new LinkageMechanism(this.width, this.height, this.traceSystem, this.shouldLoadPreset);
     this.camera = new Camera();
     this.videoExporter = new VideoExporter();
 
@@ -40,11 +44,11 @@ class LinkageApp {
     this.historyManager = new HistoryManager(this.urlStateManager);
     this.urlStateManager.setHistoryManager(this.historyManager);
 
-    // Load state from URL if present
-    const stateLoaded = this.urlStateManager.decodeStateFromURL();
-
-    // If no state in URL, load the first preset
-    if (!stateLoaded && presets.length > 0) {
+    // Load state from URL if present, otherwise load first preset
+    if (hasUrlState) {
+      this.urlStateManager.decodeStateFromURL();
+    } else if (presets.length > 0) {
+      // Load first preset
       this.stateSerializer.importState(presets[0].state);
     }
 
@@ -108,6 +112,16 @@ class LinkageApp {
 
         // Pass p5 instance to UIController for GIF export
         this.uiController.setP5Instance(p, this.mechanism);
+
+        // Trigger auto-fit if we loaded a preset on initialization
+        if (this.shouldLoadPreset) {
+          console.log('Setting up auto-fit for preset load:', {
+            crankAngle: this.mechanism.crankAngle,
+            shouldLoadPreset: this.shouldLoadPreset
+          });
+          this.uiController.autoFitStartAngle = this.mechanism.crankAngle;
+          this.uiController.waitingForAutoFit = true;
+        }
       };
 
       p.draw = () => {
