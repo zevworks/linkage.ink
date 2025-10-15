@@ -10,6 +10,7 @@ import { StateSerializer } from '../utils/StateSerializer.js';
 import { URLStateManager } from '../utils/URLStateManager.js';
 import { HistoryManager } from '../utils/HistoryManager.js';
 import { LocalStorageManager } from '../utils/LocalStorageManager.js';
+import { presets } from '../data/presets.js';
 
 /**
  * Main application class that orchestrates all components
@@ -40,7 +41,12 @@ class LinkageApp {
     this.urlStateManager.setHistoryManager(this.historyManager);
 
     // Load state from URL if present
-    this.urlStateManager.decodeStateFromURL();
+    const stateLoaded = this.urlStateManager.decodeStateFromURL();
+
+    // If no state in URL, load the first preset
+    if (!stateLoaded && presets.length > 0) {
+      this.stateSerializer.importState(presets[0].state);
+    }
 
     // Replace current history entry with initial state
     // Subsequent user actions will push new entries
