@@ -63,10 +63,10 @@
     <main id="canvas-container" class="w-screen h-screen"></main>
 
     <!-- Left Sidebar for Saved States -->
-    <div id="statesSidebar" class="fixed left-0 top-0 h-full shadow-2xl transition-transform duration-300 z-20" style="width: 216px; background: rgba(0, 0, 0, 0.6); border-right: 1px solid black;">
+    <div id="statesSidebar" class="fixed left-0 top-0 h-full shadow-2xl transition-transform duration-300 z-20" style="width: 184px; background: rgba(0, 0, 0, 0.6); border-right: 1px solid black;">
 
         <!-- Sidebar Toggle Button (at right edge of sidebar) -->
-        <button id="sidebarToggle" class="absolute flex items-center justify-center rounded-r-lg cursor-pointer transition-all duration-300" style="top: 18px; left: 216px; width: 32px; height: 36px; background: transparent; border-top: 3px solid black; border-right: 3px solid black; border-bottom: 3px solid black; border-left: none;">
+        <button id="sidebarToggle" class="absolute flex items-center justify-center rounded-r-lg cursor-pointer transition-all duration-300" style="top: 18px; left: 184px; width: 32px; height: 36px; background: transparent; border-top: 3px solid black; border-right: 3px solid black; border-bottom: 3px solid black; border-left: none;">
             <svg id="sidebarToggleIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="transition: transform 0.3s ease;">
                 <path d="M9 18l6-6-6-6" stroke="black" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -84,11 +84,11 @@
         </div>
 
         <!-- Sidebar Content -->
-        <div class="h-full overflow-y-auto p-3">
+        <div class="h-full overflow-y-auto p-2">
             <!-- Presets Section -->
             <div id="presetsSection" class="mb-4">
                 <h3 class="text-xs font-semibold mb-2 text-white uppercase tracking-wider">Presets</h3>
-                <div id="presetsGrid" class="grid grid-cols-2 gap-2" style="padding: 0.5rem 0.5rem 0 0.5rem;"></div>
+                <div id="presetsGrid" class="grid grid-cols-2 gap-2"></div>
             </div>
 
             <!-- Saved States Section -->
@@ -101,7 +101,7 @@
                         <span id="cancelEditLink" class="cursor-pointer text-white text-xs hidden">Cancel</span>
                     </div>
                 </div>
-                <div id="savedGrid" class="grid grid-cols-2 gap-2" style="padding: 0.5rem 0.5rem 0 0.5rem;"></div>
+                <div id="savedGrid" class="grid grid-cols-2 gap-2"></div>
                 <div id="noSavesMessage" class="text-gray-400 text-xs text-center py-4 hidden">No saved states</div>
             </div>
         </div>

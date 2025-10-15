@@ -39,7 +39,7 @@
 
   /* States Sidebar */
   #statesSidebar {
-    transform: translateX(-216px);
+    transform: translateX(-184px);
   }
 
   #statesSidebar.open {
@@ -52,7 +52,7 @@
   }
 
   #sidebarToggle.open {
-    left: 216px;
+    left: 184px;
   }
 
   #sidebarToggle:hover {
