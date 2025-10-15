@@ -219,7 +219,8 @@ export class InputHandler {
     }
 
     // Handle canvas click (no object selected) - toggle play/pause
-    if (!this.selectedObject && wasClick && !this.isPanning) {
+    // wasClick means it wasn't dragged, so it's a click even if isPanning was set
+    if (!this.selectedObject && wasClick) {
       this.mechanism.togglePlayPause();
       // Don't push to history for play/pause toggle
     }
