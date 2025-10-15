@@ -241,29 +241,68 @@ export class UIController {
   }
 
   /**
-   * Generate a 480x480 thumbnail from the current canvas
+   * Generate a 480x480 thumbnail fitted to trace bounds
    */
   generateThumbnail() {
-    const canvas = this.p5Instance.canvas;
+    // Get trace bounds
+    const bounds = this.traceSystem.calculateBounds();
+    if (!bounds || bounds.width === 0 || bounds.height === 0) {
+      // No trace yet, just capture current view
+      const canvas = this.p5Instance.canvas;
+      const thumbnailCanvas = document.createElement('canvas');
+      const size = 480;
+      thumbnailCanvas.width = size;
+      thumbnailCanvas.height = size;
+      const ctx = thumbnailCanvas.getContext('2d');
 
-    // Create a square thumbnail canvas
+      const sourceSize = Math.min(canvas.width, canvas.height);
+      const sourceX = (canvas.width - sourceSize) / 2;
+      const sourceY = (canvas.height - sourceSize) / 2;
+
+      ctx.drawImage(canvas, sourceX, sourceY, sourceSize, sourceSize, 0, 0, size, size);
+      return thumbnailCanvas.toDataURL('image/png', 0.9);
+    }
+
+    // Save current camera state
+    const savedCamera = {
+      x: this.camera.x,
+      y: this.camera.y,
+      zoom: this.camera.zoom
+    };
+
+    // Temporarily fit camera to trace bounds (use square canvas size)
+    const canvasSize = Math.min(this.p5Instance.width, this.p5Instance.height);
+    this.camera.fitToView(bounds, canvasSize, canvasSize, false);
+
+    // Force a synchronous redraw with the new camera position
+    this.p5Instance.push();
+    this.p5Instance.background(this.renderer.getInverse() ? 0 : 245);
+    this.renderer.draw(this.p5Instance);
+    this.p5Instance.pop();
+
+    // Capture the canvas
+    const canvas = this.p5Instance.canvas;
     const thumbnailCanvas = document.createElement('canvas');
     const size = 480;
     thumbnailCanvas.width = size;
     thumbnailCanvas.height = size;
     const ctx = thumbnailCanvas.getContext('2d');
 
-    // Calculate dimensions to crop/scale the original canvas to fit square
+    // Crop to square from center and scale
     const sourceSize = Math.min(canvas.width, canvas.height);
     const sourceX = (canvas.width - sourceSize) / 2;
     const sourceY = (canvas.height - sourceSize) / 2;
 
-    // Draw the cropped and scaled canvas content
     ctx.drawImage(
       canvas,
-      sourceX, sourceY, sourceSize, sourceSize,  // source rectangle (square crop from center)
-      0, 0, size, size                            // destination rectangle (480x480)
+      sourceX, sourceY, sourceSize, sourceSize,
+      0, 0, size, size
     );
+
+    // Restore camera state
+    this.camera.x = savedCamera.x;
+    this.camera.y = savedCamera.y;
+    this.camera.zoom = savedCamera.zoom;
 
     return thumbnailCanvas.toDataURL('image/png', 0.9);
   }
