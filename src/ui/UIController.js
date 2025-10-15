@@ -299,8 +299,9 @@ export class UIController {
     // Capture the canvas
     const canvas = this.p5Instance.canvas;
     const thumbnailCanvas = document.createElement('canvas');
-    thumbnailCanvas.width = thumbnailSize;
-    thumbnailCanvas.height = thumbnailSize;
+    const size = 100;
+    thumbnailCanvas.width = size;
+    thumbnailCanvas.height = size;
     const ctx = thumbnailCanvas.getContext('2d');
 
     // Crop to square from center and scale to 100x100
@@ -311,7 +312,7 @@ export class UIController {
     ctx.drawImage(
       canvas,
       sourceX, sourceY, sourceSize, sourceSize,
-      0, 0, thumbnailSize, thumbnailSize
+      0, 0, size, size
     );
 
     // Restore camera state
