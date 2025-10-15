@@ -162,22 +162,6 @@ export class Renderer {
       }
     });
 
-    // Update edit mode controls colors
-    const editSavedBtn = document.getElementById('editSavedBtn');
-    if (editSavedBtn) {
-      editSavedBtn.style.color = this.isInverse ? 'black' : 'white';
-    }
-
-    const saveEditLink = document.getElementById('saveEditLink');
-    if (saveEditLink) {
-      saveEditLink.style.color = this.isInverse ? 'black' : 'white';
-    }
-
-    const cancelEditLink = document.getElementById('cancelEditLink');
-    if (cancelEditLink) {
-      cancelEditLink.style.color = this.isInverse ? 'black' : 'white';
-    }
-
     // Update "No saved states" message
     const noSavesMessage = document.getElementById('noSavesMessage');
     if (noSavesMessage) {

@@ -16,9 +16,6 @@ export class UIController {
     this.localStorageManager = localStorageManager;
     this.p5Instance = null;
     this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer, traceSystem, mechanism);
-    this.isEditMode = false;
-    this.savedStatesOrder = []; // Track order of saved states
-    this.editModeSnapshot = null; // Snapshot of states before editing
 
     // Auto-fit after state load
     this.waitingForAutoFit = false;
@@ -193,45 +190,6 @@ export class UIController {
         e.preventDefault();
         e.stopPropagation();
         this.toggleStatesSidebar();
-      });
-    }
-
-    // Edit saved states button
-    const editSavedBtn = document.getElementById('editSavedBtn');
-    if (editSavedBtn) {
-      editSavedBtn.onclick = () => {
-        this.toggleEditMode();
-      };
-      editSavedBtn.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.toggleEditMode();
-      });
-    }
-
-    // Save edit link
-    const saveEditLink = document.getElementById('saveEditLink');
-    if (saveEditLink) {
-      saveEditLink.onclick = () => {
-        this.saveEditOrder();
-      };
-      saveEditLink.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.saveEditOrder();
-      });
-    }
-
-    // Cancel edit link
-    const cancelEditLink = document.getElementById('cancelEditLink');
-    if (cancelEditLink) {
-      cancelEditLink.onclick = () => {
-        this.cancelEditMode();
-      };
-      cancelEditLink.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        this.cancelEditMode();
       });
     }
 
@@ -459,21 +417,6 @@ export class UIController {
 
     const savedStates = this.localStorageManager.getSavedStates();
 
-    // Initialize order if empty, or add new states that aren't in the order yet
-    // BUT: Don't add items back if we're in edit mode (they might have been deleted)
-    if (this.savedStatesOrder.length === 0) {
-      this.savedStatesOrder = savedStates.map(s => s.id);
-    } else if (!this.isEditMode) {
-      // Only add new states when NOT in edit mode
-      // In edit mode, respect the current savedStatesOrder (which may have deletions)
-      // Add new states to the TOP of the list
-      savedStates.forEach(s => {
-        if (!this.savedStatesOrder.includes(s.id)) {
-          this.savedStatesOrder.unshift(s.id);
-        }
-      });
-    }
-
     if (savedStates.length === 0) {
       if (noSavesMessage) {
         noSavesMessage.classList.remove('hidden');
@@ -485,30 +428,9 @@ export class UIController {
       noSavesMessage.classList.add('hidden');
     }
 
-    // Filter out items that were "deleted" (not in savedStatesOrder) and sort
-    const orderedStates = savedStates
-      .filter(s => this.savedStatesOrder.includes(s.id))
-      .sort((a, b) => {
-        const indexA = this.savedStatesOrder.indexOf(a.id);
-        const indexB = this.savedStatesOrder.indexOf(b.id);
-        return indexA - indexB;
-      });
-
-    // Check if all items were deleted
-    if (orderedStates.length === 0) {
-      if (noSavesMessage) {
-        noSavesMessage.classList.remove('hidden');
-      }
-      return;
-    }
-
-    orderedStates.forEach((saveData, index) => {
-      const isFirst = index === 0;
-      const isLast = index === orderedStates.length - 1;
-      const card = this.createStateCard(saveData, this.isEditMode, isFirst, isLast, index);
+    savedStates.forEach((saveData) => {
+      const card = this.createStateCard(saveData);
       card.dataset.stateId = saveData.id;
-      card.dataset.index = index;
-
       savedGrid.appendChild(card);
     });
   }
@@ -516,12 +438,8 @@ export class UIController {
   /**
    * Create a state card element
    * @param {Object} data - State data with {id, thumbnail, state}
-   * @param {boolean} showEditControls - Whether to show edit controls (only in edit mode)
-   * @param {boolean} isFirst - Whether this is the first item
-   * @param {boolean} isLast - Whether this is the last item
-   * @param {number} index - Index in the array
    */
-  createStateCard(data, showEditControls, isFirst, isLast, index) {
+  createStateCard(data) {
     const card = document.createElement('div');
     card.className = 'state-card';
 
@@ -539,59 +457,10 @@ export class UIController {
       card.appendChild(placeholder);
     }
 
-    // Add edit controls for saved states in edit mode
-    if (showEditControls) {
-      // Up arrow (if not first)
-      if (!isFirst) {
-        const upBtn = document.createElement('button');
-        upBtn.className = 'state-card-arrow state-card-arrow-up';
-        upBtn.innerHTML = `
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 10V2M6 2L2 6M6 2L10 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        `;
-        upBtn.onclick = (e) => {
-          console.log('Up button clicked for index:', index);
-          e.preventDefault();
-          e.stopPropagation();
-          this.moveStateUp(index);
-        };
-        upBtn.addEventListener('touchend', (e) => {
-          console.log('Up button touchend for index:', index);
-          e.preventDefault();
-          e.stopPropagation();
-          this.moveStateUp(index);
-        });
-        card.appendChild(upBtn);
-      }
-
-      // Down arrow (if not last)
-      if (!isLast) {
-        const downBtn = document.createElement('button');
-        downBtn.className = 'state-card-arrow state-card-arrow-down';
-        downBtn.innerHTML = `
-          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 2V10M6 10L2 6M6 10L10 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        `;
-        downBtn.onclick = (e) => {
-          console.log('Down button clicked for index:', index);
-          e.preventDefault();
-          e.stopPropagation();
-          this.moveStateDown(index);
-        };
-        downBtn.addEventListener('touchend', (e) => {
-          console.log('Down button touchend for index:', index);
-          e.preventDefault();
-          e.stopPropagation();
-          this.moveStateDown(index);
-        });
-        card.appendChild(downBtn);
-      }
-
-      // Delete button
+    // Add delete button for saved states (has an id)
+    if (data.id) {
       const deleteBtn = document.createElement('button');
-      deleteBtn.className = 'state-card-delete-edit';
+      deleteBtn.className = 'state-card-delete';
       deleteBtn.innerHTML = `
         <svg width="10" height="10" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M1 1L11 11M11 1L1 11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -602,7 +471,6 @@ export class UIController {
       let touchHandled = false;
 
       deleteBtn.addEventListener('touchend', (e) => {
-        console.log('Delete button touchend fired for id:', data.id);
         e.preventDefault();
         e.stopPropagation();
         touchHandled = true;
@@ -611,7 +479,6 @@ export class UIController {
       });
 
       deleteBtn.onclick = (e) => {
-        console.log('Delete button click fired for id:', data.id, 'touchHandled:', touchHandled);
         e.preventDefault();
         e.stopPropagation();
         if (!touchHandled) {
@@ -622,12 +489,10 @@ export class UIController {
       card.appendChild(deleteBtn);
     }
 
-    // Click card to load state (only when not in edit mode)
-    if (!showEditControls) {
-      card.onclick = () => {
-        this.loadState(data.state);
-      };
-    }
+    // Click card to load state
+    card.onclick = () => {
+      this.loadState(data.state);
+    };
 
     return card;
   }
@@ -729,136 +594,12 @@ export class UIController {
   }
 
   /**
-   * Delete a saved state (or mark for deletion in edit mode)
+   * Delete a saved state
    * @param {string} id - State ID to delete
    */
   deleteState(id) {
-    console.log('deleteState called with id:', id);
-    console.log('isEditMode:', this.isEditMode);
-    console.log('savedStatesOrder before:', [...this.savedStatesOrder]);
-
-    if (this.isEditMode) {
-      // In edit mode, just remove from order array (deletion happens on save)
-      const beforeLength = this.savedStatesOrder.length;
-      this.savedStatesOrder = this.savedStatesOrder.filter(stateId => stateId !== id);
-      console.log('savedStatesOrder after filter:', [...this.savedStatesOrder]);
-      console.log('Removed items:', beforeLength - this.savedStatesOrder.length);
-      this.populateSavedGrid();
-    } else {
-      // Not in edit mode, delete immediately
-      const success = this.localStorageManager.deleteState(id);
-      if (success) {
-        this.savedStatesOrder = this.savedStatesOrder.filter(stateId => stateId !== id);
-        this.populateSavedGrid();
-      }
-    }
-  }
-
-  /**
-   * Toggle edit mode for saved states
-   */
-  toggleEditMode() {
-    this.isEditMode = !this.isEditMode;
-    const editSavedBtn = document.getElementById('editSavedBtn');
-    const saveEditLink = document.getElementById('saveEditLink');
-    const cancelEditLink = document.getElementById('cancelEditLink');
-
-    if (this.isEditMode) {
-      // Take a snapshot of current order when entering edit mode
-      this.editModeSnapshot = [...this.savedStatesOrder];
-
-      // Show Save/Cancel links, hide Edit button
-      if (editSavedBtn) editSavedBtn.classList.add('hidden');
-      if (saveEditLink) saveEditLink.classList.remove('hidden');
-      if (cancelEditLink) cancelEditLink.classList.remove('hidden');
-    } else {
-      // Show Edit button, hide Save/Cancel links
-      if (editSavedBtn) editSavedBtn.classList.remove('hidden');
-      if (saveEditLink) saveEditLink.classList.add('hidden');
-      if (cancelEditLink) cancelEditLink.classList.add('hidden');
-    }
-
-    // Refresh grid to show/hide edit controls
-    this.populateSavedGrid();
-  }
-
-  /**
-   * Save the current order of saved states
-   */
-  saveEditOrder() {
-    // Find states that were deleted (in snapshot but not in current order)
-    if (this.editModeSnapshot) {
-      const deletedStates = this.editModeSnapshot.filter(id => !this.savedStatesOrder.includes(id));
-
-      // Actually delete them from localStorage
-      deletedStates.forEach(id => {
-        this.localStorageManager.deleteState(id);
-      });
-    }
-
-    // Save the new order to localStorage
-    this.localStorageManager.saveSaveOrder(this.savedStatesOrder);
-
-    // Exit edit mode
-    this.isEditMode = false;
-    this.editModeSnapshot = null;
-
-    const editSavedBtn = document.getElementById('editSavedBtn');
-    const saveEditLink = document.getElementById('saveEditLink');
-    const cancelEditLink = document.getElementById('cancelEditLink');
-
-    if (editSavedBtn) editSavedBtn.classList.remove('hidden');
-    if (saveEditLink) saveEditLink.classList.add('hidden');
-    if (cancelEditLink) cancelEditLink.classList.add('hidden');
-
-    this.populateSavedGrid();
-  }
-
-  /**
-   * Cancel edit mode and revert order
-   */
-  cancelEditMode() {
-    this.isEditMode = false;
-
-    // Restore from snapshot (reverts both deletions and reordering)
-    if (this.editModeSnapshot) {
-      this.savedStatesOrder = [...this.editModeSnapshot];
-      this.editModeSnapshot = null;
-    }
-
-    const editSavedBtn = document.getElementById('editSavedBtn');
-    const saveEditLink = document.getElementById('saveEditLink');
-    const cancelEditLink = document.getElementById('cancelEditLink');
-
-    if (editSavedBtn) editSavedBtn.classList.remove('hidden');
-    if (saveEditLink) saveEditLink.classList.add('hidden');
-    if (cancelEditLink) cancelEditLink.classList.add('hidden');
-
-    this.populateSavedGrid();
-  }
-
-  /**
-   * Move a state up in the order
-   */
-  moveStateUp(index) {
-    if (index > 0) {
-      // Swap with previous item
-      const temp = this.savedStatesOrder[index];
-      this.savedStatesOrder[index] = this.savedStatesOrder[index - 1];
-      this.savedStatesOrder[index - 1] = temp;
-      this.populateSavedGrid();
-    }
-  }
-
-  /**
-   * Move a state down in the order
-   */
-  moveStateDown(index) {
-    if (index < this.savedStatesOrder.length - 1) {
-      // Swap with next item
-      const temp = this.savedStatesOrder[index];
-      this.savedStatesOrder[index] = this.savedStatesOrder[index + 1];
-      this.savedStatesOrder[index + 1] = temp;
+    const success = this.localStorageManager.deleteState(id);
+    if (success) {
       this.populateSavedGrid();
     }
   }
