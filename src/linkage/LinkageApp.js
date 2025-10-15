@@ -119,6 +119,14 @@ class LinkageApp {
             crankAngle: this.mechanism.crankAngle,
             shouldLoadPreset: this.shouldLoadPreset
           });
+
+          // Immediately fit to mechanism bounds (shows crank/rods right away)
+          const mechanismBounds = this.mechanism.calculateBounds();
+          if (mechanismBounds) {
+            this.camera.fitToView(mechanismBounds, p.width, p.height, true);
+          }
+
+          // Set up auto-fit for after one full rotation
           this.uiController.autoFitStartAngle = this.mechanism.crankAngle;
           this.uiController.waitingForAutoFit = true;
         }
