@@ -41,34 +41,66 @@ export class InputHandler {
     const jointRadius = screenJointRadius / this.camera.zoom;
     const objectRadius = screenObjectRadius / this.camera.zoom;
 
+    // Collect all potential hits with their distances
+    let candidates = [];
+
     // Check for anchor selection
     if (this.mechanism.anchor.isMouseOver(worldMouse, objectRadius)) {
-      this.selectedObject = { type: 'anchor', obj: this.mechanism.anchor };
-      this.dragOffset = Vector.sub(this.mechanism.anchor.pos, worldMouse);
-      this.renderer.setSelectedObject(this.selectedObject);
-      return;
+      const dist = Vector.dist(this.mechanism.anchor.pos, worldMouse);
+      candidates.push({
+        type: 'anchor',
+        obj: this.mechanism.anchor,
+        distance: dist,
+        dragOffset: Vector.sub(this.mechanism.anchor.pos, worldMouse)
+      });
     }
 
     // Check for guide point selection
     for (let i = 0; i < this.mechanism.guidePoints.length; i++) {
       let gp = this.mechanism.guidePoints[i];
       if (gp.isMouseOver(worldMouse, objectRadius)) {
-        this.selectedObject = { type: 'guidePoint', obj: gp, rodIndex: i + 1 };
-        this.dragOffset = Vector.sub(gp.pos, worldMouse);
-        this.renderer.setSelectedObject(this.selectedObject);
-        return;
+        const dist = Vector.dist(gp.pos, worldMouse);
+        candidates.push({
+          type: 'guidePoint',
+          obj: gp,
+          rodIndex: i + 1,
+          distance: dist,
+          dragOffset: Vector.sub(gp.pos, worldMouse)
+        });
       }
     }
 
-    // Check for joint selection (in reverse order for proper layering)
-    for (let i = this.mechanism.joints.length - 1; i >= 0; i--) {
+    // Check for joint selection
+    for (let i = 0; i < this.mechanism.joints.length; i++) {
       let joint = this.mechanism.joints[i];
       let dist = Vector.dist(joint, worldMouse);
-      if (dist < jointRadius) { // Joint click radius (larger for touch)
-        this.selectedObject = { type: 'joint', obj: joint, rodIndex: i };
-        this.renderer.setSelectedObject(this.selectedObject);
-        return;
+      if (dist < jointRadius) {
+        candidates.push({
+          type: 'joint',
+          obj: joint,
+          rodIndex: i,
+          distance: dist
+        });
       }
+    }
+
+    // If we have candidates, select the closest one
+    if (candidates.length > 0) {
+      candidates.sort((a, b) => a.distance - b.distance);
+      const closest = candidates[0];
+
+      this.selectedObject = {
+        type: closest.type,
+        obj: closest.obj,
+        rodIndex: closest.rodIndex
+      };
+
+      if (closest.dragOffset) {
+        this.dragOffset = closest.dragOffset;
+      }
+
+      this.renderer.setSelectedObject(this.selectedObject);
+      return;
     }
 
     // Check for rod selection (in reverse order for proper layering)
