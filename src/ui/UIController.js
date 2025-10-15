@@ -241,93 +241,29 @@ export class UIController {
   }
 
   /**
-   * Generate a 480x480 thumbnail with fitted trace
+   * Generate a 480x480 thumbnail from the current canvas
    */
   generateThumbnail() {
-    // Create offscreen canvas
+    const canvas = this.p5Instance.canvas;
+
+    // Create a square thumbnail canvas
     const thumbnailCanvas = document.createElement('canvas');
     const size = 480;
     thumbnailCanvas.width = size;
     thumbnailCanvas.height = size;
     const ctx = thumbnailCanvas.getContext('2d');
 
-    // Set background color (matching renderer)
-    const bgColor = this.renderer.getInverse() ? '#000000' : '#f5f5f5';
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, size, size);
+    // Calculate dimensions to crop/scale the original canvas to fit square
+    const sourceSize = Math.min(canvas.width, canvas.height);
+    const sourceX = (canvas.width - sourceSize) / 2;
+    const sourceY = (canvas.height - sourceSize) / 2;
 
-    // Get trace bounds
-    const bounds = this.traceSystem.calculateBounds();
-    if (!bounds || bounds.width === 0 || bounds.height === 0) {
-      // No trace yet, return blank thumbnail
-      return thumbnailCanvas.toDataURL('image/png', 0.9);
-    }
-
-    // Calculate zoom to fit trace in the thumbnail with padding
-    const padding = 40; // pixels of padding around the trace
-    const availableWidth = size - 2 * padding;
-    const availableHeight = size - 2 * padding;
-
-    const scaleX = availableWidth / bounds.width;
-    const scaleY = availableHeight / bounds.height;
-    const zoom = Math.min(scaleX, scaleY);
-
-    // Calculate offset to center the trace
-    const offsetX = size / 2 - (bounds.centerX * zoom);
-    const offsetY = size / 2 - (bounds.centerY * zoom);
-
-    // Create a simple p5-like object for drawing
-    // Note: For thumbnails, we use simple straight lines for better browser compatibility
-    let firstPoint = true;
-
-    const p5Like = {
-      stroke: (...args) => {
-        if (args.length === 1) {
-          ctx.strokeStyle = `rgb(${args[0]}, ${args[0]}, ${args[0]})`;
-        } else if (args.length === 3) {
-          ctx.strokeStyle = `rgb(${args[0]}, ${args[1]}, ${args[2]})`;
-        } else if (args.length === 4) {
-          ctx.strokeStyle = `rgba(${args[0]}, ${args[1]}, ${args[2]}, ${args[3] / 255})`;
-        }
-      },
-      strokeWeight: (w) => {
-        ctx.lineWidth = w * zoom;
-      },
-      noFill: () => {
-        ctx.fillStyle = 'transparent';
-      },
-      beginShape: () => {
-        ctx.beginPath();
-        firstPoint = true;
-      },
-      vertex: (x, y) => {
-        const screenX = x * zoom + offsetX;
-        const screenY = y * zoom + offsetY;
-        if (firstPoint) {
-          ctx.moveTo(screenX, screenY);
-          firstPoint = false;
-        } else {
-          ctx.lineTo(screenX, screenY);
-        }
-      },
-      curveVertex: (x, y) => {
-        // For thumbnails, just draw as straight lines for better compatibility
-        const screenX = x * zoom + offsetX;
-        const screenY = y * zoom + offsetY;
-        if (firstPoint) {
-          ctx.moveTo(screenX, screenY);
-          firstPoint = false;
-        } else {
-          ctx.lineTo(screenX, screenY);
-        }
-      },
-      endShape: () => {
-        ctx.stroke();
-      }
-    };
-
-    // Draw the traces using the trace system
-    this.traceSystem.draw(p5Like, zoom);
+    // Draw the cropped and scaled canvas content
+    ctx.drawImage(
+      canvas,
+      sourceX, sourceY, sourceSize, sourceSize,  // source rectangle (square crop from center)
+      0, 0, size, size                            // destination rectangle (480x480)
+    );
 
     return thumbnailCanvas.toDataURL('image/png', 0.9);
   }
