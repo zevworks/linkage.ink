@@ -60,7 +60,8 @@ export class StateSerializer {
       rodsWidth: this.traceSystem.getRodsWidth(),
       fadingEnabled: this.traceSystem.getFading(),
       isStretchingMode: this.mechanism.isStretchingMode,
-      isInverse: this.renderer.getInverse()
+      isInverse: this.renderer.getInverse(),
+      crankSpeed: this.mechanism.crankSpeed
     };
   }
 
@@ -132,6 +133,11 @@ export class StateSerializer {
     // Restore inverse mode
     if (state.isInverse !== undefined) {
       this.renderer.setInverse(state.isInverse);
+    }
+
+    // Restore crank speed (spin direction)
+    if (state.crankSpeed !== undefined) {
+      this.mechanism.crankSpeed = state.crankSpeed;
     }
 
     // Update joints

@@ -177,6 +177,17 @@ export class InputHandler {
     const dragDist = Vector.dist(new Vector(x, y), this.pressPos);
     let wasClick = dragDist < 5 * (window.devicePixelRatio || 1);
 
+    // Handle anchor click - reverse spin direction
+    if (this.selectedObject && this.selectedObject.type === 'anchor') {
+      if (wasClick) {
+        this.mechanism.reverseSpinDirection();
+        // Push to history immediately for toggle action
+        if (this.urlStateManager) {
+          this.urlStateManager.pushToHistoryNow();
+        }
+      }
+    }
+
     // Handle joint click - toggle point tracing
     if (this.selectedObject && this.selectedObject.type === 'joint') {
       if (wasClick) {

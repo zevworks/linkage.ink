@@ -141,6 +141,10 @@ export class LinkageMechanism {
     return this.isStretchingMode;
   }
 
+  reverseSpinDirection() {
+    this.crankSpeed = -this.crankSpeed;
+  }
+
   getTracingRods() {
     return this.rods.filter(rod => rod.isTracing);
   }
