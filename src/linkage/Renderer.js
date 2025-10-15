@@ -106,14 +106,23 @@ export class Renderer {
       }
     }
 
+    // Update sidebar right border - normal: black, dark: white
+    if (statesSidebar) {
+      if (this.isInverse) {
+        statesSidebar.style.borderRight = '2px solid white';
+      } else {
+        statesSidebar.style.borderRight = '2px solid black';
+      }
+    }
+
     // Update sidebar toggle button border - normal: black, dark: white
     const sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebarToggle) {
       if (this.isInverse) {
-        sidebarToggle.style.border = '1px solid white';
+        sidebarToggle.style.border = '2px solid white';
         sidebarToggle.style.background = 'transparent';
       } else {
-        sidebarToggle.style.border = '1px solid black';
+        sidebarToggle.style.border = '2px solid black';
         sidebarToggle.style.background = 'transparent';
       }
     }
