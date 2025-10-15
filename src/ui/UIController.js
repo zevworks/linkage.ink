@@ -241,7 +241,7 @@ export class UIController {
   }
 
   /**
-   * Generate a 480x480 thumbnail fitted to trace bounds
+   * Generate a 100x100 thumbnail fitted to trace bounds
    */
   generateThumbnail() {
     // Get trace bounds
@@ -250,7 +250,7 @@ export class UIController {
       // No trace yet, just capture current view
       const canvas = this.p5Instance.canvas;
       const thumbnailCanvas = document.createElement('canvas');
-      const size = 480;
+      const size = 100;
       thumbnailCanvas.width = size;
       thumbnailCanvas.height = size;
       const ctx = thumbnailCanvas.getContext('2d');
@@ -283,7 +283,7 @@ export class UIController {
     // Capture the canvas
     const canvas = this.p5Instance.canvas;
     const thumbnailCanvas = document.createElement('canvas');
-    const size = 480;
+    const size = 100;
     thumbnailCanvas.width = size;
     thumbnailCanvas.height = size;
     const ctx = thumbnailCanvas.getContext('2d');
