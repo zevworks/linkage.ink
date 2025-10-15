@@ -471,8 +471,8 @@ export class UIController {
       card.appendChild(placeholder);
     }
 
-    // Add delete button for saved states (has an id) when in edit mode
-    if (data.id && this.isEditMode) {
+    // Add delete button for saved states (has an id and not a preset) when in edit mode
+    if (data.id && !data.id.startsWith('preset-') && this.isEditMode) {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'state-card-delete';
       deleteBtn.innerHTML = `

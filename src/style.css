@@ -104,14 +104,8 @@
     align-items: center;
     justify-content: center;
     opacity: 1;
-    transition: background 0.15s ease, transform 0.15s ease;
     z-index: 20;
     pointer-events: auto;
-  }
-
-  .state-card-delete:hover {
-    background: rgba(220, 38, 38, 1);
-    transform: scale(1.1);
   }
 
   .state-card-delete:active {
