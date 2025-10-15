@@ -106,22 +106,24 @@ export class Renderer {
       }
     }
 
-    // Update sidebar toggle button background - normal: black, dark: white
+    // Update sidebar toggle button border - normal: black, dark: white
     const sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebarToggle) {
       if (this.isInverse) {
-        sidebarToggle.style.background = 'white';
+        sidebarToggle.style.border = '1px solid white';
+        sidebarToggle.style.background = 'transparent';
       } else {
-        sidebarToggle.style.background = 'black';
+        sidebarToggle.style.border = '1px solid black';
+        sidebarToggle.style.background = 'transparent';
       }
     }
 
-    // Update sidebar toggle icon color - normal: white, dark: black
+    // Update sidebar toggle icon color - normal: black, dark: white
     const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
     if (sidebarToggleIcon) {
       const path = sidebarToggleIcon.querySelector('path');
       if (path) {
-        path.setAttribute('stroke', this.isInverse ? '#000000' : '#ffffff');
+        path.setAttribute('stroke', this.isInverse ? '#ffffff' : '#000000');
       }
     }
 
