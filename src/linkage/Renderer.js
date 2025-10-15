@@ -109,9 +109,9 @@ export class Renderer {
     // Update sidebar right border - normal: black, dark: white
     if (statesSidebar) {
       if (this.isInverse) {
-        statesSidebar.style.borderRight = '2px solid white';
+        statesSidebar.style.borderRight = '1px solid white';
       } else {
-        statesSidebar.style.borderRight = '2px solid black';
+        statesSidebar.style.borderRight = '1px solid black';
       }
     }
 
