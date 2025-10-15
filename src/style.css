@@ -61,7 +61,7 @@
 
   .state-card {
     position: relative;
-    border-radius: 0.5rem;
+    border-radius: 0;
     overflow: visible;
     background: rgba(255, 255, 255, 0.1);
     cursor: pointer;
@@ -72,7 +72,7 @@
 
   .state-card img,
   .state-card-placeholder {
-    border-radius: 0.5rem;
+    border-radius: 0;
     overflow: hidden;
   }
 
