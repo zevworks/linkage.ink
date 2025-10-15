@@ -270,14 +270,19 @@ export class UIController {
       zoom: this.camera.zoom
     };
 
-    // Calculate zoom to fit trace bounds in thumbnail with padding
-    const thumbnailSize = 100;
-    const padding = 10; // pixels of padding
-    const availableSize = thumbnailSize - 2 * padding;
+    // Calculate zoom to fit trace bounds in the canvas viewport with padding
+    const padding = 40; // world-space padding
+    const canvasWidth = this.p5Instance.width;
+    const canvasHeight = this.p5Instance.height;
 
-    // Calculate zoom that fits the bounds
-    const zoomX = availableSize / bounds.width;
-    const zoomY = availableSize / bounds.height;
+    // Calculate zoom that fits the bounds (with padding) in the canvas
+    const boundsWithPadding = {
+      width: bounds.width + 2 * padding,
+      height: bounds.height + 2 * padding
+    };
+
+    const zoomX = canvasWidth / boundsWithPadding.width;
+    const zoomY = canvasHeight / boundsWithPadding.height;
     const zoom = Math.min(zoomX, zoomY);
 
     // Set camera to center on trace bounds with calculated zoom
