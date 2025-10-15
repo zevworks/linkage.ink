@@ -88,11 +88,11 @@
     object-fit: cover;
   }
 
-  /* Delete button - top left corner */
+  /* Delete button - inside card at top left */
   .state-card-delete {
     position: absolute;
-    top: -0.875rem; /* Half of 1.75rem to center on corner */
-    left: -0.875rem;
+    top: 0.5rem;
+    left: 0.5rem;
     width: 1.75rem;
     height: 1.75rem;
     border-radius: 50%;

@@ -16,6 +16,7 @@ export class UIController {
     this.localStorageManager = localStorageManager;
     this.p5Instance = null;
     this.colorPicker = new ColorPicker((design) => this.handleDesignChange(design), renderer, traceSystem, mechanism);
+    this.isEditMode = false;
 
     // Auto-fit after state load
     this.waitingForAutoFit = false;
@@ -190,6 +191,19 @@ export class UIController {
         e.preventDefault();
         e.stopPropagation();
         this.toggleStatesSidebar();
+      });
+    }
+
+    // Edit saved states button
+    const editSavedBtn = document.getElementById('editSavedBtn');
+    if (editSavedBtn) {
+      editSavedBtn.onclick = () => {
+        this.toggleEditMode();
+      };
+      editSavedBtn.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.toggleEditMode();
       });
     }
 
@@ -457,8 +471,8 @@ export class UIController {
       card.appendChild(placeholder);
     }
 
-    // Add delete button for saved states (has an id)
-    if (data.id) {
+    // Add delete button for saved states (has an id) when in edit mode
+    if (data.id && this.isEditMode) {
       const deleteBtn = document.createElement('button');
       deleteBtn.className = 'state-card-delete';
       deleteBtn.innerHTML = `
@@ -489,10 +503,12 @@ export class UIController {
       card.appendChild(deleteBtn);
     }
 
-    // Click card to load state
-    card.onclick = () => {
-      this.loadState(data.state);
-    };
+    // Click card to load state (only when not in edit mode)
+    if (!this.isEditMode) {
+      card.onclick = () => {
+        this.loadState(data.state);
+      };
+    }
 
     return card;
   }
@@ -602,5 +618,21 @@ export class UIController {
     if (success) {
       this.populateSavedGrid();
     }
+  }
+
+  /**
+   * Toggle edit mode for saved states
+   */
+  toggleEditMode() {
+    this.isEditMode = !this.isEditMode;
+    const editSavedBtn = document.getElementById('editSavedBtn');
+
+    if (editSavedBtn) {
+      editSavedBtn.textContent = this.isEditMode ? 'Close' : 'Edit';
+    }
+
+    // Refresh grid to show/hide delete buttons
+    this.populateSavedGrid();
+    this.populatePresetsGrid();
   }
 }

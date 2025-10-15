@@ -162,6 +162,12 @@ export class Renderer {
       }
     });
 
+    // Update edit button color
+    const editSavedBtn = document.getElementById('editSavedBtn');
+    if (editSavedBtn) {
+      editSavedBtn.style.color = this.isInverse ? 'black' : 'white';
+    }
+
     // Update "No saved states" message
     const noSavesMessage = document.getElementById('noSavesMessage');
     if (noSavesMessage) {
