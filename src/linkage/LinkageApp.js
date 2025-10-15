@@ -173,16 +173,28 @@ class LinkageApp {
       };
 
       // Mouse events
-      p.mousePressed = () => {
+      p.mousePressed = (event) => {
+        // Check if mouse is on a button or UI element
+        if (event && event.target && (event.target.tagName === 'BUTTON' || event.target.closest('button'))) {
+          return true; // Allow button clicks
+        }
         if (p.mouseX < 0 || p.mouseX > this.width || p.mouseY < 0 || p.mouseY > this.height) return;
         this.inputHandler.handlePress(p.mouseX, p.mouseY);
       };
 
-      p.mouseDragged = () => {
+      p.mouseDragged = (event) => {
+        // Check if mouse is on a button or UI element
+        if (event && event.target && (event.target.tagName === 'BUTTON' || event.target.closest('button'))) {
+          return true;
+        }
         this.inputHandler.handleDrag(p.mouseX, p.mouseY, p.pmouseX, p.pmouseY);
       };
 
-      p.mouseReleased = () => {
+      p.mouseReleased = (event) => {
+        // Check if mouse is on a button or UI element
+        if (event && event.target && (event.target.tagName === 'BUTTON' || event.target.closest('button'))) {
+          return true;
+        }
         this.inputHandler.handleRelease(p.mouseX, p.mouseY);
       };
 
