@@ -277,8 +277,8 @@ export class UIController {
     const offsetY = size / 2 - (bounds.centerY * zoom);
 
     // Create a simple p5-like object for drawing
-    let currentPath = [];
-    let isCurvePath = false;
+    // Note: For thumbnails, we use simple straight lines for better browser compatibility
+    let firstPoint = true;
 
     const p5Like = {
       stroke: (...args) => {
@@ -294,73 +294,35 @@ export class UIController {
         ctx.lineWidth = w * zoom;
       },
       noFill: () => {
-        // No-op for thumbnail
+        ctx.fillStyle = 'transparent';
       },
       beginShape: () => {
-        currentPath = [];
-        isCurvePath = false;
+        ctx.beginPath();
+        firstPoint = true;
       },
       vertex: (x, y) => {
         const screenX = x * zoom + offsetX;
         const screenY = y * zoom + offsetY;
-        currentPath.push({ x: screenX, y: screenY });
+        if (firstPoint) {
+          ctx.moveTo(screenX, screenY);
+          firstPoint = false;
+        } else {
+          ctx.lineTo(screenX, screenY);
+        }
       },
       curveVertex: (x, y) => {
+        // For thumbnails, just draw as straight lines for better compatibility
         const screenX = x * zoom + offsetX;
         const screenY = y * zoom + offsetY;
-        currentPath.push({ x: screenX, y: screenY });
-        isCurvePath = true;
+        if (firstPoint) {
+          ctx.moveTo(screenX, screenY);
+          firstPoint = false;
+        } else {
+          ctx.lineTo(screenX, screenY);
+        }
       },
       endShape: () => {
-        if (currentPath.length === 0) return;
-
-        ctx.beginPath();
-
-        if (isCurvePath && currentPath.length >= 4) {
-          // Draw Catmull-Rom curves
-          ctx.moveTo(currentPath[1].x, currentPath[1].y);
-
-          for (let i = 1; i < currentPath.length - 2; i++) {
-            const p0 = currentPath[i - 1];
-            const p1 = currentPath[i];
-            const p2 = currentPath[i + 1];
-            const p3 = currentPath[i + 2];
-
-            // Draw Catmull-Rom spline segment with smaller steps for smoothness
-            const steps = 10;
-            for (let s = 1; s <= steps; s++) {
-              const t = s / steps;
-              const t2 = t * t;
-              const t3 = t2 * t;
-
-              const x = 0.5 * (
-                2 * p1.x +
-                (-p0.x + p2.x) * t +
-                (2 * p0.x - 5 * p1.x + 4 * p2.x - p3.x) * t2 +
-                (-p0.x + 3 * p1.x - 3 * p2.x + p3.x) * t3
-              );
-
-              const y = 0.5 * (
-                2 * p1.y +
-                (-p0.y + p2.y) * t +
-                (2 * p0.y - 5 * p1.y + 4 * p2.y - p3.y) * t2 +
-                (-p0.y + 3 * p1.y - 3 * p2.y + p3.y) * t3
-              );
-
-              ctx.lineTo(x, y);
-            }
-          }
-        } else if (currentPath.length > 0) {
-          // Draw straight line segments
-          ctx.moveTo(currentPath[0].x, currentPath[0].y);
-          for (let i = 1; i < currentPath.length; i++) {
-            ctx.lineTo(currentPath[i].x, currentPath[i].y);
-          }
-        }
-
         ctx.stroke();
-        currentPath = [];
-        isCurvePath = false;
       }
     };
 
