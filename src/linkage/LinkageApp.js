@@ -117,13 +117,18 @@ class LinkageApp {
         if (this.shouldLoadPreset) {
           console.log('Setting up auto-fit for preset load:', {
             crankAngle: this.mechanism.crankAngle,
-            shouldLoadPreset: this.shouldLoadPreset
+            shouldLoadPreset: this.shouldLoadPreset,
+            rodsCount: this.mechanism.rods.length
           });
 
           // Immediately fit to mechanism bounds (shows crank/rods right away)
           const mechanismBounds = this.mechanism.calculateBounds();
+          console.log('Mechanism bounds:', mechanismBounds);
           if (mechanismBounds) {
+            console.log('Fitting to mechanism bounds immediately');
             this.camera.fitToView(mechanismBounds, p.width, p.height, true);
+          } else {
+            console.log('No mechanism bounds available');
           }
 
           // Set up auto-fit for after one full rotation
