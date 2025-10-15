@@ -110,13 +110,13 @@ export class Renderer {
     const sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebarToggle) {
       if (this.isInverse) {
-        sidebarToggle.style.background = 'rgba(255, 255, 255, 0.6)';
+        sidebarToggle.style.background = 'white';
       } else {
-        sidebarToggle.style.background = 'rgba(0, 0, 0, 0.6)';
+        sidebarToggle.style.background = 'black';
       }
     }
 
-    // Update sidebar toggle icon color
+    // Update sidebar toggle icon color - normal: white, dark: black
     const sidebarToggleIcon = document.getElementById('sidebarToggleIcon');
     if (sidebarToggleIcon) {
       const path = sidebarToggleIcon.querySelector('path');
