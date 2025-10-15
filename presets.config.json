@@ -2,8 +2,16 @@
   {
     "id": "hart",
     "name": "hart",
-    "description": "Basic single-rod circular motion",
+    "description": "",
     "thumbnail": "hart.png",
     "stateUrl": "#anchor=-95.6%2C14.9&crank=254.1%2C0%2C0&rod1=494.8%2C-101.9%2C-195.0%2C0%2C1&rod2=1028.7%2C-106.8%2C-743.3%2C1%2C0&camera=1291.6%2C1038.8%2C0.754&color=255%2C0%2C0&traceWidth=9&rodsWidth=4&stretch=0&inverse=1&fade=1"
+  },
+  {
+    "id": "shell",
+    "name": "The Shell",
+    "description": "",
+    "thumbnail": "shell.png",
+    "stateUrl": "#anchor=620.3%2C123.2&crank=581.7%2C0%2C0&rod1=825.8%2C620.0%2C332.7%2C1%2C0&rod2=778.0%2C592.1%2C-10.5%2C1%2C1&rod3=959.2%2C900.0%2C-103.6%2C1%2C0&camera=557.4%2C564.7%2C0.959&color=255%2C255%2C255&traceWidth=2&rodsWidth=2&stretch=1&inverse=1&fade=1"
   }
+  
 ]
