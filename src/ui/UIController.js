@@ -271,7 +271,7 @@ export class UIController {
     };
 
     // Calculate zoom to fit trace bounds in the canvas viewport with padding
-    const padding = 40; // world-space padding
+    const padding = 80; // world-space padding
     const canvasWidth = this.p5Instance.width;
     const canvasHeight = this.p5Instance.height;
 
