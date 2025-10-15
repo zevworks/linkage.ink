@@ -265,8 +265,8 @@ export class UIController {
 
     // Save current camera state
     const savedCamera = {
-      x: this.camera.x,
-      y: this.camera.y,
+      offsetX: this.camera.offset.x,
+      offsetY: this.camera.offset.y,
       zoom: this.camera.zoom
     };
 
@@ -285,16 +285,18 @@ export class UIController {
     const zoomY = canvasHeight / boundsWithPadding.height;
     const zoom = Math.min(zoomX, zoomY);
 
-    // Set camera to center on trace bounds with calculated zoom
-    this.camera.x = bounds.centerX;
-    this.camera.y = bounds.centerY;
+    // Calculate offset to center the trace bounds on canvas
+    // offset = screenCenter - worldCenter * zoom
+    const offsetX = canvasWidth / 2 - bounds.centerX * zoom;
+    const offsetY = canvasHeight / 2 - bounds.centerY * zoom;
+
+    // Set camera transform
+    this.camera.offset.x = offsetX;
+    this.camera.offset.y = offsetY;
     this.camera.zoom = zoom;
 
     // Force a synchronous redraw with the new camera position
-    this.p5Instance.push();
-    this.p5Instance.background(this.renderer.getInverse() ? 0 : 245);
     this.renderer.draw(this.p5Instance);
-    this.p5Instance.pop();
 
     // Capture the canvas
     const canvas = this.p5Instance.canvas;
@@ -316,8 +318,8 @@ export class UIController {
     );
 
     // Restore camera state
-    this.camera.x = savedCamera.x;
-    this.camera.y = savedCamera.y;
+    this.camera.offset.x = savedCamera.offsetX;
+    this.camera.offset.y = savedCamera.offsetY;
     this.camera.zoom = savedCamera.zoom;
 
     return thumbnailCanvas.toDataURL('image/png', 0.9);
