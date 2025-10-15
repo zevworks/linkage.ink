@@ -277,9 +277,8 @@ export class UIController {
     const offsetY = size / 2 - (bounds.centerY * zoom);
 
     // Create a simple p5-like object for drawing
-    const curvePoints = [];
-    let hasVertices = false;
-    let firstVertex = true;
+    let currentPath = [];
+    let isCurvePath = false;
 
     const p5Like = {
       stroke: (...args) => {
@@ -295,42 +294,42 @@ export class UIController {
         ctx.lineWidth = w * zoom;
       },
       noFill: () => {
-        ctx.fillStyle = 'transparent';
+        // No-op for thumbnail
       },
       beginShape: () => {
-        ctx.beginPath();
-        curvePoints.length = 0;
-        hasVertices = false;
-        firstVertex = true;
+        currentPath = [];
+        isCurvePath = false;
       },
       vertex: (x, y) => {
         const screenX = x * zoom + offsetX;
         const screenY = y * zoom + offsetY;
-        if (firstVertex) {
-          ctx.moveTo(screenX, screenY);
-          firstVertex = false;
-        } else {
-          ctx.lineTo(screenX, screenY);
-        }
-        hasVertices = true;
+        currentPath.push({ x: screenX, y: screenY });
       },
       curveVertex: (x, y) => {
         const screenX = x * zoom + offsetX;
         const screenY = y * zoom + offsetY;
-        curvePoints.push({ x: screenX, y: screenY });
+        currentPath.push({ x: screenX, y: screenY });
+        isCurvePath = true;
       },
       endShape: () => {
-        // Handle curve vertices
-        if (curvePoints.length >= 4) {
-          ctx.moveTo(curvePoints[1].x, curvePoints[1].y);
-          for (let i = 1; i < curvePoints.length - 2; i++) {
-            const p0 = curvePoints[i - 1];
-            const p1 = curvePoints[i];
-            const p2 = curvePoints[i + 1];
-            const p3 = curvePoints[i + 2];
+        if (currentPath.length === 0) return;
 
-            // Draw Catmull-Rom spline segment
-            for (let t = 0; t <= 1; t += 0.1) {
+        ctx.beginPath();
+
+        if (isCurvePath && currentPath.length >= 4) {
+          // Draw Catmull-Rom curves
+          ctx.moveTo(currentPath[1].x, currentPath[1].y);
+
+          for (let i = 1; i < currentPath.length - 2; i++) {
+            const p0 = currentPath[i - 1];
+            const p1 = currentPath[i];
+            const p2 = currentPath[i + 1];
+            const p3 = currentPath[i + 2];
+
+            // Draw Catmull-Rom spline segment with smaller steps for smoothness
+            const steps = 10;
+            for (let s = 1; s <= steps; s++) {
+              const t = s / steps;
               const t2 = t * t;
               const t3 = t2 * t;
 
@@ -351,12 +350,17 @@ export class UIController {
               ctx.lineTo(x, y);
             }
           }
-          ctx.stroke();
-          curvePoints.length = 0;
-        } else if (hasVertices) {
-          // If we used vertex() calls, stroke them
-          ctx.stroke();
+        } else if (currentPath.length > 0) {
+          // Draw straight line segments
+          ctx.moveTo(currentPath[0].x, currentPath[0].y);
+          for (let i = 1; i < currentPath.length; i++) {
+            ctx.lineTo(currentPath[i].x, currentPath[i].y);
+          }
         }
+
+        ctx.stroke();
+        currentPath = [];
+        isCurvePath = false;
       }
     };
 
