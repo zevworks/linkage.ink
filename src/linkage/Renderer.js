@@ -119,10 +119,16 @@ export class Renderer {
     const sidebarToggle = document.getElementById('sidebarToggle');
     if (sidebarToggle) {
       if (this.isInverse) {
-        sidebarToggle.style.border = '2px solid white';
+        sidebarToggle.style.borderTop = '3px solid white';
+        sidebarToggle.style.borderRight = '3px solid white';
+        sidebarToggle.style.borderBottom = '3px solid white';
+        sidebarToggle.style.borderLeft = 'none';
         sidebarToggle.style.background = 'transparent';
       } else {
-        sidebarToggle.style.border = '2px solid black';
+        sidebarToggle.style.borderTop = '3px solid black';
+        sidebarToggle.style.borderRight = '3px solid black';
+        sidebarToggle.style.borderBottom = '3px solid black';
+        sidebarToggle.style.borderLeft = 'none';
         sidebarToggle.style.background = 'transparent';
       }
     }
