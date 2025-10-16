@@ -4,41 +4,48 @@
     "name": "just8",
     "description": "",
     "thumbnail": "just8.png",
-    "stateUrl": "#anchor=1079.3%2C164.2&crank=178.2%2C0%2C0&rod1=210.3%2C1117.4%2C-60.1%2C1%2C0&camera=-1614.5%2C566.6%2C1.830&color=35%2C1%2C74&traceWidth=4&rodsWidth=4&stretch=0&inverse=0&fade=1"
+    "stateUrl": "#anchor=1079.3%2C164.2&crank=178.2%2C0%2C0&rod1=210.3%2C1117.4%2C-60.1%2C1%2C0&camera=-727.7%2C326.5%2C0.823&color=35%2C1%2C74&traceWidth=4&rodsWidth=4&stretch=0&inverse=0&fade=1"
   },
   {
     "id": "3d",
     "name": "3d",
     "description": "",
     "thumbnail": "3d.png",
-    "stateUrl": "https://linkage.ink/#anchor=387.3%2C1040.3&crank=266.7%2C0%2C0&rod1=888.8%2C372.1%2C967.6%2C0%2C0&rod2=1909.4%2C219.2%2C-157.1%2C0%2C0&rod3=1052.5%2C320.0%2C-729.7%2C1%2C0&rod4=352.0%2C-1479.8%2C-1256.3%2C0%2C1&camera=333.8%2C677.0%2C0.283&color=0%2C127%2C255&traceWidth=5&rodsWidth=5&stretch=0&inverse=1&fade=1"
+    "stateUrl": "#anchor=387.3%2C1040.3&crank=266.7%2C0%2C0&rod1=888.8%2C372.1%2C967.6%2C0%2C0&rod2=1909.4%2C219.2%2C-157.1%2C0%2C0&rod3=1052.5%2C320.0%2C-729.7%2C1%2C0&rod4=352.0%2C-1479.8%2C-1256.3%2C0%2C1&camera=167.9%2C367.5%2C0.143&color=0%2C190%2C255&traceWidth=5&rodsWidth=5&stretch=0&inverse=1&fade=1"
   },
   {
     "id": "hart",
     "name": "hart",
     "description": "",
     "thumbnail": "hart.png",
-    "stateUrl": "#anchor=-95.6%2C14.9&crank=254.1%2C0%2C0&rod1=494.8%2C-101.9%2C-195.0%2C0%2C0&rod2=1028.7%2C-112.1%2C-718.0%2C1%2C0&camera=391.1%2C1090.2%2C0.695&color=255%2C0%2C0&traceWidth=5&rodsWidth=5&stretch=0&inverse=1&fade=1"
+    "stateUrl": "https://linkage.ink/#anchor=-95.6%2C14.9&crank=254.1%2C0%2C0&rod1=494.8%2C-101.9%2C-195.0%2C0%2C0&rod2=1028.7%2C-112.1%2C-718.0%2C1%2C0&camera=209.6%2C543.1%2C0.309&color=255%2C0%2C0&traceWidth=5&rodsWidth=5&stretch=0&inverse=1&fade=1"
   },
   {
     "id": "shell",
     "name": "The Shell",
     "description": "",
     "thumbnail": "shell.png",
-    "stateUrl": "#anchor=620.3%2C123.2&crank=581.7%2C0%2C0&rod1=825.8%2C620.0%2C332.7%2C1%2C0&rod2=778.0%2C592.1%2C-10.5%2C1%2C1&rod3=959.2%2C900.0%2C-103.6%2C1%2C0&camera=16.8%2C515.7%2C0.524&color=255%2C255%2C255&traceWidth=2&rodsWidth=2&stretch=1&inverse=1&fade=1"
+    "stateUrl": "#anchor=620.3%2C123.2&crank=581.7%2C0%2C0&rod1=825.8%2C620.0%2C332.7%2C1%2C0&rod2=778.0%2C592.1%2C-10.5%2C1%2C1&rod3=959.2%2C900.0%2C-103.6%2C1%2C0&camera=8.9%2C263.7%2C0.256&color=255%2C255%2C255&traceWidth=2&rodsWidth=2&stretch=1&inverse=1&fade=1"
   },
   {
     "id": "3shapes",
     "name": "3shapes",
     "description": "",
     "thumbnail": "3shapes.png",
-    "stateUrl": "#anchor=-226.3%2C509.4&crank=319.4%2C1%2C0&rod1=1072.4%2C-365.4%2C-18.5%2C1%2C0&rod2=1973.7%2C-78.1%2C-3.4%2C1%2C0&rod3=2007.2%2C-278.9%2C949.6%2C1%2C0&camera=359.6%2C253.7%2C0.200&color=0%2C0%2C0&traceWidth=10&rodsWidth=10&stretch=1&inverse=0&fade=1"
+    "stateUrl": "#anchor=-226.3%2C509.4&crank=319.4%2C1%2C0&rod1=1072.4%2C-365.4%2C-18.5%2C1%2C0&rod2=1973.7%2C-78.1%2C-3.4%2C1%2C0&rod3=2007.2%2C-278.9%2C949.6%2C1%2C0&camera=193.2%2C201.5%2C0.105&color=0%2C0%2C0&traceWidth=10&rodsWidth=10&stretch=1&inverse=0&fade=1"
   },
   {
     "id": "animal",
     "name": "animal",
     "description": "",
     "thumbnail": "animal.png",
-    "stateUrl": "#anchor=757.2%2C490.4&crank=61.8%2C1%2C0&rod1=194.1%2C847.5%2C433.4%2C0%2C0&rod2=409.7%2C910.8%2C322.0%2C0%2C0&rod3=555.6%2C1597.2%2C8.5%2C0%2C0&rod4=255.2%2C1592.0%2C26.3%2C0%2C0&rod5=143.3%2C1629.6%2C21.9%2C0%2C0&rod6=50.7%2C1662.4%2C45.1%2C0%2C0&rod7=95.7%2C1630.7%2C31.4%2C0%2C0&rod8=86.9%2C1652.8%2C26.0%2C0%2C0&rod9=64.0%2C1659.2%2C27.5%2C0%2C0&rod10=87.8%2C1684.0%2C92.0%2C0%2C0&rod11=96.9%2C1648.1%2C77.5%2C0%2C0&rod12=98.7%2C1603.9%2C33.9%2C0%2C0&rod13=73.8%2C1558.9%2C38.7%2C0%2C0&rod14=125.6%2C1600.4%2C67.9%2C0%2C0&rod15=50.6%2C1580.7%2C-1.8%2C0%2C0&rod16=109.2%2C1605.8%2C-30.5%2C0%2C0&rod17=95.0%2C1690.5%2C-29.3%2C0%2C0&rod18=95.4%2C1683.1%2C-14.9%2C0%2C0&rod19=74.0%2C1693.4%2C53.7%2C0%2C0&camera=-185.3%2C120.6%2C0.351&color=103%2C103%2C103&traceWidth=4&rodsWidth=2&stretch=0&inverse=1&fade=1"
+    "stateUrl": "#anchor=757.2%2C490.4&crank=61.8%2C1%2C0&rod1=194.1%2C847.5%2C433.4%2C0%2C0&rod2=409.7%2C910.8%2C322.0%2C0%2C0&rod3=555.6%2C1597.2%2C8.5%2C0%2C0&rod4=255.2%2C1592.0%2C26.3%2C0%2C0&rod5=143.3%2C1629.6%2C21.9%2C0%2C0&rod6=50.7%2C1662.4%2C45.1%2C0%2C0&rod7=95.7%2C1630.7%2C31.4%2C0%2C0&rod8=86.9%2C1652.8%2C26.0%2C0%2C0&rod9=64.0%2C1659.2%2C27.5%2C0%2C0&rod10=87.8%2C1684.0%2C92.0%2C0%2C0&rod11=96.9%2C1648.1%2C77.5%2C0%2C0&rod12=98.7%2C1603.9%2C33.9%2C0%2C0&rod13=73.8%2C1558.9%2C38.7%2C0%2C0&rod14=125.6%2C1600.4%2C67.9%2C0%2C0&rod15=50.6%2C1580.7%2C-1.8%2C0%2C0&rod16=109.2%2C1605.8%2C-30.5%2C0%2C0&rod17=95.0%2C1690.5%2C-29.3%2C0%2C0&rod18=95.4%2C1683.1%2C-14.9%2C0%2C0&rod19=74.0%2C1693.4%2C53.7%2C0%2C0&camera=-194.6%2C149.2%2C0.315&color=231%2C231%2C231&traceWidth=4&rodsWidth=2&stretch=0&inverse=1&fade=1"
+  },
+  {
+    "id": "shimi",
+    "name": "shimi",
+    "description": "",
+    "thumbnail": "shimi.png",
+    "stateUrl": "#anchor=469.0%2C155.1&crank=651.4%2C1%2C0&rod1=907.0%2C620.0%2C332.7%2C1%2C0&rod2=778.0%2C592.1%2C-10.5%2C1%2C1&rod3=1023.1%2C900.0%2C-103.6%2C1%2C0&rod4=1425.7%2C1113.6%2C341.8%2C1%2C1&camera=37.5%2C238.9%2C0.188&color=255%2C160%2C255&traceWidth=2&rodsWidth=2&stretch=1&inverse=1&fade=1"
   }
 ]
