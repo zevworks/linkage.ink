@@ -47,5 +47,12 @@
     "description": "",
     "thumbnail": "shimi.png",
     "stateUrl": "#anchor=469.0%2C155.1&crank=651.4%2C1%2C0&rod1=907.0%2C620.0%2C332.7%2C1%2C0&rod2=778.0%2C592.1%2C-10.5%2C1%2C1&rod3=1023.1%2C900.0%2C-103.6%2C1%2C0&rod4=1425.7%2C1113.6%2C341.8%2C1%2C1&camera=37.5%2C238.9%2C0.188&color=255%2C160%2C255&traceWidth=2&rodsWidth=2&stretch=1&inverse=1&fade=1"
+  },
+  {
+    "id": "niddles",
+    "name": "niddles",
+    "description": "",
+    "thumbnail": "niddles.png",
+    "stateUrl": "#anchor=482.6%2C397.5&crank=68.1%2C1%2C0&rod1=360.5%2C668.2%2C360.7%2C0%2C0&rod2=494.3%2C851.5%2C277.1%2C0%2C0&rod3=1291.7%2C1597.2%2C8.5%2C0%2C0&rod4=969.4%2C1592.0%2C26.3%2C1%2C0&rod5=981.8%2C1633.7%2C28.7%2C1%2C0&rod6=917.0%2C1662.4%2C45.1%2C1%2C0&rod7=931.1%2C1630.7%2C31.4%2C1%2C0&rod8=993.5%2C1620.2%2C84.5%2C1%2C0&rod9=1000.7%2C1659.2%2C27.5%2C1%2C0&rod10=987.3%2C1684.0%2C92.0%2C1%2C0&rod11=943.3%2C1648.1%2C77.5%2C1%2C0&rod12=862.2%2C1603.9%2C33.9%2C1%2C0&rod13=810.8%2C1558.9%2C38.7%2C1%2C0&rod14=849.0%2C1600.4%2C67.9%2C1%2C0&rod15=920.1%2C1580.7%2C-1.8%2C1%2C0&rod16=828.8%2C1597.9%2C-33.8%2C1%2C0&camera=-63.2%2C263.5%2C0.169&color=255%2C255%2C0&traceWidth=5&rodsWidth=3&stretch=1&inverse=1&fade=1"
   }
 ]
