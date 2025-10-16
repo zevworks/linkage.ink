@@ -114,17 +114,17 @@ class LinkageApp {
         this.uiController.setP5Instance(p, this.mechanism);
 
         // Trigger auto-fit if we loaded a preset on initialization
-        if (this.shouldLoadPreset) {
-          // Immediately fit to mechanism bounds (shows crank/rods right away)
-          const mechanismBounds = this.mechanism.calculateBounds();
-          if (mechanismBounds) {
-            this.camera.fitToView(mechanismBounds, p.width, p.height, true);
-          }
+        // if (this.shouldLoadPreset) {
+        //   // Immediately fit to mechanism bounds (shows crank/rods right away)
+        //   const mechanismBounds = this.mechanism.calculateBounds();
+        //   if (mechanismBounds) {
+        //     this.camera.fitToView(mechanismBounds, p.width, p.height, true);
+        //   }
 
-          // Set up auto-fit for after one full rotation
-          this.uiController.autoFitStartAngle = this.mechanism.crankAngle;
-          this.uiController.waitingForAutoFit = true;
-        }
+        //   // Set up auto-fit for after one full rotation
+        //   this.uiController.autoFitStartAngle = this.mechanism.crankAngle;
+        //   this.uiController.waitingForAutoFit = true;
+        // }
       };
 
       p.draw = () => {
@@ -135,9 +135,9 @@ class LinkageApp {
         this.mechanism.update();
 
         // Check if we should auto-fit after state load
-        if (this.uiController) {
-          this.uiController.checkAutoFit();
-        }
+        // if (this.uiController) {
+        //   this.uiController.checkAutoFit();
+        // }
 
         // Only add trace points when mechanism is playing
         if (this.mechanism.isPlaying) {

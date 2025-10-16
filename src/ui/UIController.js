@@ -541,16 +541,16 @@ export class UIController {
       this.toggleStatesSidebar();
 
       // Immediately fit to mechanism bounds (shows crank/rods right away)
-      if (this.p5Instance) {
-        const mechanismBounds = this.mechanism.calculateBounds();
-        if (mechanismBounds) {
-          this.camera.fitToView(mechanismBounds, this.p5Instance.width, this.p5Instance.height, true);
-        }
-      }
+      // if (this.p5Instance) {
+      //   const mechanismBounds = this.mechanism.calculateBounds();
+      //   if (mechanismBounds) {
+      //     this.camera.fitToView(mechanismBounds, this.p5Instance.width, this.p5Instance.height, true);
+      //   }
+      // }
 
       // Initiate auto-fit: record start angle and set flag for re-fit after one round
-      this.autoFitStartAngle = this.mechanism.crankAngle;
-      this.waitingForAutoFit = true;
+      // this.autoFitStartAngle = this.mechanism.crankAngle;
+      // this.waitingForAutoFit = true;
     } catch (error) {
       console.error('Error loading state:', error);
       alert('Failed to load state. The data may be corrupted.');
