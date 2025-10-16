@@ -10,14 +10,24 @@ export class VideoExporter {
     this.targetFrames = 0;
     this.onComplete = null;
     this.stream = null;
+    this.mechanism = null;
+    this.originalCrankSpeed = null;
+    this.speedMultiplier = 2.0; // Speed up animation by 2x during recording to compensate for slowdown
   }
 
-  startRecording(canvas, framesPerRound, onComplete) {
+  startRecording(canvas, framesPerRound, mechanism, onComplete) {
     this.isRecording = true;
     this.frameCount = 0;
     this.targetFrames = framesPerRound * 3 - 1; // 3 full rotations minus 1 frame for seamless loop
     this.onComplete = onComplete;
     this.chunks = [];
+    this.mechanism = mechanism;
+
+    // Speed up animation to compensate for recording slowdown
+    if (this.mechanism) {
+      this.originalCrankSpeed = this.mechanism.crankSpeed;
+      this.mechanism.crankSpeed = this.originalCrankSpeed * this.speedMultiplier;
+    }
 
     console.log(`Starting video recording: ${this.targetFrames} frames`);
 
@@ -122,12 +132,19 @@ export class VideoExporter {
   }
 
   cleanup() {
+    // Restore original animation speed
+    if (this.mechanism && this.originalCrankSpeed !== null) {
+      this.mechanism.crankSpeed = this.originalCrankSpeed;
+      this.originalCrankSpeed = null;
+    }
+
     if (this.stream) {
       this.stream.getTracks().forEach(track => track.stop());
       this.stream = null;
     }
     this.mediaRecorder = null;
     this.chunks = [];
+    this.mechanism = null;
   }
 
   isCurrentlyRecording() {
