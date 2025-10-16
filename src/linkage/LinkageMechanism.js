@@ -119,9 +119,16 @@ export class LinkageMechanism {
     newRod.isTracing = true;
     this.rods.push(newRod);
 
-    // Position GP at previous GP's X coordinate
-    const previousGP = this.guidePoints[this.guidePoints.length - 1];
-    const gpX = previousGP.pos.x;
+    // Position GP at previous GP's X coordinate, or at anchor X if no previous GP
+    let gpX;
+    if (this.guidePoints.length === 0) {
+      // First guide point - use anchor X coordinate (crank center)
+      gpX = this.anchor.pos.x;
+    } else {
+      // Use previous GP's X coordinate
+      const previousGP = this.guidePoints[this.guidePoints.length - 1];
+      gpX = previousGP.pos.x;
+    }
 
     // Calculate GP Y position to divide rod with golden ratio
     // The rod length is divided into two segments: from start to GP, and from GP to end
