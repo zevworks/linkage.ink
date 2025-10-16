@@ -97,26 +97,57 @@ export class LinkageMechanism {
   addRod() {
     const newId = this.rods.length;
     if (this.joints.length === 0) return;
-    
+
     const lastJointPos = this.joints[this.joints.length - 1];
-    
+
     // Turn off tracing for current last rod
     if (this.rods.length > 0) {
       this.rods[this.rods.length - 1].isTracing = false;
     }
 
-    // Add new rod with random length between 50-150
-    const randomLength = 50 + Math.random() * 100;
-    let newRod = new Rod(newId, randomLength);
+    // Calculate new rod length using golden ratio
+    const PHI = 1.618033988749895; // Golden ratio
+    const previousRodLength = this.rods[this.rods.length - 1].length;
+
+    // Randomly decide if new rod is larger or smaller
+    const isLarger = Math.random() < 0.5;
+    const newLength = isLarger
+      ? previousRodLength * PHI
+      : previousRodLength / PHI;
+
+    let newRod = new Rod(newId, newLength);
     newRod.isTracing = true;
     this.rods.push(newRod);
 
-    // Add corresponding guide point at random position within rod's reach
-    const randomAngle = Math.random() * Math.PI * 2;
-    const randomDistance = Math.random() * randomLength;
-    const gpX = lastJointPos.x + randomDistance * Math.cos(randomAngle);
-    const gpY = lastJointPos.y + randomDistance * Math.sin(randomAngle);
-    this.guidePoints.push(new GuidePoint(newId, gpX, gpY));
+    // Position GP at previous GP's X coordinate
+    const previousGP = this.guidePoints[this.guidePoints.length - 1];
+    const gpX = previousGP.pos.x;
+
+    // Calculate GP Y position to divide rod with golden ratio
+    // The rod length is divided into two segments: from start to GP, and from GP to end
+    const shortSegment = newLength / (1 + PHI); // ≈ 0.382 * newLength
+    const longSegment = newLength - shortSegment; // ≈ 0.618 * newLength
+
+    // Randomly decide which segment is closer to the start (from lastJointPos to GP)
+    const largerSegmentFirst = Math.random() < 0.5;
+    const distanceToGP = largerSegmentFirst ? longSegment : shortSegment;
+
+    // Place GP at this distance from lastJointPos, keeping X fixed
+    // Calculate Y offset: if GP is at gpX and we know the distance, solve for Y
+    const deltaX = gpX - lastJointPos.x;
+    const deltaYSquared = distanceToGP * distanceToGP - deltaX * deltaX;
+
+    // If deltaYSquared is negative, GP is too far horizontally - clamp to horizontal distance
+    if (deltaYSquared < 0) {
+      // GP is unreachable at this X with this distance, place it at same Y
+      const gpY = lastJointPos.y;
+      this.guidePoints.push(new GuidePoint(newId, gpX, gpY));
+    } else {
+      const deltaY = Math.sqrt(deltaYSquared);
+      // Randomly choose positive or negative Y direction
+      const gpY = lastJointPos.y + (Math.random() < 0.5 ? deltaY : -deltaY);
+      this.guidePoints.push(new GuidePoint(newId, gpX, gpY));
+    }
   }
 
   removeRod() {
