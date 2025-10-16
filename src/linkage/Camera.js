@@ -9,7 +9,7 @@ export class Camera {
     this.offset = new Vector(0, 0);
     this.zoom = 1.0;
     this.maxZoom = 5.0;
-    this.minZoom = 0.2;
+    this.minZoom = 0.1;
 
     // Animation properties
     this.isAnimating = false;

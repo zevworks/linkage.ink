@@ -11,28 +11,28 @@
     "name": "3d",
     "description": "",
     "thumbnail": "3d.png",
-    "stateUrl": "#anchor=387.3%2C1040.3&crank=266.7%2C0%2C0&rod1=888.8%2C372.1%2C967.6%2C0%2C0&rod2=1909.4%2C219.2%2C-157.1%2C0%2C0&rod3=1052.5%2C320.0%2C-729.7%2C1%2C0&rod4=352.0%2C-2207.9%2C-1330.1%2C0%2C1&camera=503.5%2C976.7%2C0.474&color=255%2C0%2C255&traceWidth=5&rodsWidth=5&stretch=0&inverse=1&fade=1"
+    "stateUrl": "https://linkage.ink/#anchor=387.3%2C1040.3&crank=266.7%2C0%2C0&rod1=888.8%2C372.1%2C967.6%2C0%2C0&rod2=1909.4%2C219.2%2C-157.1%2C0%2C0&rod3=1052.5%2C320.0%2C-729.7%2C1%2C0&rod4=352.0%2C-1479.8%2C-1256.3%2C0%2C1&camera=333.8%2C677.0%2C0.283&color=0%2C127%2C255&traceWidth=5&rodsWidth=5&stretch=0&inverse=1&fade=1"
   },
   {
     "id": "hart",
     "name": "hart",
     "description": "",
     "thumbnail": "hart.png",
-    "stateUrl": "#anchor=-95.6%2C14.9&crank=254.1%2C0%2C0&rod1=494.8%2C-101.9%2C-195.0%2C0%2C0&rod2=1028.7%2C-112.1%2C-718.0%2C1%2C0&camera=1292.3%2C1039.8%2C0.750&color=255%2C0%2C0&traceWidth=5&rodsWidth=5&stretch=0&inverse=1&fade=1"
+    "stateUrl": "#anchor=-95.6%2C14.9&crank=254.1%2C0%2C0&rod1=494.8%2C-101.9%2C-195.0%2C0%2C0&rod2=1028.7%2C-112.1%2C-718.0%2C1%2C0&camera=391.1%2C1090.2%2C0.695&color=255%2C0%2C0&traceWidth=5&rodsWidth=5&stretch=0&inverse=1&fade=1"
   },
   {
     "id": "shell",
     "name": "The Shell",
     "description": "",
     "thumbnail": "shell.png",
-    "stateUrl": "#anchor=620.3%2C123.2&crank=581.7%2C0%2C0&rod1=825.8%2C620.0%2C332.7%2C1%2C0&rod2=778.0%2C592.1%2C-10.5%2C1%2C1&rod3=959.2%2C900.0%2C-103.6%2C1%2C0&camera=557.4%2C564.7%2C0.959&color=255%2C255%2C255&traceWidth=2&rodsWidth=2&stretch=1&inverse=1&fade=1"
+    "stateUrl": "#anchor=620.3%2C123.2&crank=581.7%2C0%2C0&rod1=825.8%2C620.0%2C332.7%2C1%2C0&rod2=778.0%2C592.1%2C-10.5%2C1%2C1&rod3=959.2%2C900.0%2C-103.6%2C1%2C0&camera=16.8%2C515.7%2C0.524&color=255%2C255%2C255&traceWidth=2&rodsWidth=2&stretch=1&inverse=1&fade=1"
   },
   {
     "id": "3shapes",
     "name": "3shapes",
     "description": "",
     "thumbnail": "3shapes.png",
-    "stateUrl": "#anchor=-226.3%2C509.4&crank=319.4%2C1%2C0&rod1=1072.4%2C-365.4%2C-18.5%2C1%2C0&rod2=1973.7%2C-78.1%2C-3.4%2C1%2C0&rod3=2007.2%2C-278.9%2C949.6%2C1%2C0&camera=1445.7%2C492.4%2C0.364&color=0%2C0%2C0&traceWidth=10&rodsWidth=10&stretch=1&inverse=0&fade=1"
+    "stateUrl": "#anchor=-226.3%2C509.4&crank=319.4%2C1%2C0&rod1=1072.4%2C-365.4%2C-18.5%2C1%2C0&rod2=1973.7%2C-78.1%2C-3.4%2C1%2C0&rod3=2007.2%2C-278.9%2C949.6%2C1%2C0&camera=359.6%2C253.7%2C0.200&color=0%2C0%2C0&traceWidth=10&rodsWidth=10&stretch=1&inverse=0&fade=1"
   },
   {
     "id": "animal",
