@@ -173,7 +173,7 @@ export class UIController {
 
           sidebarVideoBtn.textContent = 'RECORDING...';
 
-          this.videoExporter.startRecording(canvas, framesPerRound, this.mechanism, () => {
+          this.videoExporter.startRecording(canvas, framesPerRound, () => {
             sidebarVideoBtn.textContent = 'VIDEO';
           });
         }
