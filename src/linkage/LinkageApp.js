@@ -78,6 +78,9 @@ class LinkageApp {
       this.localStorageManager
     );
 
+    // Connect UIController to InputHandler for button state sync
+    this.inputHandler.setUIController(this.uiController);
+
     // Store p5 instance for GIF export
     this.p5Instance = null;
 

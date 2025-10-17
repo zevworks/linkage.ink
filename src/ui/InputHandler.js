@@ -9,12 +9,17 @@ export class InputHandler {
     this.camera = camera;
     this.renderer = renderer;
     this.urlStateManager = urlStateManager;
+    this.uiController = null;
 
     this.selectedObject = null;
     this.dragOffset = null;
     this.isPanning = false;
     this.pressPos = null;
     this.prevPinchDist = 0;
+  }
+
+  setUIController(uiController) {
+    this.uiController = uiController;
   }
 
   /**
@@ -222,6 +227,10 @@ export class InputHandler {
     // wasClick means it wasn't dragged, so it's a click even if isPanning was set
     if (!this.selectedObject && wasClick) {
       this.mechanism.togglePlayPause();
+      // Sync button state if UIController is available
+      if (this.uiController) {
+        this.uiController.syncButtonStates();
+      }
       // Don't push to history for play/pause toggle
     }
 
